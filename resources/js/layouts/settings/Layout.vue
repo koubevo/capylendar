@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -70,3 +70,4 @@ const currentPath = typeof window !== undefined ? window.location.pathname : '';
         </div>
     </div>
 </template>
+ -->

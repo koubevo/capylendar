@@ -31,11 +31,11 @@
     },
     "dependencies": {
         "@inertiajs/vue3": "^2.1.0",
+        "@nuxt/ui": "^4.1.0",
+        "@tailwindcss/forms": "^0.5.10",
         "@vueuse/core": "^12.8.2",
         "class-variance-authority": "^0.7.1",
-        "clsx": "^2.1.1",
         "laravel-vite-plugin": "^2.0.0",
-        "lucide-vue-next": "^0.468.0",
         "reka-ui": "^2.4.1",
         "tailwind-merge": "^3.2.0",
         "tailwindcss": "^4.1.1",

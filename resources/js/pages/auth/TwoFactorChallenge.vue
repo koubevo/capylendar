@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -139,3 +139,4 @@ const codeValue = computed<string>(() => code.value.join(''));
         </div>
     </AuthLayout>
 </template>
+ -->

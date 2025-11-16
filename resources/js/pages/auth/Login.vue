@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import GuestLayout from '@/layouts/app/GuestLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import LoginLayout from '@/layouts/app/LoginLayout.vue';
 
 const fields = ref<AuthFormField[]>([
     {
@@ -20,7 +20,7 @@ const fields = ref<AuthFormField[]>([
 <template>
     <Head title="Přihlášení" />
 
-    <GuestLayout>
+    <LoginLayout>
         <UPageCard>
             <UAuthForm
                 title="Vítej zpět, kapybáro."
@@ -29,5 +29,5 @@ const fields = ref<AuthFormField[]>([
             >
             </UAuthForm>
         </UPageCard>
-    </GuestLayout>
+    </LoginLayout>
 </template>

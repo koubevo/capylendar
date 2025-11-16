@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-use App\Models\User;
+use Illuminate\Support\Facades\Config;
 
 enum Capybara: string
 {
@@ -15,8 +15,8 @@ enum Capybara: string
     public function getLabel(): string
     {
         return match ($this) {
-            self::Blue => User::find(1)->name,
-            self::Pink => User::find(2)->name,
+            self::Blue => Config::get('app.blue.name'),
+            self::Pink => Config::get('app.pink.name'),
             self::Yellow => 'Oba',
         };
     }

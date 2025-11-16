@@ -1,7 +1,7 @@
-<script setup lang="ts">
+<!-- <script setup lang="ts">
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
 import InputError from '@/components/InputError.vue';
-import AppLayout from '@/layouts/AppLayout.vue';
+import AppLayout from '@/layouts/LoginLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { edit } from '@/routes/user-password';
 import { Form, Head } from '@inertiajs/vue3';
@@ -112,3 +112,4 @@ const breadcrumbItems: BreadcrumbItem[] = [
         </SettingsLayout>
     </AppLayout>
 </template>
+ -->

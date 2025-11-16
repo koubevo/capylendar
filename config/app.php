@@ -131,4 +131,8 @@ return [
         'name' => env('APP_PINK_NAME', 'Pink'),
     ],
 
+    'yellow' => [
+        'name' => env('APP_YELLOW_NAME', 'Yellow'),
+    ],
+
 ];

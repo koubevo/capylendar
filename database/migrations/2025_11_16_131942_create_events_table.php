@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Capybara;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,10 +17,10 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->foreignIdFor(User::class, 'author_id')->constrained('users');
-            $table->string('capybara');
+            $table->enum('capybara', array_column(Capybara::cases(), 'value'));
             $table->dateTime('start_at');
             $table->dateTime('end_at')->nullable();
-            $table->boolean('is_all_day')->nullable();
+            $table->boolean('is_all_day')->default(false);
             $table->string('description')->nullable();
             $table->string('icon')->nullable();
             $table->timestamps();

@@ -17,7 +17,7 @@ enum Capybara: string
         return match ($this) {
             self::Blue => Config::get('app.blue.name'),
             self::Pink => Config::get('app.pink.name'),
-            self::Yellow => 'Oba',
+            self::Yellow => Config::get('app.yellow.name'),
         };
     }
 }

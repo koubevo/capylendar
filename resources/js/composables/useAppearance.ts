@@ -38,7 +38,6 @@ const getStoredAppearance = () => {
 
 const handleSystemThemeChange = () => {
     const currentAppearance = getStoredAppearance();
-    console.log(currentAppearance);
 
     updateTheme(currentAppearance || 'system');
 };
@@ -51,7 +50,6 @@ export function initializeTheme() {
     // Initialize theme from saved preference or default to system...
     const savedAppearance = getStoredAppearance();
     updateTheme(savedAppearance || 'system');
-    console.log(savedAppearance);
 
     // Set up system theme change listener...
     mediaQuery()?.addEventListener('change', handleSystemThemeChange);

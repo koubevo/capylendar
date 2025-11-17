@@ -12,12 +12,12 @@ enum Capybara: string
 
     case Yellow = 'yellow';
 
-    public function getLabel(): string
+    public function getLabel(): mixed
     {
         return match ($this) {
-            self::Blue => Config::get('app.blue.name'),
-            self::Pink => Config::get('app.pink.name'),
-            self::Yellow => Config::get('app.yellow.name'),
+            self::Blue => Config::get('app.blue.name', 'Blue'),
+            self::Pink => Config::get('app.pink.name', 'Pink'),
+            self::Yellow => Config::get('app.yellow.name', 'Yellow'),
         };
     }
 }

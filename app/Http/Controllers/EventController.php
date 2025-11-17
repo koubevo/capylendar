@@ -8,27 +8,27 @@ use App\Models\Event;
 
 class EventController extends Controller
 {
-    public function create()
+    public function create(): void
     {
         //
     }
 
-    public function store(StoreEventRequest $request)
+    public function store(StoreEventRequest $request): void
     {
         //
     }
 
-    public function edit(Event $event)
+    public function edit(Event $event): void
     {
         //
     }
 
-    public function update(UpdateEventRequest $request, Event $event)
+    public function update(UpdateEventRequest $request, Event $event): void
     {
         //
     }
 
-    public function destroy(Event $event)
+    public function destroy(Event $event): void
     {
         //
     }

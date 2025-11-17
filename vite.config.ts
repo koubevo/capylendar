@@ -25,6 +25,10 @@ export default defineConfig({
                     secondary: 'sky',
                     neutral: 'slate',
                 },
+
+                button: {
+                    base: 'cursor-pointer',
+                },
             },
             colorMode: false,
         }),

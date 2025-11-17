@@ -14,7 +14,7 @@ Route::get('/dashboard', DashboardController::class)
     ->name('dashboard');
 
 // TODO: auth
-Route::resource('event', EventController::class)
+Route::resource('/event', EventController::class)
     ->only(['create', 'store', 'edit', 'update', 'destroy']);
 
 require __DIR__.'/settings.php';

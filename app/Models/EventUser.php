@@ -4,14 +4,12 @@ namespace App\Models;
 
 use Database\Factories\EventUserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class EventUser extends Model
+class EventUser extends Pivot
 {
     /** @use HasFactory<EventUserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory;
 
     /**
      * @var string

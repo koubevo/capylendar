@@ -12,12 +12,31 @@ enum Capybara: string
 
     case Yellow = 'yellow';
 
-    public function getLabel(): mixed
+    public function getLabel(): string
+    {
+        return $this->info()['label'];
+    }
+
+    public function getAvatar(): string
+    {
+        return $this->info()['avatar'];
+    }
+
+    public function info(): array
     {
         return match ($this) {
-            self::Blue => Config::get('app.blue.name', 'Blue'),
-            self::Pink => Config::get('app.pink.name', 'Pink'),
-            self::Yellow => Config::get('app.yellow.name', 'Yellow'),
+            self::Blue => [
+                'label' => Config::get('app.blue.name', 'Blue'),
+                'avatar' => 'https://raw.githubusercontent.com/koubevo/capys/refs/heads/main/blue.webp', // Sem dej odkaz na avatar
+            ],
+            self::Pink => [
+                'label' => Config::get('app.pink.name', 'Pink'),
+                'avatar' => 'https://raw.githubusercontent.com/koubevo/capys/refs/heads/main/pink.webp',
+            ],
+            self::Yellow => [
+                'label' => Config::get('app.yellow.name', 'Yellow'),
+                'avatar' => 'https://raw.githubusercontent.com/koubevo/capys/refs/heads/main/yellow.webp',
+            ],
         };
     }
 }

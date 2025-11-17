@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Event;
+use App\Models\EventUser;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -13,11 +15,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        User::factory()->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        User::factory()->pink()->create();
+
+        Event::factory(5)->create();
+
+        Event::factory(5)->allDay()->create();
+
+        Event::factory(5)->pink()->create();
+
+        Event::factory(5)->pink()->allDay()->create();
+
+        EventUser::factory(10)->create();
     }
 }

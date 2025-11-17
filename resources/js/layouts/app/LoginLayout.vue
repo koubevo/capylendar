@@ -7,10 +7,8 @@ import AppLayout from '@/layouts/AppLayout.vue';
     <AppLayout>
         <GuestHeader />
 
-        <UMain class="flex flex-grow items-center justify-center">
-            <UContainer>
-                <slot />
-            </UContainer>
+        <UMain class="flex flex-grow items-center justify-center px-6">
+            <slot />
         </UMain>
     </AppLayout>
 </template>

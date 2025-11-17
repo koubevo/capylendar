@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Container from '@/components/Container.vue';
 import GuestHeader from '@/components/guest/GuestHeader.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 </script>
@@ -8,9 +9,9 @@ import AppLayout from '@/layouts/AppLayout.vue';
         <GuestHeader />
 
         <UMain>
-            <UContainer>
+            <Container>
                 <slot />
-            </UContainer>
+            </Container>
         </UMain>
     </AppLayout>
 </template>

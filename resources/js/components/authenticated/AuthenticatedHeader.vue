@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import EventController from '@/actions/App/Http/Controllers/EventController';
+import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import Logo from '@/components/Logo.vue';
 import { Link } from '@inertiajs/vue3';
 </script>
@@ -11,9 +13,12 @@ import { Link } from '@inertiajs/vue3';
 
         <template #right>
             <Link>
-                <UButton color="primary" icon="i-lucide-plus">
+                <PrimaryButton
+                    icon="i-lucide-plus"
+                    :to="EventController.create()"
+                >
                     Přidat event
-                </UButton>
+                </PrimaryButton>
             </Link>
         </template>
     </UHeader>

@@ -53,11 +53,17 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * @return HasMany<Event, $this>
+     */
     public function authoredEvents(): HasMany
     {
         return $this->hasMany(Event::class, 'author_id');
     }
 
+    /**
+     * @return BelongsToMany<Event, $this>
+     */
     public function assignedEvents(): BelongsToMany
     {
         return $this->belongsToMany(Event::class, 'event_user');

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Capybara;
 use Database\Factories\EventFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,6 +29,19 @@ class Event extends Model
         'description',
         'icon',
     ];
+
+    /**
+     * @return array<string, string|Capybara>
+     */
+    protected function casts(): array
+    {
+        return [
+            'start_at' => 'datetime',
+            'end_at' => 'datetime',
+            'is_all_day' => 'boolean',
+            'capybara' => Capybara::class,
+        ];
+    }
 
     /**
      * @return BelongsTo<User, $this>

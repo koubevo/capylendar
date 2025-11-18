@@ -7,11 +7,9 @@ import { Link } from '@inertiajs/vue3';
 </script>
 
 <template>
-    <UHeader :toggle="false">
-        <template #left>
-            <Link :to="DashboardController">
-                <logo />
-            </Link>
+    <UHeader :toggle="false" :to="DashboardController()">
+        <template #title>
+            <logo />
         </template>
 
         <template #right>

@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Config;
 
 enum Capybara: string
 {
-    case Blue = 'blue';
-
     case Pink = 'pink';
+
+    case Blue = 'blue';
 
     case Yellow = 'yellow';
 
@@ -25,13 +25,13 @@ enum Capybara: string
     public function info(): array
     {
         return match ($this) {
-            self::Blue => [
-                'label' => Config::get('app.blue.name', 'Blue'),
-                'avatar' => 'https://raw.githubusercontent.com/koubevo/capys/refs/heads/main/blue.webp', // Sem dej odkaz na avatar
-            ],
             self::Pink => [
                 'label' => Config::get('app.pink.name', 'Pink'),
                 'avatar' => 'https://raw.githubusercontent.com/koubevo/capys/refs/heads/main/pink.webp',
+            ],
+            self::Blue => [
+                'label' => Config::get('app.blue.name', 'Blue'),
+                'avatar' => 'https://raw.githubusercontent.com/koubevo/capys/refs/heads/main/blue.webp', // Sem dej odkaz na avatar
             ],
             self::Yellow => [
                 'label' => Config::get('app.yellow.name', 'Yellow'),

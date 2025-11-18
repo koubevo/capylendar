@@ -8,7 +8,7 @@ const props = defineProps<{
     capybaraOptions: Array<{
         value: string;
         label: string;
-        avatar: string;
+        avatar: { src: string; alt: string };
     }>;
 }>();
 
@@ -22,16 +22,8 @@ const form = useForm<EventFormData>({
 });
 
 function submit() {
-    form.transform((data) => ({
-        ...data,
-        start_at: data.is_all_day
-            ? `${data.date} 00:00:00`
-            : `${data.date} ${data.start_at}`,
-        end_at:
-            data.is_all_day || !data.end_at
-                ? null
-                : `${data.date} ${data.end_at}`,
-    })).post(route('events.store'));
+    //TODO
+    form.post(route('events.store'));
 }
 </script>
 

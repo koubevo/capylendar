@@ -19,7 +19,10 @@ class EventController extends Controller
             return [
                 'value' => $case->value,
                 'label' => $case->getLabel(),
-                'avatar' => $case->getAvatar(),
+                'avatar' => [
+                    'src' => $case->getAvatar(),
+                    'alt' => $case->getLabel(),
+                ],
             ];
         });
 

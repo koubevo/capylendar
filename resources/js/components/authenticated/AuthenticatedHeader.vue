@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
 import EventController from '@/actions/App/Http/Controllers/EventController';
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import Logo from '@/components/Logo.vue';
@@ -7,8 +8,10 @@ import { Link } from '@inertiajs/vue3';
 
 <template>
     <UHeader :toggle="false">
-        <template #title>
-            <logo />
+        <template #left>
+            <Link :to="DashboardController">
+                <logo />
+            </Link>
         </template>
 
         <template #right>

@@ -29,6 +29,24 @@ export default defineConfig({
                 button: {
                     base: 'cursor-pointer',
                 },
+
+                switch: {
+                    defaultVariants: {
+                        size: 'xl',
+                    },
+                },
+
+                input: {
+                    defaultVariants: {
+                        size: 'xl',
+                    },
+                },
+
+                select: {
+                    defaultVariants: {
+                        size: 'xl',
+                    },
+                },
             },
             colorMode: false,
         }),

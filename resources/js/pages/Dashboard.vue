@@ -1,6 +1,16 @@
 <script setup lang="ts">
+import Construction from '@/components/Construction.vue';
+import EventsList from '@/components/events/EventsList.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
+import type { Event } from '@/types/Event';
 import { Head } from '@inertiajs/vue3';
+
+//TODO: pinia
+interface Props {
+    events: Event[];
+}
+
+const props = defineProps<Props>();
 
 const items = [
     {
@@ -18,18 +28,20 @@ const items = [
 
 <template>
     <Head title="Domů" />
-
     <AuthenticatedLayout>
         <UTabs :items="items">
             <template #coming>
-                <section class="mt-4">
-                    <h1>Nadcházející</h1>
-                </section>
+                <EventsList
+                    heading="Nadcházející"
+                    :events="props.events"
+                    :create-event-if-empty="true"
+                />
             </template>
 
             <template #history>
                 <section class="mt-4">
                     <h1>Historické</h1>
+                    <Construction />
                 </section>
             </template>
         </UTabs>

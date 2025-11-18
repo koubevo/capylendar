@@ -27,15 +27,15 @@ enum Capybara: string
         return match ($this) {
             self::Pink => [
                 'label' => Config::get('app.pink.name', 'Pink'),
-                'avatar' => 'https://raw.githubusercontent.com/koubevo/capys/refs/heads/main/pink.webp',
+                'avatar' => '/images/capys/pink.jpg',
             ],
             self::Blue => [
                 'label' => Config::get('app.blue.name', 'Blue'),
-                'avatar' => 'https://raw.githubusercontent.com/koubevo/capys/refs/heads/main/blue.webp', // Sem dej odkaz na avatar
+                'avatar' => '/images/capys/blue.jpg',
             ],
             self::Yellow => [
                 'label' => Config::get('app.yellow.name', 'Yellow'),
-                'avatar' => 'https://raw.githubusercontent.com/koubevo/capys/refs/heads/main/yellow.webp',
+                'avatar' => '/images/capys/yellow.jpg',
             ],
         };
     }

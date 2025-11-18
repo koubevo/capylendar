@@ -1,15 +1,12 @@
 <script setup lang="ts">
 import EventForm from '@/components/events/EventForm.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
+import { Capybara } from '@/types/Capybara';
 import { EventFormData } from '@/types/EventFormData';
 import { Head, useForm } from '@inertiajs/vue3';
 
 const props = defineProps<{
-    capybaraOptions: Array<{
-        value: string;
-        label: string;
-        avatar: { src: string; alt: string };
-    }>;
+    capybaraOptions: Capybara[];
 }>();
 
 const form = useForm<EventFormData>({

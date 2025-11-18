@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /* eslint-disable vue/no-mutating-props */ // Toto je správně, ignoruje chybu ESLint
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
+import { Capybara } from '@/types/Capybara';
 import type { EventFormData } from '@/types/EventFormData';
 import type { Form } from '@inertiajs/vue3';
 import { computed } from 'vue';
@@ -8,11 +9,7 @@ import { computed } from 'vue';
 interface Props {
     form: Form<EventFormData>;
     isEditMode: boolean;
-    capybaraOptions: Array<{
-        value: string;
-        label: string;
-        avatar: { src: string; alt: string };
-    }>;
+    capybaraOptions: Capybara[];
 }
 
 const selectedAvatar = computed(() => {

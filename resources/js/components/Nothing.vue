@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { Button } from '@/types/Button';
+
 const props = defineProps<{
-    to: string | null;
+    button: Button | undefined;
 }>();
 </script>
 
@@ -12,6 +14,8 @@ const props = defineProps<{
             class="w-full md:w-100"
         />
         <span class="component-alert-text"> Nic tady není! </span>
-        <UButton :to="props.to" class="mt-4">Přidat</UButton>
+        <UButton v-if="props.button" :to="props.button.to" class="mt-4">{{
+            props.button.label
+        }}</UButton>
     </div>
 </template>

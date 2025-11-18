@@ -9,7 +9,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class EventResource extends JsonResource
 {
     /**
-     *
      * @var Event
      */
     public $resource;

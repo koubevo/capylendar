@@ -13,21 +13,8 @@ class EventController extends Controller
 {
     public function create(): Response
     {
-        $cases = Capybara::cases();
-
-        $capybaraOptions = collect($cases)->map(function ($case) {
-            return [
-                'value' => $case->value,
-                'label' => $case->getLabel(),
-                'avatar' => [
-                    'src' => $case->getAvatar(),
-                    'alt' => $case->getLabel(),
-                ],
-            ];
-        });
-
         return Inertia::render('events/EventCreate', [
-            'capybaraOptions' => $capybaraOptions,
+            'capybaraOptions' => Capybara::options(),
         ]);
     }
 

@@ -5,4 +5,8 @@
     h1 {
         @apply mb-4 text-2xl font-bold;
     }
+
+    .component-alert-text {
+        @apply text-center text-xl font-bold;
+    }
 }

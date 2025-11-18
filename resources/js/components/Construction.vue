@@ -5,7 +5,7 @@
             alt="Construction"
             class="w-full md:w-100"
         />
-        <span class="mt-4 text-center text-xl font-bold"> Makáme na tom! </span>
+        <span class="component-alert-text"> Makáme na tom! </span>
     </div>
 </template>
 <script setup lang="ts"></script>

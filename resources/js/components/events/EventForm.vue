@@ -101,6 +101,12 @@ const emit = defineEmits<{
                 </UFormField>
             </div>
 
+            <USwitch
+                label="Soukromé (tajný kapybara event)"
+                v-model="props.form.is_private"
+                :error="props.form.errors.is_private"
+            />
+
             <PrimaryButton class="w-full justify-center">
                 {{ props.isEditMode ? 'Upravit' : 'Přidat' }}
             </PrimaryButton>

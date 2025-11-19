@@ -5,4 +5,5 @@ export interface EventFormData {
     start_at: string;
     end_at: string;
     is_all_day: boolean;
+    is_private: boolean;
 }

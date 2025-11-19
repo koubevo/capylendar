@@ -113,5 +113,3 @@ const emit = defineEmits<{
         </div>
     </form>
 </template>
-
-<style scoped></style>

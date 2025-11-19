@@ -7,5 +7,3 @@ import GuestLayout from '@/layouts/app/GuestLayout.vue';
         <!-- landing page -->
     </GuestLayout>
 </template>
-
-<style scoped></style>

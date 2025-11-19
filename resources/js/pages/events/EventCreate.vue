@@ -37,5 +37,3 @@ function submit() {
         />
     </AuthenticatedLayout>
 </template>
-
-<style scoped></style>

@@ -56,5 +56,3 @@ const groupedEvents = computed(() => {
 
     <Nothing v-if="!props.events.length" :button="button" />
 </template>
-
-<style scoped></style>

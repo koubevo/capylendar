@@ -14,7 +14,5 @@ const page = usePage();
                 </p>
             </div>
         </template>
-
-        <UNavigationMenu :items="items" variant="link" />
     </UFooter>
 </template>

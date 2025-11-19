@@ -8,4 +8,3 @@
         <span class="component-alert-text"> Makáme na tom! </span>
     </div>
 </template>
-<script setup lang="ts"></script>

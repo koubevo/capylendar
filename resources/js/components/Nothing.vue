@@ -10,7 +10,7 @@ const props = defineProps<{
     <div class="flex w-full flex-col items-center justify-center">
         <img
             src="/images/capys/nothing.jpg"
-            alt="Construction"
+            alt="Nothing here"
             class="w-full md:w-100"
         />
         <span class="component-alert-text"> Nic tady není! </span>

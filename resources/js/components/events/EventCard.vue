@@ -14,7 +14,7 @@ const props = defineProps<Props>();
                 <h3 class="font-bold">{{ props.event.title }}</h3>
                 <p class="text-xs">
                     {{ props.event.capybara.label }} |
-                    <span v-if="event.date.is_all_day"> Celý den </span>
+                    <span v-if="props.event.date.is_all_day"> Celý den </span>
                     <span v-else>
                         <span>
                             {{ props.event.date.start_time }}
@@ -35,5 +35,3 @@ const props = defineProps<Props>();
         </div>
     </UCard>
 </template>
-
-<style scoped></style>

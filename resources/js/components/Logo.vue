@@ -1,5 +1,3 @@
-<script setup lang="ts"></script>
-
 <template>
     <span class="logo mt-1 text-2xl text-pink-500 uppercase">Capylendar</span>
 </template>

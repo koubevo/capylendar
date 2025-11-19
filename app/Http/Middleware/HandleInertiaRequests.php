@@ -42,6 +42,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            'version' => config('app.version'),
             /** @phpstan-ignore-next-line */
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [

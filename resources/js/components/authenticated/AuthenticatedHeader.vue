@@ -3,7 +3,6 @@ import DashboardController from '@/actions/App/Http/Controllers/DashboardControl
 import EventController from '@/actions/App/Http/Controllers/EventController';
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import Logo from '@/components/Logo.vue';
-import { Link } from '@inertiajs/vue3';
 </script>
 
 <template>
@@ -13,14 +12,13 @@ import { Link } from '@inertiajs/vue3';
         </template>
 
         <template #right>
-            <Link>
-                <PrimaryButton
-                    icon="i-lucide-plus"
-                    :to="EventController.create()"
-                >
-                    Přidat event
-                </PrimaryButton>
-            </Link>
+            <PrimaryButton
+                class="hidden md:flex"
+                icon="i-lucide-plus"
+                :to="EventController.create()"
+            >
+                Přidat event
+            </PrimaryButton>
         </template>
     </UHeader>
 </template>

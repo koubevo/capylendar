@@ -1,4 +1,9 @@
 export interface Button {
-    to: { url: string; method: string };
+    to: To;
     label: string;
+}
+
+export interface To {
+    url: string;
+    method: string;
 }

@@ -61,9 +61,6 @@ class EventResource extends JsonResource
             return 'Zítra';
         }
 
-        // Vrátí např.: "Pondělí 20. listopadu"
-        // 'l' = den slovy, 'j.' = den číslem bez nuly, 'F' = měsíc slovy
-        // ucfirst() zajistí velké počáteční písmeno (Pondělí)
-        return ucfirst($date->translatedFormat('l j. M'));
+        return ucfirst($date->translatedFormat('l d.m.y'));
     }
 }

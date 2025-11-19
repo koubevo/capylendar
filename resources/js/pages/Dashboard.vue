@@ -28,7 +28,7 @@ const items = [
 
 <template>
     <Head title="Domů" />
-    <AuthenticatedLayout>
+    <AuthenticatedLayout :display-footer="true">
         <UTabs :items="items">
             <template #coming>
                 <EventsList

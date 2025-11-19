@@ -12,6 +12,8 @@ interface Props {
     capybaraOptions: Capybara[];
 }
 
+const props = defineProps<Props>();
+
 const selectedAvatar = computed(() => {
     const selected = props.capybaraOptions.find(
         (option) => option.value === props.form.capybara,
@@ -19,8 +21,6 @@ const selectedAvatar = computed(() => {
 
     return selected ? selected.avatar : undefined;
 });
-
-const props = defineProps<Props>();
 
 const emit = defineEmits<{
     (e: 'submit'): void;

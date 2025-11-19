@@ -14,13 +14,13 @@ const props = defineProps<Props>();
                 <h3 class="font-bold">{{ props.event.title }}</h3>
                 <p class="text-xs">
                     {{ props.event.capybara.label }} |
-                    <span v-if="event.is_all_day"> Celý den </span>
+                    <span v-if="event.date.is_all_day"> Celý den </span>
                     <span v-else>
                         <span>
-                            {{ props.event.start_at }}
+                            {{ props.event.date.start_time }}
                         </span>
-                        <span v-if="props.event.end_at">
-                            - {{ props.event.end_at }}
+                        <span v-if="props.event.date.end_time">
+                            - {{ props.event.date.end_time }}
                         </span>
                     </span>
                 </p>

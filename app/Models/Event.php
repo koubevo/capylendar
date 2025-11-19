@@ -3,12 +3,21 @@
 namespace App\Models;
 
 use App\Enums\Capybara;
+use Carbon\Carbon;
 use Database\Factories\EventFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * @property int $id
+ * @property string $title
+ * @property Carbon $start_at
+ * @property Carbon|null $end_at
+ * @property bool $is_all_day
+ * @property Capybara $capybara
+ */
 class Event extends Model
 {
     /** @use HasFactory<EventFactory> */

@@ -25,6 +25,28 @@ export default defineConfig({
                     secondary: 'sky',
                     neutral: 'slate',
                 },
+
+                button: {
+                    base: 'cursor-pointer',
+                },
+
+                switch: {
+                    defaultVariants: {
+                        size: 'xl',
+                    },
+                },
+
+                input: {
+                    defaultVariants: {
+                        size: 'xl',
+                    },
+                },
+
+                select: {
+                    defaultVariants: {
+                        size: 'xl',
+                    },
+                },
             },
             colorMode: false,
         }),

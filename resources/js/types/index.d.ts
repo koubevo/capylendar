@@ -24,16 +24,13 @@ export type AppPageProps<
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
+    version: string;
 };
 
 export interface User {
     id: number;
     name: string;
-    email: string;
-    avatar?: string;
-    email_verified_at: string | null;
-    created_at: string;
-    updated_at: string;
+    capybara: string;
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

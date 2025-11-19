@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import Logo from '@/components/Logo.vue';
-import { Link } from '@inertiajs/vue3';
+import { login } from '@/routes';
 </script>
 
 <template>
@@ -10,9 +11,7 @@ import { Link } from '@inertiajs/vue3';
         </template>
 
         <template #right>
-            <Link>
-                <UButton color="primary">Přihlásit se</UButton>
-            </Link>
+            <PrimaryButton :to="login()"> Přihlásit se </PrimaryButton>
         </template>
     </UHeader>
 </template>

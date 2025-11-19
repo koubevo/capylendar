@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
+import LoginLayout from '@/layouts/app/LoginLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import { ref } from 'vue';
-import LoginLayout from '@/layouts/app/LoginLayout.vue';
 
 const fields = ref<AuthFormField[]>([
     {
@@ -12,7 +13,7 @@ const fields = ref<AuthFormField[]>([
     {
         name: 'password',
         type: 'password',
-        label: 'Password',
+        label: 'Heslo',
     },
 ]);
 </script>
@@ -21,12 +22,18 @@ const fields = ref<AuthFormField[]>([
     <Head title="Přihlášení" />
 
     <LoginLayout>
-        <UPageCard>
+        <UPageCard class="w-full sm:max-w-md">
             <UAuthForm
                 title="Vítej zpět, kapybáro."
                 @submit="onSubmit"
                 :fields="fields"
+                :submit-button="{ label: 'Přihlásit se' }"
             >
+                <template #submit>
+                    <PrimaryButton type="submit" class="w-full justify-center">
+                        Přihlásit se
+                    </PrimaryButton>
+                </template>
             </UAuthForm>
         </UPageCard>
     </LoginLayout>

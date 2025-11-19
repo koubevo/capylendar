@@ -40,7 +40,7 @@ const items = [
 
             <template #history>
                 <section class="mt-4">
-                    <h1>Historické</h1>
+                    <h2>Historické</h2>
                     <Construction />
                 </section>
             </template>

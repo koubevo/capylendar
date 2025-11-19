@@ -27,7 +27,7 @@ function submit() {
 <template>
     <Head title="Přidat event" />
     <AuthenticatedLayout class="w-full sm:max-w-xl">
-        <h1>Přidat event</h1>
+        <h2>Přidat event</h2>
         <EventForm
             :form="form"
             :is-edit-mode="false"

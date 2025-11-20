@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import LoginLayout from '@/layouts/app/LoginLayout.vue';
-import { Head } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { store } from '@/routes/login';
+import { Head, useForm } from '@inertiajs/vue3';
 
-const fields = ref<AuthFormField[]>([
-    {
-        name: 'email',
-        type: 'email',
-        label: 'Email',
-    },
-    {
-        name: 'password',
-        type: 'password',
-        label: 'Heslo',
-    },
-]);
+const form = useForm({
+    email: '',
+    password: '',
+    remember: true,
+});
+
+const onSubmit = () => {
+    form.remember = true;
+    form.post(store());
+};
 </script>
 
 <template>
@@ -23,18 +21,39 @@ const fields = ref<AuthFormField[]>([
 
     <LoginLayout>
         <UPageCard class="w-full sm:max-w-md">
-            <UAuthForm
-                title="Vítej zpět, kapybáro."
-                @submit="onSubmit"
-                :fields="fields"
-                :submit-button="{ label: 'Přihlásit se' }"
-            >
-                <template #submit>
-                    <PrimaryButton type="submit" class="w-full justify-center">
+            <h1>Vítej zpět, <span class="text-primary">kapybáro.</span></h1>
+            <form :form="form" @submit.prevent="onSubmit">
+                <div class="flex flex-col gap-y-4">
+                    <UFormField
+                        label="Email"
+                        name="email"
+                        :error="form.errors.email"
+                        required
+                    >
+                        <UInput
+                            v-model="form.email"
+                            type="email"
+                            class="w-full"
+                        />
+                    </UFormField>
+                    <UFormField
+                        label="Heslo"
+                        name="password"
+                        :error="form.errors.password"
+                        required
+                    >
+                        <UInput
+                            v-model="form.password"
+                            type="password"
+                            class="w-full"
+                        />
+                    </UFormField>
+
+                    <PrimaryButton type="submit" @click="onSubmit">
                         Přihlásit se
                     </PrimaryButton>
-                </template>
-            </UAuthForm>
+                </div>
+            </form>
         </UPageCard>
     </LoginLayout>
 </template>

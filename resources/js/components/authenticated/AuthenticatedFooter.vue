@@ -19,6 +19,7 @@ const page = usePage();
                 <p class="text-sm text-muted">
                     Capylendar by HLBPRG © {{ new Date().getFullYear() }}
                 </p>
+                <ULink to="/logout" method="post"> Odhlásit se </ULink>
             </div>
         </template>
     </UFooter>

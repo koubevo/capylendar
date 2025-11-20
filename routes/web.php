@@ -9,12 +9,12 @@ Route::get('/', function () {
     return Inertia::render('LandingPage', []);
 })->name('landingPage');
 
-// TODO: auth
-Route::get('/dashboard', DashboardController::class)
-    ->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', DashboardController::class)
+        ->name('dashboard');
 
-// TODO: auth
-Route::resource('/event', EventController::class)
-    ->only(['create', 'store', 'edit', 'update', 'destroy']);
+    Route::resource('/event', EventController::class)
+        ->only(['create', 'store', 'edit', 'update', 'destroy']);
+});
 
 require __DIR__.'/settings.php';

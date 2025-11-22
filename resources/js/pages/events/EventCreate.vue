@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import EventController from '@/actions/App/Http/Controllers/EventController';
 import EventForm from '@/components/events/EventForm.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import { Capybara } from '@/types/Capybara';
 import { EventFormData } from '@/types/EventFormData';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
+
+const page = usePage();
 
 const props = defineProps<{
     capybaraOptions: Capybara[];
@@ -11,7 +14,7 @@ const props = defineProps<{
 
 const form = useForm<EventFormData>({
     title: '',
-    capybara: 'pink',
+    capybara: page.props.auth.user.capybara,
     date: '',
     start_at: '',
     end_at: '',
@@ -20,8 +23,7 @@ const form = useForm<EventFormData>({
 });
 
 function submit() {
-    //TODO
-    form.post(route('events.store'));
+    form.post(EventController.store());
 }
 </script>
 

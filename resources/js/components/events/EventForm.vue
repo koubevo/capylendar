@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/* eslint-disable vue/no-mutating-props */ // Toto je správně, ignoruje chybu ESLint
+/* eslint-disable vue/no-mutating-props */
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import { Capybara } from '@/types/Capybara';
 import type { EventFormData } from '@/types/EventFormData';
@@ -107,7 +107,7 @@ const emit = defineEmits<{
                 :error="props.form.errors.is_private"
             />
 
-            <PrimaryButton class="w-full justify-center">
+            <PrimaryButton class="w-full justify-center" type="submit">
                 {{ props.isEditMode ? 'Upravit' : 'Přidat' }}
             </PrimaryButton>
         </div>

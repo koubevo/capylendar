@@ -25,7 +25,7 @@ const page = usePage();
             <img
                 :src="'/images/capys/' + page.props.auth.user.capybara + '.jpg'"
                 :alt="page.props.auth.user.name"
-                class="h-10 w-10 rounded-sm"
+                class="ms-2 h-8 w-8 rounded-md"
             />
         </template>
     </UHeader>

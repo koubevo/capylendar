@@ -22,7 +22,7 @@ const onSubmit = () => {
     <LoginLayout>
         <UPageCard class="w-full sm:max-w-md">
             <h1>Vítej zpět, <span class="text-primary">kapybáro.</span></h1>
-            <form :form="form" @submit.prevent="onSubmit">
+            <form @submit.prevent="onSubmit">
                 <div class="flex flex-col gap-y-4">
                     <UFormField
                         label="Email"
@@ -49,9 +49,7 @@ const onSubmit = () => {
                         />
                     </UFormField>
 
-                    <PrimaryButton type="submit" @click="onSubmit">
-                        Přihlásit se
-                    </PrimaryButton>
+                    <PrimaryButton type="submit"> Přihlásit se </PrimaryButton>
                 </div>
             </form>
         </UPageCard>

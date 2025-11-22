@@ -3,7 +3,7 @@
 
 @layer base {
     h1 {
-        @apply mb-4 text-4xl/12 font-bold ;
+        @apply mb-4 text-4xl/12 font-bold;
     }
 
     h2 {

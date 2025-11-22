@@ -1,7 +1,7 @@
 import ui from '@nuxt/ui/vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
-import { defineConfig, loadEnv } from 'vite'; // 1. Přidat loadEnv
+import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');

@@ -11,7 +11,6 @@ const form = useForm({
 });
 
 const onSubmit = () => {
-    form.remember = true;
     form.post(store());
 };
 </script>

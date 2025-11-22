@@ -6,6 +6,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -22,6 +24,16 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
+    ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (TooManyRequestsHttpException $e, Request $request) {
+            if ($request->inertia()) {
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        'email' => __('auth.throttle', [
+                            'seconds' => $e->getHeaders()['Retry-After'] ?? 60,
+                        ]),
+                    ]);
+            }
+        });
     })->create();

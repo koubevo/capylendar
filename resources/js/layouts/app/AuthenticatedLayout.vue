@@ -31,5 +31,6 @@ const props = withDefaults(defineProps<Props>(), {
         />
 
         <AuthenticatedFooter v-if="props.displayFooter" />
+        <UNotifications />
     </AppLayout>
 </template>

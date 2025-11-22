@@ -19,6 +19,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('/event', EventController::class)
         ->only(['create', 'store', 'edit', 'update', 'destroy']);
+
+    Route::get('/profile', function () {
+        return Inertia::render('settings/Profile', []);
+    })->name('profile');
 });
 
 require __DIR__.'/settings.php';

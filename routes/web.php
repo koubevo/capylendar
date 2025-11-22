@@ -6,15 +6,19 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+
     return Inertia::render('LandingPage', []);
 })->name('landingPage');
 
-// TODO: auth
-Route::get('/dashboard', DashboardController::class)
-    ->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', DashboardController::class)
+        ->name('dashboard');
 
-// TODO: auth
-Route::resource('/event', EventController::class)
-    ->only(['create', 'store', 'edit', 'update', 'destroy']);
+    Route::resource('/event', EventController::class)
+        ->only(['create', 'store', 'edit', 'update', 'destroy']);
+});
 
 require __DIR__.'/settings.php';

@@ -16,7 +16,10 @@ const page = usePage();
                 >
                     Náhlásit problém
                 </ULink>
-                <p class="text-sm text-muted">
+                <ULink to="/logout" method="post" class="mb-2">
+                    Odhlásit se
+                </ULink>
+                <p class="mb-2 text-sm text-muted">
                     Capylendar by HLBPRG © {{ new Date().getFullYear() }}
                 </p>
             </div>

@@ -1,5 +1,5 @@
 <template>
-    <UButton color="primary" v-bind="$attrs">
+    <UButton color="primary" block class="justify-center" v-bind="$attrs">
         <slot />
     </UButton>
 </template>

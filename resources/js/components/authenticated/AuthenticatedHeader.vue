@@ -3,6 +3,9 @@ import DashboardController from '@/actions/App/Http/Controllers/DashboardControl
 import EventController from '@/actions/App/Http/Controllers/EventController';
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import Logo from '@/components/Logo.vue';
+import { usePage } from '@inertiajs/vue3';
+
+const page = usePage();
 </script>
 
 <template>
@@ -19,6 +22,11 @@ import Logo from '@/components/Logo.vue';
             >
                 Přidat event
             </PrimaryButton>
+            <img
+                :src="'/images/capys/' + page.props.auth.user.capybara + '.jpg'"
+                :alt="page.props.auth.user.name"
+                class="ms-2 h-8 w-8 rounded-md"
+            />
         </template>
     </UHeader>
 </template>

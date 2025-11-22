@@ -27,7 +27,7 @@ const props = defineProps<Props>();
             </div>
             <div>
                 <img
-                    class="h-14 w-14 rounded-sm"
+                    class="h-14 w-14 rounded-md"
                     :src="props.event.capybara.avatar.src"
                     :alt="props.event.capybara.avatar.alt"
                 />

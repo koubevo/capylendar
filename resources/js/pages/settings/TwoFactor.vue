@@ -1,3 +1,5 @@
+<template></template>
+
 <!-- <script setup lang="ts">
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import TwoFactorRecoveryCodes from '@/components/TwoFactorRecoveryCodes.vue';

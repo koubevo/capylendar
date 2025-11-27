@@ -63,7 +63,7 @@ class Event extends Model
     /**
      * @return BelongsToMany<User, $this>
      */
-    public function participants(): BelongsToMany
+    public function subscribers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'event_user');
     }

@@ -7,7 +7,7 @@ import { Head } from '@inertiajs/vue3';
 
 //TODO: pinia
 interface Props {
-    events: Event[];
+    upcomingEvents: Event[];
 }
 
 const props = defineProps<Props>();
@@ -16,7 +16,7 @@ const items = [
     {
         label: 'Nadcházející',
         icon: 'i-lucide-rocket',
-        slot: 'coming',
+        slot: 'upcoming',
     },
     {
         label: 'Historické',
@@ -30,10 +30,10 @@ const items = [
     <Head title="Domů" />
     <AuthenticatedLayout :display-footer="true">
         <UTabs :items="items">
-            <template #coming>
+            <template #upcoming>
                 <EventsList
                     heading="Nadcházející"
-                    :events="props.events"
+                    :events="props.upcomingEvents"
                     :create-event-if-empty="true"
                 />
             </template>

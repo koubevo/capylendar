@@ -4,7 +4,6 @@ namespace App\services;
 
 use App\Models\Event;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 
 class EventUserService
 {
@@ -16,10 +15,10 @@ class EventUserService
         //
     }
 
-    public function assignSubscribers(Event $event, bool $isPrivateEvent): void
+    public function assignSubscribers(Event $event, bool $isPrivateEvent, User $author): void
     {
         if ($isPrivateEvent) {
-            $event->subscribers()->attach(Auth::user());
+            $event->subscribers()->attach($author);
         } else {
             $event->subscribers()->attach(User::pluck('id'));
         }

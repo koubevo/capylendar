@@ -19,7 +19,7 @@ class EventService
         return DB::transaction(function () use ($author, $eventData, $isPrivateEvent) {
             $event = $author->authoredEvents()->create($eventData);
 
-            $this->eventUserService->assignSubscribers($event, $isPrivateEvent);
+            $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
 
             return $event;
         });

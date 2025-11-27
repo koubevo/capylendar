@@ -15,10 +15,10 @@
         "laravel/framework": "^12.0",
         "laravel/telescope": "^5.15",
         "laravel/tinker": "^2.10.1",
-        "laravel/wayfinder": "^0.1.9"
+        "laravel/wayfinder": "^0.1.9",
+        "fakerphp/faker": "^1.23"
     },
     "require-dev": {
-        "fakerphp/faker": "^1.23",
         "larastan/larastan": "^3.0",
         "laravel-lang/common": "^6.7",
         "laravel/pail": "^1.2.2",

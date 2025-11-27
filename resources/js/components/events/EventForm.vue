@@ -57,7 +57,7 @@ const emit = defineEmits<{
             <UFormField
                 label="Datum"
                 name="date"
-                :error="props.form.errors.date"
+                :error="props.form.errors.start_at"
                 required
             >
                 <UInput v-model="props.form.date" type="date" class="w-full" />

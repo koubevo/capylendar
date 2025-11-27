@@ -17,11 +17,15 @@ abstract class EventFormRequest extends FormRequest
     {
         $date = $this->input('date');
         $startTime = $this->input('start_at');
-        $endTime = $this->input('end_at');
+        $endTime = $this->input('end_at') ?? null;
         $isAllDay = $this->boolean('is_all_day');
 
         $dbStartAt = $isAllDay ? "{$date} 00:00:00" : "{$date} {$startTime}:00";
-        $dbEndAt = $isAllDay ? null : "{$date} {$endTime}:00";
+        if ($isAllDay || ! $endTime) {
+            $dbEndAt = null;
+        } else {
+            $dbEndAt = "{$date} {$endTime}:00";
+        }
 
         $this->merge([
             'start_at' => $dbStartAt,

@@ -13,7 +13,7 @@ class DashboardController extends Controller
     public function __invoke(): Response
     {
         return Inertia::render('Dashboard', [
-            'upcomingEvents' => $this->eventService->getUpcomingEvents(),
+            'upcomingEvents' => $this->eventService->getUpcomingEvents(auth()->user()),
         ]);
     }
 }

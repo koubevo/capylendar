@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PasswordController from '@/actions/PasswordController';
+import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import { useForm } from '@inertiajs/vue3';
 

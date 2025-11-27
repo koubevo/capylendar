@@ -3,7 +3,10 @@
 namespace App\services;
 
 use App\Http\Requests\Event\StoreEventRequest;
+use App\Http\Resources\EventResource;
 use App\Models\Event;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class EventService
@@ -23,5 +26,18 @@ class EventService
 
             return $event;
         });
+    }
+
+    public function getUpcomingEvents(): array
+    {
+        $user = Auth::user();
+
+        $upcomingEvents = $user
+            ->assignedEvents()
+            ->where('start_at', '>=', Carbon::now()->startOfDay())
+            ->orderBy('start_at', 'asc')
+            ->get();
+
+        return EventResource::collection($upcomingEvents)->resolve();
     }
 }

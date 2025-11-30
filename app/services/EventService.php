@@ -13,11 +13,15 @@ class EventService
 {
     public function __construct(protected EventUserService $eventUserService) {}
 
-    public function store(StoreEventRequest $request): Event
+    public function store(StoreEventRequest $request): ?Event
     {
         $eventData = $request->safe()->except(['is_private']);
         $isPrivateEvent = $request->boolean('is_private');
         $author = $request->user();
+
+        if (! $author) {
+            return null;
+        }
 
         return DB::transaction(function () use ($author, $eventData, $isPrivateEvent) {
             $event = $author->authoredEvents()->create($eventData);
@@ -28,8 +32,15 @@ class EventService
         });
     }
 
-    public function getUpcomingEvents(User $user): array
+    /**
+     * @return array<EventResource>
+     */
+    public function getUpcomingEvents(?User $user): array
     {
+        if (! $user) {
+            return [];
+        }
+
         $upcomingEvents = $user
             ->assignedEvents()
             ->where('start_at', '>=', Carbon::now()->startOfDay())

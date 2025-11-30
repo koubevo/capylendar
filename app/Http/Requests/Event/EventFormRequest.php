@@ -15,13 +15,15 @@ abstract class EventFormRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $date = $this->input('date');
-        $startTime = $this->input('start_at');
-        $endTime = $this->input('end_at') ?? null;
+        $date = $this->string('date')->toString();
+        $startTime = $this->string('start_at')->toString();
+
+        $endTime = $this->input('end_at');
         $isAllDay = $this->boolean('is_all_day');
 
         $dbStartAt = $isAllDay ? "{$date} 00:00:00" : "{$date} {$startTime}:00";
-        if ($isAllDay || ! $endTime) {
+
+        if ($isAllDay || ! is_string($endTime)) {
             $dbEndAt = null;
         } else {
             $dbEndAt = "{$date} {$endTime}:00";
@@ -35,6 +37,9 @@ abstract class EventFormRequest extends FormRequest
         ]);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function rules(): array
     {
         return [

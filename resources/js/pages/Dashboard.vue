@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Construction from '@/components/Construction.vue';
 import EventsList from '@/components/events/EventsList.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import type { Event } from '@/types/Event';
@@ -8,6 +7,7 @@ import { Head } from '@inertiajs/vue3';
 //TODO: pinia
 interface Props {
     upcomingEvents: Event[];
+    historyEvents: Event[];
 }
 
 const props = defineProps<Props>();
@@ -39,10 +39,11 @@ const items = [
             </template>
 
             <template #history>
-                <section class="mt-4">
-                    <h2>Historické</h2>
-                    <Construction />
-                </section>
+                <EventsList
+                    heading="Historické"
+                    :events="props.historyEvents"
+                    :create-event-if-empty="true"
+                />
             </template>
         </UTabs>
     </AuthenticatedLayout>

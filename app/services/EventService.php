@@ -2,6 +2,7 @@
 
 namespace App\services;
 
+use App\Enums\EventType;
 use App\Http\Requests\Event\StoreEventRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
@@ -12,6 +13,8 @@ use Illuminate\Support\Facades\DB;
 class EventService
 {
     public function __construct(protected EventUserService $eventUserService) {}
+
+    private const HISTORY_EVENTS_LIMIT = 20;
 
     public function store(StoreEventRequest $request): ?Event
     {
@@ -35,18 +38,19 @@ class EventService
     /**
      * @return array<EventResource>
      */
-    public function getUpcomingEvents(?User $user): array
+    public function getAssignedEvents(?User $user, EventType $eventType = EventType::Upcoming): array
     {
         if (! $user) {
             return [];
         }
 
-        $upcomingEvents = $user
+        $events = $user
             ->assignedEvents()
-            ->where('start_at', '>=', Carbon::now()->startOfDay())
-            ->orderBy('start_at', 'asc')
+            ->where('start_at', $eventType->operator(), Carbon::now()->startOfDay())
+            ->orderBy('start_at', $eventType->sortDirection())
+            ->when($eventType === EventType::History, fn ($q) => $q->limit(self::HISTORY_EVENTS_LIMIT))
             ->get();
 
-        return EventResource::collection($upcomingEvents)->resolve();
+        return EventResource::collection($events)->resolve();
     }
 }

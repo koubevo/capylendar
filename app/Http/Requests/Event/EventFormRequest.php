@@ -23,7 +23,7 @@ abstract class EventFormRequest extends FormRequest
 
         $dbStartAt = $isAllDay ? "{$date} 00:00:00" : "{$date} {$startTime}:00";
 
-        if ($isAllDay || ! is_string($endTime)) {
+        if ($isAllDay || ! is_string($endTime) || $endTime == '') {
             $dbEndAt = null;
         } else {
             $dbEndAt = "{$date} {$endTime}:00";

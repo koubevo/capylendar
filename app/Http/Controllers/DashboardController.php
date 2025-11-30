@@ -13,9 +13,11 @@ class DashboardController extends Controller
 
     public function __invoke(): Response
     {
+        $user = auth()->user();
+
         return Inertia::render('Dashboard', [
-            'upcomingEvents' => $this->eventService->getAssignedEvents(auth()->user(), EventType::Upcoming),
-            'historyEvents' => $this->eventService->getAssignedEvents(auth()->user(), EventType::History),
+            'upcomingEvents' => $this->eventService->getAssignedEvents($user, EventType::Upcoming),
+            'historyEvents' => $this->eventService->getAssignedEvents($user, EventType::History),
         ]);
     }
 }

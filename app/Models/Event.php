@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Capybara;
 use Carbon\Carbon;
 use Database\Factories\EventFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property Carbon|null $end_at
  * @property bool $is_all_day
  * @property Capybara $capybara
+ * @property string|null $description
+ * @property bool $is_private
  */
 class Event extends Model
 {
@@ -66,5 +69,12 @@ class Event extends Model
     public function subscribers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'event_user');
+    }
+
+    public function isPrivate(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, $attributes) => ($this->subscribers()->count() === 1)
+        );
     }
 }

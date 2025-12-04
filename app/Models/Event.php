@@ -71,10 +71,15 @@ class Event extends Model
         return $this->belongsToMany(User::class, 'event_user');
     }
 
-    public function isPrivate(): Attribute
+    /**
+     * @return Attribute<bool, never>
+     */
+    protected function isPrivate(): Attribute
     {
         return Attribute::make(
-            get: fn ($value, $attributes) => ($this->subscribers()->count() === 1)
+            get: fn ($value, $attributes) => array_key_exists('subscribers_count', $attributes)
+                ? $attributes['subscribers_count'] === 1
+                : $this->subscribers()->count() === 1
         );
     }
 }

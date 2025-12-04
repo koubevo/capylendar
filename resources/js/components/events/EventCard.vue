@@ -12,7 +12,7 @@ const props = defineProps<Props>();
         <div class="flex items-center justify-between">
             <div>
                 <h3 class="font-bold">{{ props.event.title }}</h3>
-                <span class="flex items-center gap-x-1">
+                <div class="flex items-center gap-x-1">
                     <UIcon
                         name="i-lucide-user-lock"
                         v-if="props.event.is_private"
@@ -37,7 +37,7 @@ const props = defineProps<Props>();
                             </span>
                         </span>
                     </p>
-                </span>
+                </div>
             </div>
             <div>
                 <img

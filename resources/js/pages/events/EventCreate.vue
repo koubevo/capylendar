@@ -20,6 +20,7 @@ const form = useForm<EventFormData>({
     end_at: '',
     is_all_day: false,
     is_private: false,
+    description: '',
 });
 
 function submit() {

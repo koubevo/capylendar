@@ -18,7 +18,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('dashboard');
 
     Route::resource('/event', EventController::class)
-        ->only(['create', 'store', 'edit', 'update', 'destroy']);
+        ->only(['create', 'store', 'edit', 'update', 'destroy', 'show']);
 });
 
 require __DIR__.'/settings.php';

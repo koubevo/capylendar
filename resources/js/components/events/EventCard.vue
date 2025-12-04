@@ -12,18 +12,32 @@ const props = defineProps<Props>();
         <div class="flex items-center justify-between">
             <div>
                 <h3 class="font-bold">{{ props.event.title }}</h3>
-                <p class="text-xs">
-                    {{ props.event.capybara.label }} |
-                    <span v-if="props.event.date.is_all_day"> Celý den </span>
-                    <span v-else>
-                        <span>
-                            {{ props.event.date.start_time }}
+                <div class="flex items-center gap-x-1">
+                    <UIcon
+                        name="i-lucide-user-lock"
+                        v-if="props.event.is_private"
+                        class="size-3"
+                    />
+                    <UIcon
+                        name="i-lucide-notepad-text"
+                        v-if="props.event.description"
+                        class="size-3"
+                    />
+                    <p class="text-xs">
+                        {{ props.event.capybara.label }} |
+                        <span v-if="props.event.date.is_all_day">
+                            Celý den
                         </span>
-                        <span v-if="props.event.date.end_time">
-                            - {{ props.event.date.end_time }}
+                        <span v-else>
+                            <span>
+                                {{ props.event.date.start_time }}
+                            </span>
+                            <span v-if="props.event.date.end_time">
+                                - {{ props.event.date.end_time }}
+                            </span>
                         </span>
-                    </span>
-                </p>
+                    </p>
+                </div>
             </div>
             <div>
                 <img

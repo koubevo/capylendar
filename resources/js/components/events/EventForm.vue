@@ -101,6 +101,18 @@ const emit = defineEmits<{
                 </UFormField>
             </div>
 
+            <UFormField
+                label="Poznámka"
+                name="description"
+                :error="props.form.errors.description"
+            >
+                <UTextarea
+                    v-model="props.form.description"
+                    class="w-full"
+                    rows="5"
+                />
+            </UFormField>
+
             <USwitch
                 label="Soukromé (tajný kapybara event)"
                 v-model="props.form.is_private"

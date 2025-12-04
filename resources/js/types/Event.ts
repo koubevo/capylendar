@@ -5,6 +5,8 @@ export interface Event {
     title: string;
     date: EventDate;
     capybara: Capybara;
+    is_private: boolean;
+    description?: string;
 }
 
 export interface EventDate {

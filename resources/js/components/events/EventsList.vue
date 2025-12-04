@@ -3,6 +3,7 @@ import EventController from '@/actions/App/Http/Controllers/EventController';
 import EventCard from '@/components/events/EventCard.vue';
 import Nothing from '@/components/Nothing.vue';
 import type { Event } from '@/types/Event';
+import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 interface Props {
@@ -45,11 +46,13 @@ const groupedEvents = computed(() => {
             </h3>
 
             <div class="grid grid-cols-1 gap-4">
-                <EventCard
+                <Link
+                    :href="EventController.show(event)"
                     v-for="event in events"
                     :key="event.id"
-                    :event="event"
-                />
+                >
+                    <EventCard :event="event" />
+                </Link>
             </div>
         </section>
     </div>

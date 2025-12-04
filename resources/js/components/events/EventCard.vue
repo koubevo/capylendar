@@ -18,6 +18,11 @@ const props = defineProps<Props>();
                         v-if="props.event.is_private"
                         class="size-3"
                     />
+                    <UIcon
+                        name="i-lucide-notepad-text"
+                        v-if="props.event.description"
+                        class="size-3"
+                    />
                     <p class="text-xs">
                         {{ props.event.capybara.label }} |
                         <span v-if="props.event.date.is_all_day">

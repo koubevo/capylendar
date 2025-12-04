@@ -30,7 +30,7 @@ function submit() {
 
 <template>
     <Head title="Přidat event" />
-    <AuthenticatedLayout>
+    <AuthenticatedLayout :display-floating-action-button="false">
         <h2>Přidat event</h2>
         <EventForm
             :form="form"

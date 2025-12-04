@@ -8,10 +8,12 @@ import AppLayout from '@/layouts/AppLayout.vue';
 
 interface Props {
     displayFooter: boolean;
+    displayFloatingActionButton: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     displayFooter: false,
+    displayFloatingActionButton: true,
 });
 </script>
 
@@ -26,6 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
         </UMain>
 
         <FloatingActionButton
+            v-if="props.displayFloatingActionButton"
             aria-label="Přidat event"
             :to="EventController.create()"
         />

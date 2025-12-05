@@ -9,6 +9,7 @@ use App\Http\Resources\EventResource;
 use App\Models\Event;
 use App\services\EventService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,10 +24,20 @@ class EventController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(Request $request): Response
     {
+        $event = null;
+
+        if ($request->has('duplicate_event_id')) {
+            $foundEvent = Event::find($request->input('duplicate_event_id'));
+            if ($foundEvent instanceof Event) {
+                $event = new EventResource($foundEvent);
+            }
+        }
+
         return Inertia::render('events/EventCreate', [
             'capybaraOptions' => Capybara::options(),
+            'event' => $event?->resolve(),
         ]);
     }
 

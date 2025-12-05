@@ -29,7 +29,7 @@ class EventController extends Controller
         $event = null;
 
         if ($request->has('duplicate_event_id')) {
-            $foundEvent = Event::find($request->input('duplicate_event_id'));
+            $foundEvent = Event::findOrFail($request->input('duplicate_event_id'));
             if ($foundEvent instanceof Event) {
                 $event = new EventResource($foundEvent);
             }

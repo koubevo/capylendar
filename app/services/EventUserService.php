@@ -18,9 +18,9 @@ class EventUserService
     public function assignSubscribers(Event $event, bool $isPrivateEvent, User $author): void
     {
         if ($isPrivateEvent) {
-            $event->subscribers()->attach($author);
+            $event->subscribers()->sync($author);
         } else {
-            $event->subscribers()->attach(User::pluck('id'));
+            $event->subscribers()->sync(User::pluck('id'));
         }
     }
 }

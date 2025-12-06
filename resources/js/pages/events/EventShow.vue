@@ -35,9 +35,8 @@ const props = defineProps<{
                     >
                         <UIcon name="i-lucide-copy-plus" class="size-6" />
                     </Link>
-                    <Link disabled>
-                        <!-- wip: name="i-lucide-square-pen" -->
-                        <UIcon name="i-lucide-construction" class="size-6" />
+                    <Link :href="EventController.edit(props.event)">
+                        <UIcon name="i-lucide-square-pen" class="size-6" />
                     </Link>
                     <Link disabled>
                         <!-- wip: name="i-lucide-square-x" -->

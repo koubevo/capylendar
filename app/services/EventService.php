@@ -4,6 +4,7 @@ namespace App\services;
 
 use App\Enums\EventType;
 use App\Http\Requests\Event\StoreEventRequest;
+use App\Http\Requests\Event\UpdateEventRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
 use App\Models\User;
@@ -28,6 +29,25 @@ class EventService
 
         return DB::transaction(function () use ($author, $eventData, $isPrivateEvent) {
             $event = $author->authoredEvents()->create($eventData);
+
+            $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
+
+            return $event;
+        });
+    }
+
+    public function update(Event $event, UpdateEventRequest $request): ?Event
+    {
+        $eventData = $request->safe()->except(['is_private']);
+        $isPrivateEvent = $request->boolean('is_private');
+        $author = $request->user();
+
+        if (! $author) {
+            return null;
+        }
+
+        return DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $event) {
+            $event->update($eventData);
 
             $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
 

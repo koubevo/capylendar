@@ -48,14 +48,19 @@ class EventController extends Controller
         return redirect('dashboard');
     }
 
-    public function edit(UpdateEventRequest $event): void
+    public function edit(Event $event): Response
     {
-        //
+        return Inertia::render('events/EventEdit', [
+            'capybaraOptions' => Capybara::options(),
+            'event' => EventResource::make($event)->resolve(),
+        ]);
     }
 
-    public function update(UpdateEventRequest $request, Event $event): void
+    public function update(Event $event, UpdateEventRequest $request): RedirectResponse
     {
-        //
+        $this->eventService->update($event, $request);
+
+        return to_route('dashboard');
     }
 
     public function destroy(Event $event): void

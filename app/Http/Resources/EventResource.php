@@ -40,7 +40,7 @@ class EventResource extends JsonResource
                 'is_all_day' => (bool) $this->resource->is_all_day,
 
                 'label' => $this->getHumanDateLabel($start),
-                'start_time' => $start->format('H:i'),
+                'start_time' => $this->resource->is_all_day ? '' : $start->format('H:i'),
                 'end_time' => $this->resource->end_at?->format('H:i'),
             ],
 

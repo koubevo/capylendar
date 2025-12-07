@@ -30,7 +30,7 @@ class EventResource extends JsonResource
 
         $hasHearts = Str::contains(
             Str::lower($this->resource->title),
-            array_map('strtolower', $heartKeywords)
+            $heartKeywords
         );
 
         /** @var Carbon $start */

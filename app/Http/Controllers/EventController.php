@@ -60,11 +60,13 @@ class EventController extends Controller
     {
         $this->eventService->update($event, $request);
 
-        return to_route('dashboard');
+        return to_route('event.show', $event);
     }
 
-    public function destroy(Event $event): void
+    public function destroy(Event $event): RedirectResponse
     {
-        //
+        $event->delete();
+
+        return to_route('dashboard');
     }
 }

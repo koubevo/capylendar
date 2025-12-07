@@ -29,7 +29,10 @@ const props = defineProps<{
                     class="size-6"
                 />
             </Link>
-            <DeleteModal :deleteAction="props.deleteAction">
+            <DeleteModal
+                v-if="props.deleteAction"
+                :deleteAction="props.deleteAction"
+            >
                 <template #body>
                     <slot name="delete-modal-body" />
                 </template>

@@ -27,7 +27,6 @@ const items = [
 </script>
 
 <template>
-    <Head title="Domů" />
     <AuthenticatedLayout :display-footer="true">
         <UTabs :items="items">
             <template #upcoming>

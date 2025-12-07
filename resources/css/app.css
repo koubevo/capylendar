@@ -11,7 +11,7 @@
     }
 
     h3 {
-        @apply mb-1 font-bold lowercase;
+        @apply mb-1 font-bold;
     }
 
     .component-alert-text {

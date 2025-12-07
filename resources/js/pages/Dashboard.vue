@@ -2,7 +2,6 @@
 import EventsList from '@/components/events/EventsList.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import type { Event } from '@/types/Event';
-import { Head } from '@inertiajs/vue3';
 
 //TODO: pinia
 interface Props {
@@ -27,7 +26,6 @@ const items = [
 </script>
 
 <template>
-    <Head title="Domů" />
     <AuthenticatedLayout :display-footer="true">
         <UTabs :items="items">
             <template #upcoming>

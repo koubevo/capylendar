@@ -26,8 +26,6 @@ class Event extends Model
 {
     /** @use HasFactory<EventFactory> */
     use HasFactory;
-
-    /** @use SoftDeletes<Event> */
     use SoftDeletes;
 
     /**

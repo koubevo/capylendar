@@ -29,7 +29,7 @@ const props = defineProps<{
                     class="size-6"
                 />
             </Link>
-            <DeleteModal :delete="props.deleteAction">
+            <DeleteModal :deleteAction="props.deleteAction">
                 <template #body>
                     <slot name="delete-modal-body" />
                 </template>

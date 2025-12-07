@@ -37,7 +37,7 @@ function submit() {
         </h2>
         <EventForm
             :form="form"
-            :is-edit-mode="false"
+            :is-edit-mode="true"
             :capybara-options="props.capybaraOptions"
             @submit="submit"
         />

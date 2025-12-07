@@ -2,19 +2,18 @@
 import { DeleteAction } from '@/types/Button';
 
 const props = defineProps<{
-    delete: DeleteAction;
+    deleteAction: DeleteAction;
 }>();
 </script>
 
 <template>
     <UModal
-        v-model:open="open"
-        :title="props.delete.title"
+        :title="props.deleteAction.title"
         :ui="{ footer: 'justify-end', title: 'm-0' }"
     >
         <button class="cursor-pointer">
             <UIcon
-                :name="props.delete.icon ?? 'i-lucide-square-x'"
+                :name="props.deleteAction.icon ?? 'i-lucide-square-x'"
                 class="size-6"
             />
         </button>
@@ -30,7 +29,11 @@ const props = defineProps<{
                 variant="outline"
                 @click="close"
             />
-            <UButton label="Smazat" color="primary" :to="props.delete.url" />
+            <UButton
+                label="Smazat"
+                color="primary"
+                :to="props.deleteAction.url"
+            />
         </template>
     </UModal>
 </template>

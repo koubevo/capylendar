@@ -6,6 +6,7 @@ use App\Models\Event;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class EventResource extends JsonResource
 {
@@ -25,6 +26,12 @@ class EventResource extends JsonResource
     public function toArray(Request $request): array
     {
         $capybaraData = $this->resource->capybara->info();
+        $heartKeywords = config('app.heart_keywords', []);
+
+        $hasHearts = Str::contains(
+            Str::lower($this->resource->title),
+            array_map('strtolower', $heartKeywords)
+        );
 
         /** @var Carbon $start */
         $start = $this->resource->start_at;
@@ -34,6 +41,7 @@ class EventResource extends JsonResource
             'title' => $this->resource->title,
             'description' => $this->resource->description,
             'is_private' => $this->resource->is_private,
+            'has_hearts' => $hasHearts,
 
             'date' => [
                 'key' => $start->format('Y-m-d'),

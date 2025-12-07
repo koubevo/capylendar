@@ -8,8 +8,11 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <UCard :class="props.event.capybara.classes">
-        <div class="flex items-center justify-between">
+    <UCard :class="props.event.capybara.classes" class="event-card">
+        <div
+            class="flex items-center justify-between p-4"
+            :class="event.has_hearts ? 'bg-hearts' : ''"
+        >
             <div>
                 <h3 class="font-bold">{{ props.event.title }}</h3>
                 <div class="flex items-center gap-x-1">

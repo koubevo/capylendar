@@ -137,4 +137,5 @@ return [
         'name' => env('APP_YELLOW_NAME', 'Yellow'),
     ],
 
+    'heart_keywords' => explode(',', env('APP_EVENT_HEART_KEYWORDS', '')),
 ];

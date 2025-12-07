@@ -7,6 +7,7 @@ export interface Event {
     capybara: Capybara;
     is_private: boolean;
     description?: string;
+    has_hearts: boolean;
 }
 
 export interface EventDate {

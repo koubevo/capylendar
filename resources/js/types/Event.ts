@@ -22,6 +22,4 @@ export interface EventDate {
     is_all_day: boolean;
 }
 
-export interface View {
-    value: 'list' | 'detail';
-}
+export type View = 'list' | 'detail';

@@ -106,7 +106,7 @@ class Event extends Model
     protected function createdAtHuman(): Attribute
     {
         return Attribute::make(
-            get: fn ($value, $attributes) => $this->created_at->diffForHumans()
+            get: fn () => $this->created_at->diffForHumans()
         );
     }
 

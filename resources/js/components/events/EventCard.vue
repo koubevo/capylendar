@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Event, View } from '@/types/Event';
+import { computed } from 'vue';
 interface Props {
     event: Event;
     view: View;
@@ -9,8 +10,8 @@ const props = withDefaults(defineProps<Props>(), {
     view: 'list',
 });
 
-const showListItems = props.view === 'list';
-const showDetailItems = props.view === 'detail';
+const showListItems = computed(() => props.view === 'list');
+const showDetailItems = computed(() => props.view === 'detail');
 </script>
 
 <template>

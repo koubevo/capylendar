@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Event } from '@/types/Event';
 import { User } from '@/types';
 import InfoParagraph from '@/components/ui/InfoParagraph.vue';
 

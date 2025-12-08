@@ -13,9 +13,11 @@ const props = defineProps<{
 
 <template>
     <UCard :class="props.classes">
-        <InfoParagraph v-if="props.description" label="Popis" :value="props.description" />
-        <InfoParagraph v-if="props.updated_at_human" label="Upraveno" :value="props.updated_at_human" />
-        <InfoParagraph v-else label="Přidáno" :value="props.created_at_human" />
-        <InfoParagraph label="Autor" :value="props.author.name" />
+        <div class="flex flex-col gap-y-4">
+            <InfoParagraph v-if="props.description" label="Popis" :value="props.description" />
+            <InfoParagraph v-if="props.updated_at_human" label="Upraveno" :value="props.updated_at_human" />
+            <InfoParagraph v-else label="Přidáno" :value="props.created_at_human" />
+            <InfoParagraph label="Autor" :value="props.author.name" />
+        </div>
     </UCard>
 </template>

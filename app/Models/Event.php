@@ -21,11 +21,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Capybara $capybara
  * @property string|null $description
  * @property bool $is_private
+ * @property Carbon $created_at
+ * @property Carbon|null $updated_at
+ * @property string $created_at_human
+ * @property string|null $updated_at_human
+ * @property User $author
  */
 class Event extends Model
 {
     /** @use HasFactory<EventFactory> */
     use HasFactory;
+
     use SoftDeletes;
 
     /**
@@ -52,9 +58,18 @@ class Event extends Model
         return [
             'start_at' => 'datetime',
             'end_at' => 'datetime',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
             'is_all_day' => 'boolean',
             'capybara' => Capybara::class,
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (Event $event) {
+            $event->updated_at = null;
+        });
     }
 
     /**
@@ -82,6 +97,26 @@ class Event extends Model
             get: fn ($value, $attributes) => array_key_exists('subscribers_count', $attributes)
                 ? $attributes['subscribers_count'] === 1
                 : $this->subscribers()->count() === 1
+        );
+    }
+
+    /**
+     * @return Attribute<bool, never>
+     */
+    protected function createdAtHuman(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, $attributes) => $this->created_at->diffForHumans()
+        );
+    }
+
+    /**
+     * @return Attribute<bool, never>
+     */
+    protected function updatedAtHuman(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->updated_at?->diffForHumans()
         );
     }
 }

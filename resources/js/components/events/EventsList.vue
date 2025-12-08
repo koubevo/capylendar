@@ -41,7 +41,7 @@ const groupedEvents = computed(() => {
 
     <div v-if="props.events.length" class="space-y-4">
         <section v-for="(events, dateKey) in groupedEvents" :key="dateKey">
-            <h3>
+            <h3 class="lowercase">
                 {{ events[0].date.label }}
             </h3>
 

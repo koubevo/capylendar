@@ -1,10 +1,17 @@
 <script setup lang="ts">
-import type { Event } from '@/types/Event';
+import type { Event, View } from '@/types/Event';
+import { computed } from 'vue';
 interface Props {
     event: Event;
+    view: View;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    view: 'list',
+});
+
+const showListItems = computed(() => props.view === 'list');
+const showDetailItems = computed(() => props.view === 'detail');
 </script>
 
 <template>
@@ -23,11 +30,14 @@ const props = defineProps<Props>();
                     />
                     <UIcon
                         name="i-lucide-notepad-text"
-                        v-if="props.event.description"
+                        v-if="props.event.description && showListItems"
                         class="size-3"
                     />
                     <p class="text-xs">
                         {{ props.event.capybara.label }} |
+                        <span v-if="showDetailItems">
+                            {{ props.event.date.label }} |
+                        </span>
                         <span v-if="props.event.date.is_all_day">
                             Celý den
                         </span>

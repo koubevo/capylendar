@@ -1,4 +1,5 @@
 import { Capybara } from '@/types/Capybara';
+import { User } from '@/types/index';
 
 export interface Event {
     id: number;
@@ -8,6 +9,9 @@ export interface Event {
     is_private: boolean;
     description?: string;
     has_hearts: boolean;
+    created_at_human: string;
+    updated_at_human?: string;
+    author: User;
 }
 
 export interface EventDate {
@@ -17,3 +21,5 @@ export interface EventDate {
     end_time: string;
     is_all_day: boolean;
 }
+
+export type View = 'list' | 'detail';

@@ -26,6 +26,8 @@ class EventResource extends JsonResource
     public function toArray(Request $request): array
     {
         $capybaraData = $this->resource->capybara->info();
+
+        /** @var array<string> */
         $heartKeywords = config('app.heart_keywords', []);
 
         $hasHearts = Str::contains(
@@ -42,6 +44,11 @@ class EventResource extends JsonResource
             'description' => $this->resource->description,
             'is_private' => $this->resource->is_private,
             'has_hearts' => $hasHearts,
+            'author' => [
+                'id' => $this->resource->author->id,
+                'name' => $this->resource->author->name,
+                'capybara' => $this->resource->author->capybara,
+            ],
 
             'date' => [
                 'key' => $start->format('Y-m-d'),
@@ -58,6 +65,9 @@ class EventResource extends JsonResource
                 'classes' => $capybaraData['classes'],
                 'avatar' => $capybaraData['avatar'],
             ],
+
+            'created_at_human' => $this->resource->created_at_human,
+            'updated_at_human' => $this->resource->updated_at_human,
         ];
     }
 

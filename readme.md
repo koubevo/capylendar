@@ -1,48 +1,69 @@
-# Capylendar
+# 🗓️ Capylendar
 
-Capylendar is a mobile-first web application designed for shared event management between partners. It utilizes a
-chronological feed layout rather than a traditional calendar grid to streamline event visibility on smaller devices.
+**Capylendar** is a modern, shared calendar application built on **Laravel 12** and **Vue 3**, focusing on simplicity,
+speed, and... capybaras. 🦦
 
-The project serves as a technical playground for implementing modern full-stack patterns using Laravel 12, Vue 3, and
-TypeScript.
+The app is designed primarily for sharing events between users (e.g., couples), featuring private notes and color-coded
+themes (based on "Capybaras").
 
-![Status](https://img.shields.io/badge/status-active_development-yellow)
-![PHP](https://img.shields.io/badge/PHP-8.4-777BB4)
-![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20)
-![Vue](https://img.shields.io/badge/Vue.js-3-4FC08D)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)
+---
 
-## Technology Stack
+## 🛠 Tech Stack
 
-The application is built on a monolithic architecture using Inertia.js to avoid the complexity of a separate API layer.
+The project utilizes the latest standards in modern PHP and JavaScript development:
 
-* **Backend:** Laravel 12
-* **Frontend:** Vue 3 (Composition API) + TypeScript
-* **Routing/Glue:** Inertia.js
-* **UI Framework:** Nuxt UI (Tailwind CSS v4)
-* **Database:** PostgreSQL
-* **Environment:** Docker via Laravel Sail
-* **Static Analysis:** PHPStan (Level 9)
-* **Code Review:** Gemini
+* **Backend:** [Laravel 12](https://laravel.com) (PHP 8.4+)
+* **Frontend:** [Vue 3](https://vuejs.org) (Composition API, `<script setup>`)
+* **Language:** TypeScript & PHP (Strict types)
+* **Bridge:** [Inertia.js](https://inertiajs.com) (Monolith feel, SPA speed)
+* **Styling:** [Tailwind CSS](https://tailwindcss.com) & [Nuxt UI](https://ui.nuxt.com)
+* **Database:** PostgreSQL 17
+* **Tooling:** Vite, ESLint, Prettier, PHPStan, Pest
 
-## Architecture & Design Patterns
+---
 
-The codebase adheres to strict typing and separation of concerns.
+## ✨ Key Features
 
-### Database Design
+* **Shared vs. Private Events:**
+    * Users can create events visible to all assigned users (via `event_user` Pivot table).
+    * Option to toggle "Private" mode (visible only to the author).
+* **Capybara Themes:**
+    * Events are categorized using the `Capybara` Enum (Blue, Pink, Yellow).
+    * Each category has its own color scheme and avatar.
+* **Dashboard:**
+    * Separated into **Upcoming** and **History** tabs.
+* **Smart Features:**
+    * 💖 **Love Detection:** The backend automatically detects keywords in the title (e.g., "date", "love") and adds a
+      subtle heart pattern to the event card background.
+    * 📝 **Duplication:** Create a copy of an event with pre-filled data in one click.
+    * 🕒 **Human Readable Dates:** Creation and update times are formatted as "5 minutes ago".
 
-* **Pivot Tables:** Many-to-Many (M:N) relationships are used to manage event visibility between users.
-* **Standardization:** Dates are stored in standard SQL `datetime` format and formatted for the user locale on the
-  frontend (or backend via Carbon, depending on context).
+---
 
-## Key Features
+## 🏗 Architecture & Best Practices
 
-* **User Differentiation:** Events are visually coded based on the participant (Blue/Self, Pink/Partner, Yellow/Shared).
-* **Grouped Feed:** Events are dynamically grouped by date headers (Today, Tomorrow, specific dates) on the frontend.
-* **Mobile-First UI:** Interface elements, including the Floating Action Button (FAB) and input controls, are optimized
-  for touch interaction and bottom-thumb zones.
+The project places a strong emphasis on **Clean Code** and maintainability:
+
+### Backend (Laravel)
+
+* **Service Layer:** Data manipulation logic (Create, Update) is isolated in `EventService`. The Controller only manages
+  the data flow.
+* **API Resources:** Data transformation for the frontend is handled exclusively via `EventResource`. No raw Eloquent
+  models are exposed.
+* **Enums:** Native PHP Enums are used for states and types (e.g., `Capybara`, `EventType`) with methods for frontend
+  consumption (colors, labels).
+* **Optimization:**
+    * Usage of DB Transactions when saving M:N relationships.
+
+### Frontend (Vue + TypeScript)
+
+* **Composables:** Form logic is extracted into `EventForm.ts`. Components handle UI only.
+* **Type Safety:** All backend data (Props) have defined TypeScript interfaces (`types/Event.ts`).
+* **Atomic Design:** UI is broken down into small, reusable components (`ActionCard`, `DeleteModal`, `InfoCard`).
 
 ---
 
 This README file was generated with assistance from Google's Gemini assistant 3 Pro version, based on specifications
 provided by the project author.
+
+Made with ❤️ and 🦦 by Vojtěch Koubek

@@ -18,7 +18,8 @@ The project utilizes the latest standards in modern PHP and JavaScript developme
 * **Bridge:** [Inertia.js](https://inertiajs.com) (Monolith feel, SPA speed)
 * **Styling:** [Tailwind CSS](https://tailwindcss.com) & [Nuxt UI](https://ui.nuxt.com)
 * **Database:** PostgreSQL 17
-* **Tooling:** Vite, ESLint, Prettier, PHPStan, Pest
+* **Tooling:** Sail (Docker), Vite, ESLint, Prettier, PHPStan (level 9), Pest, Pint, Telescope
+* **PR Reviews** Gemini, Code Rabbit
 
 ---
 
@@ -60,12 +61,14 @@ The project places a strong emphasis on **Clean Code** and maintainability:
 * **Composables:** Form logic is extracted into `EventForm.ts`. Components handle UI only.
 * **Type Safety:** All backend data (Props) have defined TypeScript interfaces (`types/Event.ts`).
 * **Atomic Design:** UI is broken down into small, reusable components (`ActionCard`, `DeleteModal`, `InfoCard`).
+* **Mobile-First UI** Interface elements, including the Floating Action Button (FAB) and input controls, are optimized
+  for touch interaction and bottom-thumb zones.
 
 ---
 
-### Deployment
+## Deployment
 
-App is deployed at Laravel Cloud.
+The app is deployed on [Laravel Cloud](https://cloud.laravel.com).
 
 ---
 

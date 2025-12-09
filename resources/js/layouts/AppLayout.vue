@@ -7,7 +7,7 @@ const page = usePage();
 
 watch(
     () => page.props.flash,
-    (flash: any) => {
+    (flash: { success?: string; error?: string }) => {
         if (!flash) return;
 
         if (flash.success) {

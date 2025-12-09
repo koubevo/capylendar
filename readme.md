@@ -63,6 +63,12 @@ The project places a strong emphasis on **Clean Code** and maintainability:
 
 ---
 
+### Deployment
+
+App is deployed at Laravel Cloud.
+
+---
+
 This README file was generated with assistance from Google's Gemini assistant 3 Pro version, based on specifications
 provided by the project author.
 

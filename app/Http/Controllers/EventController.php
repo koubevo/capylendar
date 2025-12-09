@@ -45,7 +45,7 @@ class EventController extends Controller
     {
         $event = $this->eventService->store($request);
 
-        return redirect('dashboard');
+        return redirect('dashboard')->with('success', 'Event úspěšně přidán');
     }
 
     public function edit(Event $event): Response
@@ -60,13 +60,13 @@ class EventController extends Controller
     {
         $this->eventService->update($event, $request);
 
-        return to_route('event.show', $event);
+        return to_route('event.show', $event)->with('success', 'Event úspěšně aktualizován');
     }
 
     public function destroy(Event $event): RedirectResponse
     {
         $event->delete();
 
-        return to_route('dashboard');
+        return to_route('dashboard')->with('success', 'Event úspěšně smazán');
     }
 }

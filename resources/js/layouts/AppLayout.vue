@@ -1,13 +1,35 @@
 <script setup lang="ts">
-import type { BreadcrumbItemType } from '@/types';
+import { usePage } from '@inertiajs/vue3';
+import { watch } from 'vue';
 
-interface Props {
-    breadcrumbs?: BreadcrumbItemType[];
-}
+const toast = useToast();
+const page = usePage();
 
-withDefaults(defineProps<Props>(), {
-    breadcrumbs: () => [],
-});
+watch(
+    () => page.props.flash,
+    (flash: any) => {
+        if (!flash) return;
+
+        if (flash.success) {
+            toast.add({
+                title: 'Jupí',
+                description: flash.success,
+                color: 'primary',
+                icon: 'i-lucide-check-circle',
+            });
+        }
+
+        if (flash.error) {
+            toast.add({
+                title: 'Chyba',
+                description: flash.error,
+                color: 'error',
+                icon: 'i-lucide-alert-circle',
+            });
+        }
+    },
+    { deep: true, immediate: true },
+);
 </script>
 
 <template>

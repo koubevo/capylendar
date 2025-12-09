@@ -7,6 +7,8 @@ import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appPrimaryColor = import.meta.env.APP_PRIMARY_COLOR || 'f6339a';
+console.error(appPrimaryColor);
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -22,6 +24,6 @@ createInertiaApp({
             .mount(el);
     },
     progress: {
-        color: '#4B5563',
+        color: '#' + appPrimaryColor,
     },
 });

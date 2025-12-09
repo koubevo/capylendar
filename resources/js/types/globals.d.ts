@@ -4,6 +4,7 @@ import { AppPageProps } from '@/types/index';
 declare module 'vite/client' {
     interface ImportMetaEnv {
         readonly VITE_APP_NAME: string;
+        readonly APP_PRIMARY_COLOR: string;
         [key: string]: string | boolean | undefined;
     }
 

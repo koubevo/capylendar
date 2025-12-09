@@ -102,7 +102,7 @@ const emit = defineEmits<{
             </div>
 
             <UFormField
-                label="Poznámka"
+                label="Popis"
                 name="description"
                 :error="props.form.errors.description"
             >

@@ -26,7 +26,7 @@ const props = defineProps<{
                 :classes="props.event.capybara.classes"
             />
             <PreviewCard
-                v-if="props.event.meta?.map_preview"
+                v-if="props.event.has_map_meta"
                 :url="props.event.meta.map_preview.url"
                 :image="props.event.meta.map_preview.image"
                 :title="props.event.meta.map_preview.title"

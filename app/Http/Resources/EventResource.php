@@ -58,6 +58,7 @@ class EventResource extends JsonResource
                 'capybara' => $this->resource->author->capybara,
             ],
             'meta' => $this->resource->meta,
+            'has_map_meta' => ! empty($meta['map_preview']),
 
             'date' => [
                 'key' => $start->format('Y-m-d'),

@@ -19,6 +19,7 @@ export interface Event {
             url: string;
         };
     };
+    has_map_meta: boolean;
 }
 
 export interface EventDate {

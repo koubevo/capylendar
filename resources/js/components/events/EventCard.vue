@@ -33,6 +33,11 @@ const showDetailItems = computed(() => props.view === 'detail');
                         v-if="props.event.description && showListItems"
                         class="size-3"
                     />
+                    <UIcon
+                        name="i-lucide-map-pinned"
+                        v-if="props.event.has_map_meta && showListItems"
+                        class="size-3"
+                    />
                     <p class="text-xs">
                         {{ props.event.capybara.label }} |
                         <span v-if="showDetailItems">

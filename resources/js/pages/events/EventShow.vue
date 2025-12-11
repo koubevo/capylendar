@@ -22,7 +22,7 @@ const props = defineProps<{
                 :author="props.event.author"
                 :created_at_human="props.event.created_at_human"
                 :updated_at_human="props.event.updated_at_human"
-                :description="props.event.description"
+                :description="props.event.description_without_meta"
                 :classes="props.event.capybara.classes"
             />
             <PreviewCard

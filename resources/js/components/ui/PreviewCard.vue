@@ -53,7 +53,7 @@ const domain = computed(() => {
         :href="url"
         target="_blank"
         rel="noopener noreferrer"
-        class="block group no-underline rounded-md overflow-hidden transition-all duration-700 ease-out transform"
+        class="block group no-underline rounded-md overflow-hidden transition-all duration-700 ease-out transform border border-gray-200"
         :class="[
             props.classes,
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'

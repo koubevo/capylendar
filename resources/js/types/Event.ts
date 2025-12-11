@@ -8,6 +8,7 @@ export interface Event {
     capybara: Capybara;
     is_private: boolean;
     description?: string;
+    description_without_meta?: string;
     has_hearts: boolean;
     created_at_human: string;
     updated_at_human?: string;

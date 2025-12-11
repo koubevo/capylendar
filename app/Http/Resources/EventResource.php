@@ -40,16 +40,13 @@ class EventResource extends JsonResource
 
         $meta = $this->resource->meta;
         $description = $this->resource->description;
-
-        if (! empty($meta['map_preview']['url'])) {
-            $description = str_replace($meta['map_preview']['url'], '', $description ?? '');
-            $description = trim($description);
-        }
+        $descriptionWithoutMeta = $this->getDescriptionWithoutMeta($description, $meta);
 
         return [
             'id' => $this->resource->id,
             'title' => $this->resource->title,
             'description' => $description,
+            'description_without_meta' => $descriptionWithoutMeta ?? $description,
             'is_private' => $this->resource->is_private,
             'has_hearts' => $hasHearts,
             'author' => [
@@ -92,5 +89,15 @@ class EventResource extends JsonResource
         }
 
         return ucfirst($date->translatedFormat('l d.m.y'));
+    }
+
+    private function getDescriptionWithoutMeta(?string $description, ?array $meta): ?string
+    {
+        if (! empty($meta['map_preview']['url'])) {
+            $descriptionWithoutMeta = str_replace($meta['map_preview']['url'], '', $description ?? '');
+            $descriptionWithoutMeta = trim($descriptionWithoutMeta);
+        }
+
+        return $descriptionWithoutMeta ?? null;
     }
 }

@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $created_at_human
  * @property string|null $updated_at_human
  * @property User $author
+ * @property array|null $meta
  */
 class Event extends Model
 {
@@ -48,6 +49,7 @@ class Event extends Model
         'is_all_day',
         'description',
         'icon',
+        'meta',
     ];
 
     /**
@@ -62,6 +64,7 @@ class Event extends Model
             'updated_at' => 'datetime',
             'is_all_day' => 'boolean',
             'capybara' => Capybara::class,
+            'meta' => 'array',
         ];
     }
 

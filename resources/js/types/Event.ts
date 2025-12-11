@@ -12,6 +12,13 @@ export interface Event {
     created_at_human: string;
     updated_at_human?: string;
     author: User;
+    meta?: {
+        map_preview?: {
+            title: string;
+            image: string;
+            url: string;
+        };
+    };
 }
 
 export interface EventDate {

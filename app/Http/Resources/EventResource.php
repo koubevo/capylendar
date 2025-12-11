@@ -38,10 +38,18 @@ class EventResource extends JsonResource
         /** @var Carbon $start */
         $start = $this->resource->start_at;
 
+        $meta = $this->resource->meta;
+        $description = $this->resource->description;
+
+        if (! empty($meta['map_preview']['url'])) {
+            $description = str_replace($meta['map_preview']['url'], '', $description ?? '');
+            $description = trim($description);
+        }
+
         return [
             'id' => $this->resource->id,
             'title' => $this->resource->title,
-            'description' => $this->resource->description,
+            'description' => $description,
             'is_private' => $this->resource->is_private,
             'has_hearts' => $hasHearts,
             'author' => [
@@ -49,6 +57,7 @@ class EventResource extends JsonResource
                 'name' => $this->resource->author->name,
                 'capybara' => $this->resource->author->capybara,
             ],
+            'meta' => $this->resource->meta,
 
             'date' => [
                 'key' => $start->format('Y-m-d'),

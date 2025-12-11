@@ -96,11 +96,13 @@ class EventResource extends JsonResource
      */
     private function getDescriptionWithoutMeta(?string $description, ?array $meta): ?string
     {
+        $descriptionWithoutMeta = null;
+
         if (! empty($meta['map_preview']['url'])) {
             $descriptionWithoutMeta = str_replace($meta['map_preview']['url'], '', $description ?? '');
             $descriptionWithoutMeta = trim($descriptionWithoutMeta);
         }
 
-        return $descriptionWithoutMeta ?? null;
+        return $descriptionWithoutMeta;
     }
 }

@@ -8,6 +8,8 @@ const props = defineProps<{
 <template>
     <div>
         <h4 class="text-[10px] font-bold">{{props.label}}</h4>
-        {{ props.value }}
+        <div class="whitespace-pre-wrap leading-relaxed">
+            {{ props.value }}
+        </div>
     </div>
 </template>

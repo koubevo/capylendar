@@ -9,7 +9,10 @@ use App\Http\Resources\EventResource;
 use App\Models\Event;
 use App\Models\User;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use shweshi\OpenGraph\OpenGraph;
 
 class EventService
 {
@@ -26,6 +29,8 @@ class EventService
         if (! $author) {
             return null;
         }
+
+        $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
 
         return DB::transaction(function () use ($author, $eventData, $isPrivateEvent) {
             $event = $author->authoredEvents()->create($eventData);
@@ -46,6 +51,8 @@ class EventService
             return null;
         }
 
+        $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
+
         return DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $event) {
             $event->update($eventData);
 
@@ -53,6 +60,59 @@ class EventService
 
             return $event;
         });
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function resolveMetadata(?string $description): ?array
+    {
+        $meta = [];
+
+        if (! $description) {
+            return null;
+        }
+
+        if ($mapPreview = $this->resolveMapPreview($description)) {
+            $meta['map_preview'] = $mapPreview;
+        }
+
+        return $meta ?: null;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function resolveMapPreview(string $description): ?array
+    {
+        $pattern = '/https?:\/\/(?:www\.)?(?:google\.(?:com|cz)\/maps\/[^\s]+|maps\.app\.goo\.gl\/[^\s]+)/';
+
+        if (! preg_match($pattern, $description, $matches)) {
+            return null;
+        }
+
+        $mapUrl = $matches[0];
+
+        try {
+            $og = new OpenGraph;
+            $data = $og->fetch($mapUrl);
+
+            $result = [];
+            $result['title'] = $data['title'] ?? null;
+            $result['image'] = $data['image'] ?? null;
+
+            if (! $result['title'] || ! $result['image']) {
+                return null;
+            }
+
+            $result['url'] = $mapUrl;
+
+            return $result;
+        } catch (Exception $e) {
+            Log::error('Failed to fetch OpenGraph data for map preview.', ['exception' => $e]);
+
+            return null;
+        }
     }
 
     /**

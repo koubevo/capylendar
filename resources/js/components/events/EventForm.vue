@@ -1,6 +1,8 @@
 <script setup lang="ts">
 /* eslint-disable vue/no-mutating-props */
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
+import MacroAlert from '@/components/ui/MacroAlert.vue';
+import { hasGoogleMapUrl } from '@/lib/utils';
 import { Capybara } from '@/types/Capybara';
 import type { EventFormData } from '@/types/EventFormData';
 import type { Form } from '@inertiajs/vue3';
@@ -20,6 +22,10 @@ const selectedAvatar = computed(() => {
     );
 
     return selected ? selected.avatar : undefined;
+});
+
+const mapDetected = computed(() => {
+    return hasGoogleMapUrl(props.form.description);
 });
 
 const emit = defineEmits<{
@@ -110,6 +116,11 @@ const emit = defineEmits<{
                     v-model="props.form.description"
                     class="w-full"
                     rows="5"
+                />
+                <MacroAlert
+                    v-show="mapDetected"
+                    icon="i-lucide-map-pinned"
+                    label="Bude vytvořena náhledová karta mapy"
                 />
             </UFormField>
 

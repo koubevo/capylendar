@@ -10,13 +10,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "fakerphp/faker": "^1.23",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
         "laravel/telescope": "^5.15",
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
-        "fakerphp/faker": "^1.23"
+        "shweshi/opengraph": "^1.2"
     },
     "require-dev": {
         "larastan/larastan": "^3.0",

@@ -49,7 +49,7 @@ abstract class EventFormRequest extends FormRequest
             'is_all_day' => ['boolean'],
             'is_private' => ['boolean'],
             'capybara' => ['required', Rule::enum(Capybara::class)],
-            'description' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
         ];
     }
 }

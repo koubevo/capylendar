@@ -91,6 +91,9 @@ class EventResource extends JsonResource
         return ucfirst($date->translatedFormat('l d.m.y'));
     }
 
+    /**
+     * @param  array<string, array<string, string>>|null  $meta
+     */
     private function getDescriptionWithoutMeta(?string $description, ?array $meta): ?string
     {
         if (! empty($meta['map_preview']['url'])) {

@@ -61,6 +61,9 @@ class EventService
         });
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     private function resolveMetadata(?string $description): ?array
     {
         if (! $description) {
@@ -74,6 +77,9 @@ class EventService
         return $meta ?? null;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     private function resolveMapPreview(string $description): ?array
     {
         $pattern = '/https?:\/\/(?:www\.)?(?:google\.(?:com|cz)\/maps\/[^\s]+|maps\.app\.goo\.gl\/[^\s]+)/';

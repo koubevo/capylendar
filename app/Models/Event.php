@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $created_at_human
  * @property string|null $updated_at_human
  * @property User $author
- * @property array|null $meta
+ * @property array<string, array<string, string>>|null $meta
  */
 class Event extends Model
 {

@@ -10,7 +10,7 @@ const props = defineProps<Props>();
 
 <template>
     <div
-        class="mt-2 flex items-center gap-2 rounded-md border border-pink-200 bg-pink-100 p-3 text-sm transition-all"
+        class="mt-2 flex items-center gap-2 rounded-md border border-gray-200 bg-pink-100 p-3 text-sm transition-all"
     >
         <UIcon :name="props.icon" />
         <span>{{props.label}}</span>

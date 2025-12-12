@@ -1,5 +1,6 @@
 import { Capybara } from '@/types/Capybara';
 import { User } from '@/types/index';
+import { Tag } from '@/types/Tag';
 
 export interface Event {
     id: number;
@@ -21,6 +22,7 @@ export interface Event {
         };
     };
     has_map_meta: boolean;
+    tags?: Tag[];
 }
 
 export interface EventDate {

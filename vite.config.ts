@@ -46,6 +46,11 @@ export default defineConfig(({ mode }) => {
                             size: 'xl',
                         },
                     },
+                    selectMenu: {
+                        defaultVariants: {
+                            size: 'xl',
+                        },
+                    },
                 },
                 colorMode: false,
             }),

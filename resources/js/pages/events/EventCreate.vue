@@ -5,6 +5,7 @@ import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import { Capybara } from '@/types/Capybara';
 import type { Event } from '@/types/Event';
 import { EventFormData } from '@/types/EventFormData';
+import { Tag } from '@/types/Tag';
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 
 const page = usePage();
@@ -12,6 +13,7 @@ const page = usePage();
 const props = defineProps<{
     capybaraOptions: Capybara[];
     event?: Event;
+    availableTags: Tag[];
 }>();
 
 const form = useForm<EventFormData>({
@@ -23,6 +25,7 @@ const form = useForm<EventFormData>({
     is_all_day: props.event?.date.is_all_day || false,
     is_private: props.event?.is_private || false,
     description: props.event?.description || '',
+    tags: props.event?.tags ? props.event.tags.map((t) => t.id) : [],
 });
 
 function submit() {
@@ -39,6 +42,7 @@ function submit() {
             :is-edit-mode="false"
             :capybara-options="props.capybaraOptions"
             @submit="submit"
+            :available-tags="props.availableTags"
         />
     </AuthenticatedLayout>
 </template>

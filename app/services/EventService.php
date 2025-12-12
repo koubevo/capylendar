@@ -16,13 +16,13 @@ use shweshi\OpenGraph\OpenGraph;
 
 class EventService
 {
-    public function __construct(protected EventUserService $eventUserService) {}
+    public function __construct(protected EventUserService $eventUserService, protected EventTagService $eventTagService) {}
 
     private const HISTORY_EVENTS_LIMIT = 20;
 
     public function store(StoreEventRequest $request): ?Event
     {
-        $eventData = $request->safe()->except(['is_private']);
+        $eventData = $request->safe()->except(['is_private', 'tags']);
         $isPrivateEvent = $request->boolean('is_private');
         $author = $request->user();
 
@@ -30,12 +30,15 @@ class EventService
             return null;
         }
 
+        $tags = $request->input('tags', []);
         $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
 
-        return DB::transaction(function () use ($author, $eventData, $isPrivateEvent) {
+        return DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $tags) {
             $event = $author->authoredEvents()->create($eventData);
 
             $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
+
+            $this->eventTagService->assignTags($event, $tags);
 
             return $event;
         });
@@ -43,7 +46,7 @@ class EventService
 
     public function update(Event $event, UpdateEventRequest $request): ?Event
     {
-        $eventData = $request->safe()->except(['is_private']);
+        $eventData = $request->safe()->except(['is_private', 'tags']);
         $isPrivateEvent = $request->boolean('is_private');
         $author = $request->user();
 
@@ -51,12 +54,15 @@ class EventService
             return null;
         }
 
+        $tags = $request->input('tags', []);
         $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
 
-        return DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $event) {
+        return DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $event, $tags) {
             $event->update($eventData);
 
             $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
+
+            $this->eventTagService->assignTags($event, $tags);
 
             return $event;
         });

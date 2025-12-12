@@ -5,16 +5,19 @@ import Tag from '@/components/tags/Tag.vue';
 
 interface Props {
     tags: Tag[];
+    canDelete: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    canDelete: false,
+});
 </script>
 
 <template>
-    <div class="flex flex-wrap gap-2">
+    <div class="flex flex-wrap gap-1">
         <div v-for="tag in props.tags" :key="tag.id">
             <Tag :tag="tag">
-                <template #delete-button>
+                <template #delete-button v-if="canDelete">
                     <DeleteModal
                         :delete-action="{
                             url: TagController.destroy(tag),

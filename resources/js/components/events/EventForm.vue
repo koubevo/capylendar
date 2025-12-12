@@ -5,6 +5,7 @@ import MacroAlert from '@/components/ui/MacroAlert.vue';
 import { hasGoogleMapUrl } from '@/lib/utils';
 import { Capybara } from '@/types/Capybara';
 import type { EventFormData } from '@/types/EventFormData';
+import { Tag } from '@/types/Tag';
 import type { Form } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -12,6 +13,7 @@ interface Props {
     form: Form<EventFormData>;
     isEditMode: boolean;
     capybaraOptions: Capybara[];
+    availableTags?: Tag[];
 }
 
 const props = defineProps<Props>();
@@ -26,6 +28,13 @@ const selectedAvatar = computed(() => {
 
 const mapDetected = computed(() => {
     return hasGoogleMapUrl(props.form.description);
+});
+
+const selectedTags = computed({
+    get: () => props.form.tags || [],
+    set: (value) => {
+        props.form.tags = value;
+    },
 });
 
 const emit = defineEmits<{
@@ -129,6 +138,61 @@ const emit = defineEmits<{
                 v-model="props.form.is_private"
                 :error="props.form.errors.is_private"
             />
+
+            <UFormField label="Štítky" name="tags">
+                <USelectMenu
+                    v-model="selectedTags"
+                    :items="props.availableTags || []"
+                    multiple
+                    placeholder="Vyber štítky..."
+                    value-key="id"
+                    :search-input="{ placeholder: 'Hledat štítek...' }"
+                    class="w-full"
+                >
+                    <template #option="{ option }">
+                        <span
+                            class="h-2 w-2 flex-shrink-0 rounded-full"
+                            :style="{ backgroundColor: option.color }"
+                        ></span>
+                        <span class="truncate">{{ option.label }}</span>
+                    </template>
+
+                    <template #label>
+                        <div
+                            v-if="selectedTags.length"
+                            class="flex flex-wrap gap-1"
+                        >
+                            <span
+                                v-for="tagId in selectedTags"
+                                :key="tagId"
+                                class="flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-700"
+                            >
+                                <span
+                                    class="h-1.5 w-1.5 rounded-full"
+                                    :style="{
+                                        backgroundColor:
+                                            props.availableTags?.find(
+                                                (t) => t.id === tagId,
+                                            )?.color,
+                                    }"
+                                ></span>
+                                {{
+                                    props.availableTags?.find(
+                                        (t) => t.id === tagId,
+                                    )?.label
+                                }}
+                            </span>
+                        </div>
+                        <span v-else class="text-gray-500"
+                            >Vyber štítky...</span
+                        >
+                    </template>
+                </USelectMenu>
+
+                <p class="mt-1 text-xs text-gray-500">
+                    Lze vybrat pouze existující štítky vytvořené v nastavení.
+                </p>
+            </UFormField>
 
             <PrimaryButton class="w-full justify-center" type="submit">
                 {{ props.isEditMode ? 'Upravit' : 'Přidat' }}

@@ -12,8 +12,6 @@ class EventTagService
      */
     public function assignTags(Event $event, array $tags): void
     {
-        if (! empty($tags)) {
-            $event->tags()->sync($tags);
-        }
+        $event->tags()->sync($tags);
     }
 }

@@ -133,12 +133,6 @@ const emit = defineEmits<{
                 />
             </UFormField>
 
-            <USwitch
-                label="Soukromé (tajný kapybara event)"
-                v-model="props.form.is_private"
-                :error="props.form.errors.is_private"
-            />
-
             <UFormField label="Štítky" name="tags">
                 <USelectMenu
                     v-model="selectedTags"
@@ -188,11 +182,13 @@ const emit = defineEmits<{
                         >
                     </template>
                 </USelectMenu>
-
-                <p class="mt-1 text-xs text-gray-500">
-                    Lze vybrat pouze existující štítky vytvořené v nastavení.
-                </p>
             </UFormField>
+
+            <USwitch
+                label="Soukromé (tajný kapybara event)"
+                v-model="props.form.is_private"
+                :error="props.form.errors.is_private"
+            />
 
             <PrimaryButton class="w-full justify-center" type="submit">
                 {{ props.isEditMode ? 'Upravit' : 'Přidat' }}

@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => {
                         primary: 'pink',
                         secondary: 'sky',
                         neutral: 'slate',
+                        success: 'teal',
                     },
                     button: {
                         base: 'cursor-pointer',

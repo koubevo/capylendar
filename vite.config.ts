@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => {
                         primary: 'pink',
                         secondary: 'sky',
                         neutral: 'slate',
+                        success: 'teal',
                     },
                     button: {
                         base: 'cursor-pointer',
@@ -41,6 +42,11 @@ export default defineConfig(({ mode }) => {
                         },
                     },
                     select: {
+                        defaultVariants: {
+                            size: 'xl',
+                        },
+                    },
+                    selectMenu: {
                         defaultVariants: {
                             size: 'xl',
                         },

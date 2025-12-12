@@ -13,8 +13,8 @@ const props = defineProps<{
     >
         <button class="cursor-pointer">
             <UIcon
-                :name="props.deleteAction.icon ?? 'i-lucide-square-x'"
-                class="size-6"
+                :name="props.deleteAction.icon?.name ?? 'i-lucide-square-x'"
+                :class="props.deleteAction.icon?.class ?? 'size-6'"
             />
         </button>
 

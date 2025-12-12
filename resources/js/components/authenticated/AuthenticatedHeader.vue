@@ -1,18 +1,60 @@
 <script setup lang="ts">
 import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
 import EventController from '@/actions/App/Http/Controllers/EventController';
+import TagController from '@/actions/App/Http/Controllers/TagController';
+import MenuItem from '@/components/authenticated/MenuItem.vue';
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import Logo from '@/components/Logo.vue';
+import AvatarSection from '@/components/ui/AvatarSection.vue';
 import { profile } from '@/routes';
-import { Link, usePage } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
-const page = usePage();
+const links = computed(() => [
+    {
+        label: 'Dashboard',
+        to: DashboardController(),
+    },
+    {
+        label: 'Můj Profil',
+        to: profile(),
+    },
+    {
+        label: 'Správa štítků',
+        to: TagController.index(),
+        isNew: true,
+    },
+]);
 </script>
 
 <template>
-    <UHeader :toggle="false" :to="DashboardController()">
+    <UHeader
+        :to="DashboardController()"
+        :ui="{
+            toggle: 'visible lg:flex',
+            content: 'lg:block',
+        }"
+    >
         <template #title>
             <logo />
+        </template>
+
+        <template #body>
+            <section class="md-w-1/5">
+                <Link :href="profile()">
+                    <AvatarSection size="small" />
+                </Link>
+                <USeparator class="my-8" />
+                <div class="flex flex-col gap-y-4">
+                    <MenuItem
+                        v-for="link in links"
+                        :key="link.to"
+                        :to="link.to"
+                        :label="link.label"
+                        :isNew="link.isNew"
+                    />
+                </div>
+            </section>
         </template>
 
         <template #right>
@@ -23,17 +65,6 @@ const page = usePage();
             >
                 Přidat event
             </PrimaryButton>
-            <Link :href="profile()">
-                <img
-                    :src="
-                        '/images/capys/' +
-                        page.props.auth.user.capybara +
-                        '.jpg'
-                    "
-                    :alt="page.props.auth.user.name"
-                    class="ms-2 h-8 w-8 rounded-md"
-                />
-            </Link>
         </template>
     </UHeader>
 </template>

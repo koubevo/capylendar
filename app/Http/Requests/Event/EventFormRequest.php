@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Event;
 
 use App\Enums\Capybara;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -38,7 +39,7 @@ abstract class EventFormRequest extends FormRequest
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -50,6 +51,8 @@ abstract class EventFormRequest extends FormRequest
             'is_private' => ['boolean'],
             'capybara' => ['required', Rule::enum(Capybara::class)],
             'description' => ['nullable', 'string'],
+            'tags' => ['nullable', 'array'],
+            'tags.*' => ['exists:tags,id'],
         ];
     }
 }

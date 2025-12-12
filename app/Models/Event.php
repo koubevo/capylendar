@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $updated_at_human
  * @property User $author
  * @property array<string, array<string, string>>|null $meta
+ * @property array<Tag> $tags
  */
 class Event extends Model
 {
@@ -89,6 +90,14 @@ class Event extends Model
     public function subscribers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'event_user');
+    }
+
+    /**
+     * @return BelongsToMany<Tag, $this>
+     */
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'event_tag');
     }
 
     /**

@@ -7,14 +7,6 @@ use App\Models\User;
 
 class EventUserService
 {
-    /**
-     * Create a new class instance.
-     */
-    public function __construct()
-    {
-        //
-    }
-
     public function assignSubscribers(Event $event, bool $isPrivateEvent, User $author): void
     {
         if ($isPrivateEvent) {

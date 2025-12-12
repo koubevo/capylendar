@@ -7,4 +7,5 @@ export interface EventFormData {
     is_all_day: boolean;
     is_private: boolean;
     description: string;
+    tags: number[];
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Construction from '@/components/Construction.vue';
 import PasswordForm from '@/components/settings/PasswordForm.vue';
+import AvatarSection from '@/components/ui/AvatarSection.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import { Head, usePage } from '@inertiajs/vue3';
 
@@ -24,21 +25,7 @@ const items = [
 
     <AuthenticatedLayout :display-footer="true">
         <section>
-            <div class="flex flex-col items-center gap-y-4">
-                <img
-                    :src="
-                        '/images/capys/' +
-                        page.props.auth.user.capybara +
-                        '.jpg'
-                    "
-                    :alt="page.props.auth.user.name"
-                    class="h-32 w-32 rounded-lg"
-                />
-                <div class="text-center">
-                    <h2 class="mb-0">{{ page.props.auth.user.name }}</h2>
-                    <p>{{ page.props.auth.user.email }}</p>
-                </div>
-            </div>
+            <AvatarSection />
         </section>
         <section class="mt-4">
             <UTabs :items="items">

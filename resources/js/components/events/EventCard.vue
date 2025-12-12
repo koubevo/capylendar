@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import TagsList from '@/components/tags/TagsList.vue';
 import type { Event, View } from '@/types/Event';
 import { computed } from 'vue';
 interface Props {
@@ -56,6 +57,11 @@ const showDetailItems = computed(() => props.view === 'detail');
                         </span>
                     </p>
                 </div>
+                <TagsList
+                    :tags="props.event.tags"
+                    class="mt-1"
+                    v-if="props.event.tags"
+                />
             </div>
             <div>
                 <img

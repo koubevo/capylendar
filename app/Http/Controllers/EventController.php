@@ -8,6 +8,8 @@ use App\Http\Requests\Event\UpdateEventRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
 use App\services\EventService;
+use App\services\EventTagService;
+use App\services\TagService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,7 +17,7 @@ use Inertia\Response;
 
 class EventController extends Controller
 {
-    public function __construct(protected EventService $eventService) {}
+    public function __construct(protected EventService $eventService, protected EventTagService $eventTagService, protected TagService $tagService) {}
 
     public function show(Event $event): Response
     {
@@ -38,6 +40,7 @@ class EventController extends Controller
         return Inertia::render('events/EventCreate', [
             'capybaraOptions' => Capybara::options(),
             'event' => $event?->resolve(),
+            'availableTags' => $this->tagService->getAvailableTags(),
         ]);
     }
 
@@ -53,6 +56,7 @@ class EventController extends Controller
         return Inertia::render('events/EventEdit', [
             'capybaraOptions' => Capybara::options(),
             'event' => EventResource::make($event)->resolve(),
+            'availableTags' => $this->tagService->getAvailableTags(),
         ]);
     }
 

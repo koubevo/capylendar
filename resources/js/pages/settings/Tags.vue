@@ -46,7 +46,7 @@ function submit() {
 
         <section class="mt-8">
             <h2>Existující štítky</h2>
-            <TagsList :tags="props.tags" />
+            <TagsList :tags="props.tags" :can-delete="true" />
         </section>
     </AuthenticatedLayout>
 </template>

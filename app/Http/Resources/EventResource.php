@@ -73,6 +73,8 @@ class EventResource extends JsonResource
                 'avatar' => $capybaraData['avatar'],
             ],
 
+            'tags' => $this->resource->tags?->toArray(),
+
             'created_at_human' => $this->resource->created_at_human,
             'updated_at_human' => $this->resource->updated_at_human,
         ];

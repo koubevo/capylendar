@@ -21,5 +21,8 @@ export interface EditAction {
 export interface DeleteAction {
     title: string;
     url: string;
-    icon?: string;
+    icon?: {
+        name: string;
+        class: string;
+    };
 }

@@ -7,7 +7,7 @@ use App\Models\Tag;
 class TagService
 {
     /**
-     * @return array<Tag>
+     * @return array<mixed>
      */
     public function getAvailableTags(): array
     {

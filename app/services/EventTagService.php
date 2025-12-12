@@ -8,7 +8,7 @@ use App\Models\Tag;
 class EventTagService
 {
     /**
-     * @param  array<Tag>|null  $tags
+     * @param  array<Tag>  $tags
      */
     public function assignTags(Event $event, array $tags): void
     {

@@ -37,6 +37,13 @@ const selectedTags = computed({
     },
 });
 
+const availableTagsMap = computed(() => {
+    if (!props.availableTags) {
+        return new Map<number, Tag>();
+    }
+    return new Map(props.availableTags.map((tag) => [tag.id, tag]));
+});
+
 const emit = defineEmits<{
     (e: 'submit'): void;
 }>();
@@ -165,16 +172,10 @@ const emit = defineEmits<{
                                     class="h-1.5 w-1.5 rounded-full"
                                     :style="{
                                         backgroundColor:
-                                            props.availableTags?.find(
-                                                (t) => t.id === tagId,
-                                            )?.color,
+                                            availableTagsMap.get(tagId)?.color,
                                     }"
                                 ></span>
-                                {{
-                                    props.availableTags?.find(
-                                        (t) => t.id === tagId,
-                                    )?.label
-                                }}
+                                {{ availableTagsMap.get(tagId)?.label }}
                             </span>
                         </div>
                         <span v-else class="text-gray-500"

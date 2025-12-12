@@ -7,6 +7,7 @@ import type { Event } from '@/types/Event';
 import { EventFormData } from '@/types/EventFormData';
 import { Tag } from '@/types/Tag';
 import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 const page = usePage();
 
@@ -28,15 +29,19 @@ const form = useForm<EventFormData>({
     tags: props.event?.tags ? props.event.tags.map((t) => t.id) : [],
 });
 
+const title = computed(() => {
+    return props.event ? 'Duplikovat event' : 'Přidat event';
+});
+
 function submit() {
     form.post(EventController.store());
 }
 </script>
 
 <template>
-    <Head title="Přidat event" />
+    <Head :title="title" />
     <AuthenticatedLayout :display-floating-action-button="false">
-        <h2>Přidat event</h2>
+        <h2>{{ title }}</h2>
         <EventForm
             :form="form"
             :is-edit-mode="false"

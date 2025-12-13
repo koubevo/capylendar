@@ -97,7 +97,7 @@ class Event extends Model
      */
     public function tags(): BelongsToMany
     {
-        return $this->belongsToMany(Tag::class, 'event_tag');
+        return $this->belongsToMany(Tag::class, 'event_tag')->orderBy('label', 'asc');
     }
 
     /**

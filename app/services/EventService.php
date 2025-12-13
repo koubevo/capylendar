@@ -11,6 +11,7 @@ use App\Models\Tag;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use shweshi\OpenGraph\OpenGraph;
@@ -125,18 +126,41 @@ class EventService
     }
 
     /**
+     * @param  array<string, string>|null  $filters
      * @return array<EventResource>
      */
-    public function getAssignedEvents(?User $user, EventType $eventType = EventType::Upcoming): array
+    public function getAssignedEvents(?User $user, EventType $eventType = EventType::Upcoming, ?array $filters = []): array
     {
         if (! $user) {
             return [];
         }
 
-        $events = $user
+        $query = $user
             ->assignedEvents()
-            ->where('start_at', $eventType->operator(), Carbon::now()->startOfDay())
-            ->orderBy('start_at', $eventType->sortDirection())
+            ->with(['tags', 'author'])
+            ->withCount('subscribers')
+            ->where('start_at', $eventType->operator(), Carbon::now()->startOfDay());
+
+        if ($filters) {
+            if (! empty($filters['search'])) {
+                $query->where(function (Builder $q) use ($filters) {
+                    $q->where('title', 'ilike', '%'.$filters['search'].'%')
+                        ->orWhere('description', 'ilike', $filters['search'].'%');
+                });
+            }
+
+            if (! empty($filters['capybara'])) {
+                $query->where('capybara', $filters['capybara']);
+            }
+
+            if (! empty($filters['tags'])) {
+                $query->whereHas('tags', function (Builder $q) use ($filters) {
+                    $q->whereIn('tags.id', $filters['tags']);
+                });
+            }
+        }
+
+        $events = $query->orderBy('start_at', $eventType->sortDirection())
             ->when($eventType === EventType::History, fn ($q) => $q->limit(self::HISTORY_EVENTS_LIMIT))
             ->get();
 

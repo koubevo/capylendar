@@ -8,15 +8,14 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const textColorClass = computed(() => getContrastingTextColor(props.tag.color));
-console.log(textColorClass);
+const textColor = computed(() => getContrastingTextColor(props.tag.color));
 </script>
 
 <template>
     <UBadge
         :style="{
             backgroundColor: props.tag.color,
-            color: textColorClass,
+            color: textColor,
         }"
         size="sm"
         class="relative overflow-hidden transition-all"

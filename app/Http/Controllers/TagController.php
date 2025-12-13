@@ -4,16 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Settings\StoreTagRequest;
 use App\Models\Tag;
+use App\services\TagService;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class TagController extends Controller
 {
+    public function __construct(protected TagService $tagService) {}
+
     public function index(): Response
     {
         return Inertia::render('settings/Tags', [
-            'tags' => Tag::all(),
+            'tags' => $this->tagService->getAvailableTags(['by' => 'created_at', 'order' => 'desc']),
         ]);
     }
 

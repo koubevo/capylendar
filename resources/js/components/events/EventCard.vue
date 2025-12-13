@@ -31,7 +31,10 @@ const showDetailItems = computed(() => props.view === 'detail');
                     />
                     <UIcon
                         name="i-lucide-notepad-text"
-                        v-if="props.event.description && showListItems"
+                        v-if="
+                            props.event.description_without_meta &&
+                            showListItems
+                        "
                         class="size-3"
                     />
                     <UIcon

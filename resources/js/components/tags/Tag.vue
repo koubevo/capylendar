@@ -1,18 +1,21 @@
 <script setup lang="ts">
+import { getContrastingTextColor } from '@/lib/colors';
 import { Tag } from '@/types/Tag';
+import { computed } from 'vue';
 
 interface Props {
     tag: Tag;
 }
 
 const props = defineProps<Props>();
+const textColor = computed(() => getContrastingTextColor(props.tag.color));
 </script>
 
 <template>
     <UBadge
         :style="{
             backgroundColor: props.tag.color,
-            color: 'white',
+            color: textColor,
         }"
         size="sm"
         class="relative overflow-hidden transition-all"

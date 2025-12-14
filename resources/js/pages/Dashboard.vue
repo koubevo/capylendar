@@ -21,7 +21,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const handleFilterChange = (newFilters: typeof props.filters) => {
+const handleFilterChange = (newFilters: typeof props.eventFilters) => {
     router.get(DashboardController(), newFilters, {
         preserveState: true,
         preserveScroll: true,

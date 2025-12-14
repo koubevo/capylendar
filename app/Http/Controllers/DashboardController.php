@@ -23,7 +23,7 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'upcomingEvents' => $this->eventService->getAssignedEvents($user, EventType::Upcoming, $filters),
             'historyEvents' => $this->eventService->getAssignedEvents($user, EventType::History, $filters),
-            'filters' => $filters,
+            'eventFilters' => $filters,
             'capybaraOptions' => Capybara::options(),
             'availableTags' => $this->tagService->getAvailableTags(),
         ]);

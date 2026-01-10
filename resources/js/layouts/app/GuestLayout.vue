@@ -9,7 +9,7 @@ import AppLayout from '@/layouts/AppLayout.vue';
         <GuestHeader />
 
         <UMain>
-            <Container>
+            <Container class="max-w-5xl" style="padding: 0">
                 <slot />
             </Container>
         </UMain>

@@ -185,7 +185,7 @@ const historyEvents = [];
             class="bg-white font-sans text-gray-900 selection:bg-gray-900 selection:text-white"
         >
             <section
-                class="relative overflow-hidden border-b border-gray-100 pt-32 pb-24"
+                class="relative overflow-hidden border-b border-gray-100 pt-16 pb-24 md:pt-32"
             >
                 <div
                     class="relative z-10 mx-auto max-w-[110rem] px-6 text-center lg:px-12"
@@ -212,7 +212,7 @@ const historyEvents = [];
                     >
                         Shared
                         <span class="whitespace-nowrap">
-                            Ca<span class="text-primary-600">(py)</span>lendar.
+                            Ca<span class="text-primary-500">(py)</span>lendar.
                         </span>
                         <br />
                     </h1>
@@ -250,7 +250,7 @@ const historyEvents = [];
                     </div>
                 </div>
 
-                <div class="mx-auto mt-32 max-w-[100rem] px-4 lg:px-8">
+                <div class="mx-auto mt-16 max-w-[100rem] px-4 md:mt-32 lg:px-8">
                     <div
                         class="group relative flex aspect-[9/16] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] md:aspect-[16/10]"
                     >
@@ -306,7 +306,7 @@ const historyEvents = [];
                 </div>
             </section>
 
-            <section class="bg-white py-32">
+            <section class="bg-white py-16 md:py-32">
                 <div class="mx-auto max-w-[110rem] px-6 lg:px-12">
                     <div
                         class="mb-12 flex flex-col items-end justify-between pb-8 md:flex-row"

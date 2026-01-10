@@ -73,4 +73,21 @@ class EventController extends Controller
 
         return to_route('dashboard')->with('success', 'Event úspěšně smazán');
     }
+
+    public function deletedIndex(): Response
+    {
+        $user = auth()->user();
+        $deletedEvents = $this->eventService->getDeletedEvents($user);
+
+        return Inertia::render('events/EventDeletedIndex', [
+            'deletedEvents' => $deletedEvents,
+        ]);
+    }
+
+    public function restore(Event $event): RedirectResponse
+    {
+        $this->eventService->restore($event);
+
+        return to_route('event.deletedIndex')->with('success', 'Event úspěšně obnoven');
+    }
 }

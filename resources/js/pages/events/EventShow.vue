@@ -44,10 +44,11 @@ const props = defineProps<{
                 :delete-action="{
                     url: EventController.destroy(props.event),
                     title: 'Smazat event',
+                    titleShort: 'Smazat',
                 }"
                 :class="props.event.capybara.classes"
             >
-                <template #delete-modal-body>
+                <template #event-modal-body>
                     <EventCard :event="props.event" />
                 </template>
             </ActionButtons>

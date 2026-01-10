@@ -1,20 +1,30 @@
 <script setup lang="ts">
-import { DeleteAction } from '@/types/Button';
+import { Action } from '@/types/Button';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps<{
-    deleteAction: DeleteAction;
+    action: Action;
 }>();
+
+const handleAction = (close: () => void) => {
+    const method = props.action.method || 'delete';
+    router[method](props.action.url, {}, {
+        onSuccess: () => {
+            close();
+        },
+    });
+};
 </script>
 
 <template>
     <UModal
-        :title="props.deleteAction.title"
+        :title="props.action.title"
         :ui="{ footer: 'justify-end', title: 'm-0' }"
     >
         <button class="cursor-pointer">
             <UIcon
-                :name="props.deleteAction.icon?.name ?? 'i-lucide-square-x'"
-                :class="props.deleteAction.icon?.class ?? 'size-6'"
+                :name="props.action.icon?.name ?? 'i-lucide-square-x'"
+                :class="props.action.icon?.class ?? 'size-6'"
             />
         </button>
 
@@ -30,9 +40,9 @@ const props = defineProps<{
                 @click="close"
             />
             <UButton
-                label="Smazat"
+                :label="props.action.titleShort ?? 'Smazat'"
                 color="primary"
-                :to="props.deleteAction.url"
+                @click="handleAction(close)"
             />
         </template>
     </UModal>

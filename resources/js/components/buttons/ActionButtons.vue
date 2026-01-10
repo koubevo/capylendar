@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import DeleteModal from '@/components/modals/DeleteModal.vue';
-import type { DeleteAction, DuplicateAction, EditAction } from '@/types/Button';
+import ActionModal from '@/components/modals/ActionModal.vue';
+import type { DuplicateAction, EditAction, Action } from '@/types/Button';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps<{
     duplicateAction?: DuplicateAction;
     editAction?: EditAction;
-    deleteAction?: DeleteAction;
+    deleteAction?: Action;
     class: string;
 }>();
 </script>
@@ -29,14 +29,14 @@ const props = defineProps<{
                     class="size-6"
                 />
             </Link>
-            <DeleteModal
+            <ActionModal
                 v-if="props.deleteAction"
-                :deleteAction="props.deleteAction"
+                :action="props.deleteAction"
             >
                 <template #body>
-                    <slot name="delete-modal-body" />
+                    <slot name="event-modal-body" />
                 </template>
-            </DeleteModal>
+            </ActionModal>
         </div>
     </UCard>
 </template>

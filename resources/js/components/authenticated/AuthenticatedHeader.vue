@@ -22,6 +22,10 @@ const links = computed(() => [
     {
         label: 'Správa štítků',
         to: TagController.index(),
+    },
+    {
+        label: 'Obnovit eventy',
+        to: EventController.deletedIndex(),
         isNew: true,
     },
 ]);

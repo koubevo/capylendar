@@ -166,4 +166,28 @@ class EventService
 
         return EventResource::collection($events)->resolve();
     }
+
+    public function getDeletedEvents(?User $user): array
+    {
+        if (! $user) {
+            return [];
+        }
+
+        $query = $user
+            ->assignedEvents()
+            ->with(['tags', 'author']);
+
+        $events = $query->orderBy('deleted_at', 'desc')
+            ->onlyTrashed()
+            ->get();
+
+        return EventResource::collection($events)->resolve();
+    }
+
+    public function restore(Event $event): Event
+    {
+        $event->restore();
+
+        return $event;
+    }
 }

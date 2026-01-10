@@ -18,11 +18,15 @@ export interface EditAction {
     icon?: string;
 }
 
-export interface DeleteAction {
+export interface Action {
     title: string;
     url: string;
+    method?: 'post' | 'delete' | 'put' | 'patch';
     icon?: {
         name: string;
         class: string;
     };
+    titleShort?: string;
 }
+
+export type EventAction = Action;

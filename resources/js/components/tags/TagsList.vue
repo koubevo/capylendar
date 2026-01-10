@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TagController from '@/actions/App/Http/Controllers/TagController';
-import DeleteModal from '@/components/modals/DeleteModal.vue';
+import ActionModal from '@/components/modals/ActionModal.vue';
 import Tag from '@/components/tags/Tag.vue';
 
 interface Props {
@@ -18,9 +18,9 @@ const props = withDefaults(defineProps<Props>(), {
         <div v-for="tag in props.tags" :key="tag.id">
             <Tag :tag="tag">
                 <template #delete-button v-if="canDelete">
-                    <DeleteModal
-                        :delete-action="{
-                            url: TagController.destroy(tag),
+                    <ActionModal
+                        :action="{
+                            url: TagController.destroy(tag).url,
                             title: 'Smazat štítek',
                             icon: {
                                 name: 'i-lucide-square-x',
@@ -31,7 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
                         <template #body>
                             <Tag :tag="tag" />
                         </template>
-                    </DeleteModal>
+                    </ActionModal>
                 </template>
             </Tag>
         </div>

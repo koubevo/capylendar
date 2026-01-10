@@ -28,47 +28,56 @@ const columns: TableColumn<Event>[] = [
     {
         id: 'capybara',
         header: 'Kdo',
+        size: 60,
         cell: ({ row }) =>
-            h('img', {
-                src: row.original.capybara.avatar.src,
-                alt: row.original.capybara.avatar.alt,
-                class: 'h-10 w-10 rounded-md',
-            }),
+            h('div', { class: 'flex items-center justify-center min-w-[60px]' }, [
+                h('img', {
+                    src: row.original.capybara.avatar.src,
+                    alt: row.original.capybara.avatar.alt,
+                    class: 'h-10 w-10 rounded-md object-cover object-center shrink-0',
+                }),
+            ]),
     },
     {
         accessorKey: 'title',
         header: 'Název',
-        cell: ({ row }) => row.original.title,
+        size: 150,
+        cell: ({ row }) => h('div', { class: 'min-w-[150px]' }, row.original.title),
     },
     {
         id: 'date',
         header: 'Datum',
+        size: 120,
         cell: ({ row }) => {
-            return h('span', row.original.date.label);
+            return h('div', { class: 'min-w-[120px]' }, h('span', row.original.date.label));
         },
     },
     {
         id: 'time',
         header: 'Čas',
+        size: 100,
         cell: ({ row }) => {
             if (row.original.date.is_all_day) {
-                return h('span', { class: 'text-gray-600 dark:text-gray-400' }, 'Celý den');
+                return h('div', { class: 'min-w-[100px]' }, h('span', { class: 'text-gray-600 dark:text-gray-400' }, 'Celý den'));
             }
             const timeText = row.original.date.end_time 
                 ? `${row.original.date.start_time} - ${row.original.date.end_time}`
                 : row.original.date.start_time;
-            return h('span', timeText);
+            return h('div', { class: 'min-w-[100px]' }, h('span', timeText));
         },
     },
     {
         id: 'actions',
         header: 'Obnovit',
+        size: 80,
         cell: ({ row }) => {
-            return h(ActionModal, {
-                action: getRestoreAction(row.original),
-            }, {
-                body: () => h(EventCard, { event: row.original }),
-            });
+            return h('div', { class: 'flex items-center justify-center min-w-[80px]' }, [
+                h(ActionModal, {
+                    action: getRestoreAction(row.original),
+                }, {
+                    body: () => h(EventCard, { event: row.original, view: 'detail' }),
+                }),
+            ]);
         },
     },
 ];
@@ -84,11 +93,13 @@ const columns: TableColumn<Event>[] = [
             </h2>
 
             <UCard :ui="{ body: { padding: '' } }">
-                <UTable
-                    :data="props.deletedEvents"
-                    :columns="columns"
-                    class="w-full"
-                />
+                <div class="overflow-x-auto">
+                    <UTable
+                        :data="props.deletedEvents"
+                        :columns="columns"
+                        class="w-full"
+                    />
+                </div>
             </UCard>
         </div>
     </AuthenticatedLayout>

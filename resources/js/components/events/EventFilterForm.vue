@@ -6,7 +6,7 @@ import { useDebounceFn } from '@vueuse/core';
 import { ref, watch } from 'vue';
 
 interface Props {
-    filters: EventFilters;
+    eventFilters: EventFilters;
     capybaraOptions: Capybara[];
     availableTags: Tag[];
 }
@@ -14,13 +14,13 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-    (e: 'change', filters: typeof props.filters): void;
+    (e: 'change', eventFilters: typeof props.eventFilters): void;
 }>();
 
 const form = ref({
-    search: props.filters?.search || '',
-    capybara: props.filters?.capybara || null,
-    tags: props.filters?.tags?.map(Number) || [],
+    search: props.eventFilters?.search || '',
+    capybara: props.eventFilters?.capybara || null,
+    tags: props.eventFilters?.tags?.map(Number) || [],
 });
 
 const emitChange = useDebounceFn(() => {

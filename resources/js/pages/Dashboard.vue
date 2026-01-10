@@ -8,6 +8,7 @@ import type { Event } from '@/types/Event';
 import { EventFilters } from '@/types/Filters';
 import { Tag } from '@/types/Tag';
 import { router } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 //TODO: pinia
 interface Props {
@@ -20,14 +21,25 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const handleFilterChange = (newFilters: typeof props.filters) => {
+const handleFilterChange = (newFilters: typeof props.eventFilters) => {
     router.get(DashboardController(), newFilters, {
         preserveState: true,
         preserveScroll: true,
         replace: true,
-        only: ['upcomingEvents', 'historyEvents', 'filters'],
+        only: ['upcomingEvents', 'historyEvents', 'eventFilters'],
     });
 };
+
+const activeEventFiltersCount = computed(() => {
+    const count = Object.values(props.eventFilters).filter(Boolean).length;
+    return count > 0 ? count : null;
+});
+
+const eventFiltersLabel = computed(() => {
+    return activeEventFiltersCount.value
+        ? 'Filtrování (' + activeEventFiltersCount.value + ')'
+        : 'Filtrování';
+});
 
 const items = [
     {
@@ -47,7 +59,7 @@ const items = [
     <AuthenticatedLayout :display-footer="true">
         <UCollapsible class="mb-4 flex w-full flex-col gap-2">
             <UButton
-                label="Filtrování"
+                :label="eventFiltersLabel"
                 variant="soft"
                 trailing-icon="i-lucide-chevron-down"
                 block
@@ -55,7 +67,7 @@ const items = [
 
             <template #content>
                 <EventFilterForm
-                    :filters="props.filters"
+                    :eventFilters="props.eventFilters"
                     :capybara-options="props.capybaraOptions"
                     :available-tags="props.availableTags"
                     @change="handleFilterChange"

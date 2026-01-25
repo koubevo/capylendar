@@ -208,16 +208,6 @@ class NotificationService
      */
     private function buildTomorrowNotification(array $events): array
     {
-        $eventCount = count($events);
-        $title = 'Zítra: '.$eventCount.' '.trans_choice('event|eventy|eventů', $eventCount);
-
-        $eventTitles = array_map(fn ($event) => $event['title'], array_slice($events, 0, 3));
-        $body = implode(', ', $eventTitles);
-
-        if ($eventCount > 3) {
-            $body .= ' a další...';
-        }
-
         return $this->buildEventListNotification($events, 'Zítra: ');
     }
 

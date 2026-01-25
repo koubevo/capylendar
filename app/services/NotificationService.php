@@ -13,11 +13,40 @@ use Throwable;
 class NotificationService
 {
     /**
-     * Send daily notifications to all users with notifications enabled.
+     * Send evening notifications (tomorrow's events).
+     *
+     * @return array{users_notified: int, errors: int}
+     */
+    public function sendEveningNotifications(): array
+    {
+        return $this->sendNotifications(fn (User $user) => $this->getEveningNotificationContent($user));
+    }
+
+    /**
+     * Send morning notifications (today's events).
+     *
+     * @return array{users_notified: int, errors: int}
+     */
+    public function sendMorningNotifications(): array
+    {
+        return $this->sendNotifications(fn (User $user) => $this->getMorningNotificationContent($user));
+    }
+
+    /**
+     * @deprecated Use sendEveningNotifications() instead
      *
      * @return array{users_notified: int, errors: int}
      */
     public function sendDailyNotifications(): array
+    {
+        return $this->sendEveningNotifications();
+    }
+
+    /**
+     * @param  callable(User): ?array  $contentResolver
+     * @return array{users_notified: int, errors: int}
+     */
+    private function sendNotifications(callable $contentResolver): array
     {
         $users = User::query()
             ->where('notifications_enabled', true)
@@ -29,7 +58,7 @@ class NotificationService
 
         foreach ($users as $user) {
             try {
-                $notificationData = $this->getNotificationContent($user);
+                $notificationData = $contentResolver($user);
 
                 if ($notificationData) {
                     $user->notify(new DailyEventsNotification(
@@ -56,11 +85,11 @@ class NotificationService
     }
 
     /**
-     * Get notification content for a user.
+     * Get evening notification content (tomorrow's events).
      *
      * @return array{events: array<EventResource>, title: string, body: string, actionUrl: string|null}|null
      */
-    public function getNotificationContent(User $user): ?array
+    public function getEveningNotificationContent(User $user): ?array
     {
         $tomorrow = Carbon::tomorrow()->startOfDay();
         $tomorrowEvents = $this->getEventsForDate($user, $tomorrow);
@@ -69,7 +98,6 @@ class NotificationService
             return $this->buildTomorrowNotification($tomorrowEvents);
         }
 
-        // No events tomorrow, find the closest day with events
         $nextEventDay = $this->getNextDayWithEvents($user, $tomorrow);
 
         if ($nextEventDay) {
@@ -78,8 +106,32 @@ class NotificationService
             return $this->buildNoEventsTomorrowNotification($nextEvents, $nextEventDay['date']);
         }
 
-        // No upcoming events at all
         return null;
+    }
+
+    /**
+     * Get morning notification content (today's events).
+     *
+     * @return array{events: array<EventResource>, title: string, body: string, actionUrl: string|null}|null
+     */
+    public function getMorningNotificationContent(User $user): ?array
+    {
+        $today = Carbon::today()->startOfDay();
+        $todayEvents = $this->getEventsForDate($user, $today);
+
+        if (empty($todayEvents)) {
+            return null;
+        }
+
+        return $this->buildTodayNotification($todayEvents);
+    }
+
+    /**
+     * @deprecated Use getEveningNotificationContent() instead
+     */
+    public function getNotificationContent(User $user): ?array
+    {
+        return $this->getEveningNotificationContent($user);
     }
 
     /**
@@ -120,14 +172,20 @@ class NotificationService
         ];
     }
 
+    private function buildTodayNotification(array $events): array
+    {
+        return $this->buildEventListNotification($events, 'Dnes: ');
+    }
+
     /**
      * @param  array<EventResource>  $events
+     * @param  string  $titlePrefix
      * @return array{events: array<EventResource>, title: string, body: string, actionUrl: string|null}
      */
-    private function buildTomorrowNotification(array $events): array
+    private function buildEventListNotification(array $events, string $titlePrefix): array
     {
         $eventCount = count($events);
-        $title = 'Zítra: '.$eventCount.' '.trans_choice('event|eventy|eventů', $eventCount);
+        $title = $titlePrefix.$eventCount.' '.trans_choice('event|eventy|eventů', $eventCount);
 
         $eventTitles = array_map(fn ($event) => $event['title'], array_slice($events, 0, 3));
         $body = implode(', ', $eventTitles);
@@ -142,6 +200,15 @@ class NotificationService
             'body' => $body,
             'actionUrl' => null,
         ];
+    }
+
+    /**
+     * @param  array<EventResource>  $events
+     * @return array{events: array<EventResource>, title: string, body: string, actionUrl: string|null}
+     */
+    private function buildTomorrowNotification(array $events): array
+    {
+        return $this->buildEventListNotification($events, 'Zítra: ');
     }
 
     /**

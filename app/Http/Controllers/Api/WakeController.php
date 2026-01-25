@@ -20,10 +20,20 @@ class WakeController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $result = $this->notificationService->sendDailyNotifications();
+        $validated = $request->validate([
+            'type' => 'sometimes|in:morning,evening',
+        ]);
+
+        $type = $validated['type'] ?? 'evening';
+
+        $result = match ($type) {
+            'morning' => $this->notificationService->sendMorningNotifications(),
+            default => $this->notificationService->sendEveningNotifications(),
+        };
 
         return response()->json([
             'message' => 'Notifications sent',
+            'type' => $type,
             'users_notified' => $result['users_notified'],
             'errors' => $result['errors'],
         ]);

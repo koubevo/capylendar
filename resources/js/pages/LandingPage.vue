@@ -57,6 +57,29 @@ const items = [
     },
 ];
 
+const features = [
+    {
+        name: 'Sdílený kalendář',
+        desc: 'Eventy vidíte oba. Barevně odlišené podle partnera.',
+        icon: 'i-lucide-calendar-days',
+    },
+    {
+        name: 'Push notifikace',
+        desc: 'Denní připomínky ráno i večer přímo do prohlížeče.',
+        icon: 'i-lucide-bell-ring',
+    },
+    {
+        name: 'Vlastní tagy',
+        desc: 'Kategorizujte eventy podle typu a důležitosti.',
+        icon: 'i-lucide-tags',
+    },
+    {
+        name: 'PWA aplikace',
+        desc: 'Nainstalujte si jako aplikaci na mobil i desktop.',
+        icon: 'i-lucide-smartphone',
+    },
+];
+
 const upcomingEvents = [
     {
         id: 1,
@@ -302,6 +325,46 @@ const historyEvents = [];
                                 </template>
                             </UTabs>
                         </AuthenticatedLayout>
+                    </div>
+                </div>
+            </section>
+
+            <section
+                class="border-t border-gray-100 bg-gray-50/30 py-16 md:py-24"
+            >
+                <div class="mx-auto max-w-[110rem] px-6 lg:px-12">
+                    <div class="mb-12 text-center">
+                        <h2
+                            class="text-4xl font-bold tracking-tight text-gray-900"
+                        >
+                            Funkce
+                        </h2>
+                        <p class="mt-2 text-lg text-gray-500">
+                            Vše, co potřebujete pro sdílený kalendář.
+                        </p>
+                    </div>
+
+                    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                        <div
+                            v-for="feature in features"
+                            :key="feature.name"
+                            class="group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:shadow-md"
+                        >
+                            <div
+                                class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 transition-colors group-hover:bg-primary-100"
+                            >
+                                <UIcon
+                                    :name="feature.icon"
+                                    class="size-6 text-gray-600 transition-colors group-hover:text-primary-600"
+                                />
+                            </div>
+                            <h3 class="mb-2 text-lg font-bold text-gray-900">
+                                {{ feature.name }}
+                            </h3>
+                            <p class="text-sm text-gray-500">
+                                {{ feature.desc }}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>

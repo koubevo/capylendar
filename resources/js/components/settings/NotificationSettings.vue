@@ -75,8 +75,8 @@ init();
             <div class="flex-1">
                 <h3 class="text-base font-medium">Denní notifikace</h3>
                 <p class="text-sm text-neutral-500 dark:text-neutral-400">
-                    Každý den obdržíte upozornění na eventy naplánované na
-                    další den.
+                    Každý den obdržíte upozornění na eventy naplánované na další
+                    den.
                 </p>
             </div>
             <USwitch
@@ -107,8 +107,8 @@ init();
         >
             <p class="flex items-center gap-2">
                 <UIcon name="i-lucide-info" class="h-4 w-4" />
-                Notifikace budou odeslány každý den večer s přehledem eventů na
-                další den.
+                Notifikace budou odeslány každý den ráno (s dnešními eventy) a
+                večer (s přehledem eventů na další den).
             </p>
         </div>
 

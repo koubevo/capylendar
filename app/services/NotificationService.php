@@ -119,7 +119,7 @@ class NotificationService
         $today = Carbon::today()->startOfDay();
         $todayEvents = $this->getEventsForDate($user, $today);
 
-        if (count($todayEvents) === 0) {
+        if (empty($todayEvents)) {
             return null;
         }
 
@@ -172,14 +172,20 @@ class NotificationService
         ];
     }
 
-    /**
-     * @param  array<EventResource>  $events
-     * @return array{events: array<EventResource>, title: string, body: string, actionUrl: string|null}
-     */
     private function buildTodayNotification(array $events): array
     {
+        return $this->buildEventListNotification($events, 'Dnes: ');
+    }
+
+    /**
+     * @param  array<EventResource>  $events
+     * @param  string  $titlePrefix
+     * @return array{events: array<EventResource>, title: string, body: string, actionUrl: string|null}
+     */
+    private function buildEventListNotification(array $events, string $titlePrefix): array
+    {
         $eventCount = count($events);
-        $title = 'Dnes: '.$eventCount.' '.trans_choice('event|eventy|eventů', $eventCount);
+        $title = $titlePrefix.$eventCount.' '.trans_choice('event|eventy|eventů', $eventCount);
 
         $eventTitles = array_map(fn ($event) => $event['title'], array_slice($events, 0, 3));
         $body = implode(', ', $eventTitles);
@@ -212,12 +218,7 @@ class NotificationService
             $body .= ' a další...';
         }
 
-        return [
-            'events' => $events,
-            'title' => $title,
-            'body' => $body,
-            'actionUrl' => null,
-        ];
+        return $this->buildEventListNotification($events, 'Zítra: ');
     }
 
     /**

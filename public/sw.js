@@ -44,5 +44,4 @@ self.addEventListener('notificationclick', function (event) {
 
 self.addEventListener('notificationclose', function (event) {
     // Optional: track notification dismissals
-    console.log('Notification was closed', event.notification.tag);
 });

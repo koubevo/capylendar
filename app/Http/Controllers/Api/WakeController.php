@@ -16,7 +16,7 @@ class WakeController extends Controller
         $token = $request->bearerToken();
         $expectedToken = config('services.notifications.wake_token');
 
-        if (! $expectedToken || $token !== $expectedToken) {
+        if (! $expectedToken || ! hash_equals($expectedToken, (string) $token)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 

@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'notifications' => [
+        'wake_token' => env('NOTIFICATION_WAKE_TOKEN'),
+    ],
+
 ];

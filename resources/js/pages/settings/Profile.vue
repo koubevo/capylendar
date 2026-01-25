@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Construction from '@/components/Construction.vue';
+import NotificationSettings from '@/components/settings/NotificationSettings.vue';
 import PasswordForm from '@/components/settings/PasswordForm.vue';
 import AvatarSection from '@/components/ui/AvatarSection.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
@@ -13,9 +13,9 @@ const items = [
         slot: 'password',
     },
     {
-        label: 'Připravujeme',
-        icon: 'i-lucide-construction',
-        slot: 'coming-soon',
+        label: 'Notifikace',
+        icon: 'i-lucide-bell',
+        slot: 'notifications',
     },
 ];
 </script>
@@ -23,7 +23,10 @@ const items = [
 <template>
     <Head :title="page.props.auth.user.name" />
 
-    <AuthenticatedLayout :display-footer="true">
+    <AuthenticatedLayout
+        :display-footer="true"
+        :display-floating-action-button="false"
+    >
         <section>
             <AvatarSection />
         </section>
@@ -35,9 +38,9 @@ const items = [
                     </div>
                 </template>
 
-                <template #coming-soon>
+                <template #notifications>
                     <section class="mt-4">
-                        <Construction />
+                        <NotificationSettings />
                     </section>
                 </template>
             </UTabs>

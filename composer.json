@@ -12,6 +12,7 @@
         "php": "^8.2",
         "fakerphp/faker": "^1.23",
         "inertiajs/inertia-laravel": "^2.0",
+        "laravel-notification-channels/webpush": "^10.4",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
         "laravel/telescope": "^5.15",

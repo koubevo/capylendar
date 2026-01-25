@@ -8,11 +8,15 @@ const props = defineProps<{
 
 const handleAction = (close: () => void) => {
     const method = props.action.method || 'delete';
-    router[method](props.action.url, {}, {
-        onSuccess: () => {
-            close();
+    router[method](
+        props.action.url,
+        {},
+        {
+            onSuccess: () => {
+                close();
+            },
         },
-    });
+    );
 };
 </script>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ActionModal from '@/components/modals/ActionModal.vue';
-import type { DuplicateAction, EditAction, Action } from '@/types/Button';
+import type { Action, DuplicateAction, EditAction } from '@/types/Button';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps<{
@@ -29,10 +29,7 @@ const props = defineProps<{
                     class="size-6"
                 />
             </Link>
-            <ActionModal
-                v-if="props.deleteAction"
-                :action="props.deleteAction"
-            >
+            <ActionModal v-if="props.deleteAction" :action="props.deleteAction">
                 <template #body>
                     <slot name="event-modal-body" />
                 </template>

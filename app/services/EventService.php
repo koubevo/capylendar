@@ -167,6 +167,9 @@ class EventService
         return EventResource::collection($events)->resolve();
     }
 
+    /**
+     * @return array<EventResource>
+     */
     public function getDeletedEvents(?User $user): array
     {
         if (! $user) {

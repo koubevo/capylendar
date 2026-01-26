@@ -43,7 +43,7 @@ class NotificationService
     }
 
     /**
-     * @param  callable(User): ?array  $contentResolver
+     * @param  callable(User): ?array{events: array<EventResource>, title: string, body: string, actionUrl: string|null}  $contentResolver
      * @return array{users_notified: int, errors: int}
      */
     private function sendNotifications(callable $contentResolver): array
@@ -128,6 +128,8 @@ class NotificationService
 
     /**
      * @deprecated Use getEveningNotificationContent() instead
+     *
+     * @return array{events: array<EventResource>, title: string, body: string, actionUrl: string|null}|null
      */
     public function getNotificationContent(User $user): ?array
     {
@@ -172,6 +174,10 @@ class NotificationService
         ];
     }
 
+    /**
+     * @param  array<EventResource>  $events
+     * @return array{events: array<EventResource>, title: string, body: string, actionUrl: string|null}
+     */
     private function buildTodayNotification(array $events): array
     {
         return $this->buildEventListNotification($events, 'Dnes: ');
@@ -224,7 +230,10 @@ class NotificationService
         $body = "Další event: {$dateFormatted}";
 
         if ($daysUntil <= 7) {
-            $body = "Další event za {$daysUntil} ".$this->pluralizeDays($daysUntil).': '.$events[0]['title'];
+            $days = (int) $daysUntil;
+            /** @var string $title */
+            $title = $events[0]['title'];
+            $body = "Další event za {$days} ".$this->pluralizeDays($days).': '.$title;
         }
 
         return [

@@ -1,4 +1,4 @@
-<template></template>
+<template><div><!-- TODO: Implement Two Factor Challenge --></div></template>
 
 <!-- <script setup lang="ts">
 import InputError from '@/components/InputError.vue';

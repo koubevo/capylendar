@@ -3,7 +3,8 @@ name: versioning
 on:
   push:
     branches:
-      - main
+    branches:
+      - master
 
 permissions:
   contents: write
@@ -34,7 +35,7 @@ jobs:
         with:
           commit_message: 'chore(release): v${{ steps.tag_version.outputs.new_version }} [skip ci]'
           file_pattern: VERSION
-          branch: main
+          branch: master
 
       - name: Create Release
         uses: ncipollo/release-action@v1

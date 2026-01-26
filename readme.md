@@ -98,7 +98,7 @@ The project places a strong emphasis on **Clean Code** and maintainability:
 
 ## Deployment
 
-The app is deployed on [Laravel Cloud](https://cloud.laravel.com).
+The app is deployed on [Laravel Cloud](https://capylendar.laravel.cloud).
 
 ---
 

@@ -185,7 +185,6 @@ class NotificationService
 
     /**
      * @param  array<EventResource>  $events
-     * @param  string  $titlePrefix
      * @return array{events: array<EventResource>, title: string, body: string, actionUrl: string|null}
      */
     private function buildEventListNotification(array $events, string $titlePrefix): array
@@ -231,8 +230,8 @@ class NotificationService
 
         if ($daysUntil <= 7) {
             $days = (int) $daysUntil;
-            /** @var string $eventTitle */
             $eventTitle = $events[0]['title'];
+            assert(is_string($eventTitle));
             $body = "Další event za {$days} ".$this->pluralizeDays($days).': '.$eventTitle;
         }
 

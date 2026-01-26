@@ -4,6 +4,8 @@ use App\Models\User;
 
 describe('WakeController', function () {
     it('rejects requests without bearer token', function () {
+        config(['services.notifications.wake_token' => 'valid-token']);
+
         $response = $this->postJson('/api/wake');
 
         $response->assertStatus(401);

@@ -1,0 +1,51 @@
+name: YouTrack Linker
+on:
+  pull_request:
+    types: [opened, reopened, edited]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  link-ticket:
+    name: Link YouTrack Ticket
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add Link to PR Body
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const YOUTRACK_URL = 'https://koubevo.youtrack.cloud/issue/';
+            const PROJECT_PREFIX = 'CAPY';
+
+            const pr = context.payload.pull_request;
+            const branchName = pr.head.ref;
+
+            const regex = new RegExp(`${PROJECT_PREFIX}-\\d+`, 'i');
+            const match = branchName.match(regex);
+
+            if (match) {
+              const ticketId = match[0].toUpperCase();
+              
+              const linkHeader = `# [${ticketId}](${YOUTRACK_URL}${ticketId})`;
+              
+              let body = pr.body || "";
+
+              if (body.includes(linkHeader)) {
+                console.log(`Ticket ${ticketId} already linked in header.`);
+                return;
+              }
+
+              body = `${linkHeader}\n\n${body}`;
+
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                body: body
+              });
+              
+              console.log(`Linked ${ticketId} as H1 header`);
+            } else {
+              console.log(`No ticket ID found in branch name.`);
+            }

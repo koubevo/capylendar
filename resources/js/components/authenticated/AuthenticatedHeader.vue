@@ -26,7 +26,6 @@ const links = computed(() => [
     {
         label: 'Obnovit eventy',
         to: EventController.deletedIndex(),
-        isNew: true,
     },
 ]);
 </script>

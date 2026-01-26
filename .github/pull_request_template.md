@@ -1,7 +1,3 @@
-## Description
-
-## Related Issue
-
 ## Type of Change
 
 - [ ] 🐛 Bug fix (non-breaking change which fixes an issue)

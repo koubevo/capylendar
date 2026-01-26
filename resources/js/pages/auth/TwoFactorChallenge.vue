@@ -94,7 +94,7 @@ const codeValue = computed<string>(() => code.value.join(''));
                     <Button type="submit" class="w-full" :disabled="processing"
                         >Continue</Button
                     >
-                    <div class="text-center text-sm text-muted-foreground">
+                    <div class="text-muted-foreground text-center text-sm">
                         <span>or you can </span>
                         <button
                             type="button"
@@ -126,7 +126,7 @@ const codeValue = computed<string>(() => code.value.join(''));
                         >Continue</Button
                     >
 
-                    <div class="text-center text-sm text-muted-foreground">
+                    <div class="text-muted-foreground text-center text-sm">
                         <span>or you can </span>
                         <button
                             type="button"

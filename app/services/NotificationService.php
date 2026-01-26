@@ -179,7 +179,6 @@ class NotificationService
 
     /**
      * @param  array<EventResource>  $events
-     * @param  string  $titlePrefix
      * @return array{events: array<EventResource>, title: string, body: string, actionUrl: string|null}
      */
     private function buildEventListNotification(array $events, string $titlePrefix): array

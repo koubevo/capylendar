@@ -1,0 +1,45 @@
+name: versioning
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Calculate Next Version
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_release_rules: '!fix:major:Breaking Change'
+
+      - name: Update VERSION File
+        if: steps.tag_version.outputs.new_tag != steps.tag_version.outputs.old_tag
+        run: echo "${{ steps.tag_version.outputs.new_version }}" > VERSION
+
+      - name: Commit & Push VERSION File
+        if: steps.tag_version.outputs.new_tag != steps.tag_version.outputs.old_tag
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore(release): v${{ steps.tag_version.outputs.new_version }} [skip ci]'
+          file_pattern: VERSION
+          branch: main
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        if: steps.tag_version.outputs.new_tag != steps.tag_version.outputs.old_tag
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}

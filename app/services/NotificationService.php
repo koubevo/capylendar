@@ -231,9 +231,9 @@ class NotificationService
 
         if ($daysUntil <= 7) {
             $days = (int) $daysUntil;
-            /** @var string $title */
-            $title = $events[0]['title'];
-            $body = "Další event za {$days} ".$this->pluralizeDays($days).': '.$title;
+            /** @var string $eventTitle */
+            $eventTitle = $events[0]['title'];
+            $body = "Další event za {$days} ".$this->pluralizeDays($days).': '.$eventTitle;
         }
 
         return [

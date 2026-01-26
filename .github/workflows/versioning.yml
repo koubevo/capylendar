@@ -3,7 +3,6 @@ name: versioning
 on:
   push:
     branches:
-    branches:
       - master
 
 permissions:

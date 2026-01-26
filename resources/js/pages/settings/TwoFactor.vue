@@ -1,4 +1,6 @@
-<template><div><!-- TODO: Implement Two Factor Settings --></div></template>
+<template>
+    <div><!-- TODO: Implement Two Factor Settings --></div>
+</template>
 
 <!-- <script setup lang="ts">
 import HeadingSmall from '@/components/HeadingSmall.vue';

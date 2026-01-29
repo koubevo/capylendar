@@ -18,7 +18,11 @@ use shweshi\OpenGraph\OpenGraph;
 
 class EventService
 {
-    public function __construct(protected EventUserService $eventUserService, protected EventTagService $eventTagService) {}
+    public function __construct(
+        protected EventUserService $eventUserService,
+        protected EventTagService $eventTagService,
+        protected OpenGraph $openGraph
+    ) {}
 
     private const HISTORY_EVENTS_LIMIT = 20;
 
@@ -104,8 +108,7 @@ class EventService
         $mapUrl = $matches[0];
 
         try {
-            $og = new OpenGraph;
-            $data = $og->fetch($mapUrl);
+            $data = $this->openGraph->fetch($mapUrl);
 
             $result = [];
             $result['title'] = $data['title'] ?? null;
@@ -142,12 +145,13 @@ class EventService
             ->where('start_at', $eventType->operator(), Carbon::now()->startOfDay());
 
         if ($filters) {
-            if (! empty($filters['search'])) {
-                $query->where(function (Builder $q) use ($filters) {
-                    $q->where('title', 'ilike', '%'.$filters['search'].'%')
-                        ->orWhere('description', 'ilike', $filters['search'].'%');
-                });
-            }
+            if (isset($filters['search'])) {
+            $operator = DB::connection()->getDriverName() === 'sqlite' ? 'like' : 'ilike';
+            $query->where(function (Builder $query) use ($filters, $operator) {
+                $query->where('title', $operator, "%{$filters['search']}%")
+                    ->orWhere('description', $operator, "%{$filters['search']}%");
+            });
+        }
 
             if (! empty($filters['capybara'])) {
                 $query->where('capybara', $filters['capybara']);

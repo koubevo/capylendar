@@ -1,7 +1,7 @@
 <?php
 
-use App\Notifications\DailyEventsNotification;
 use App\Models\User;
+use App\Notifications\DailyEventsNotification;
 use NotificationChannels\WebPush\WebPushChannel;
 use NotificationChannels\WebPush\WebPushMessage;
 
@@ -19,11 +19,11 @@ describe('DailyEventsNotification', function () {
 
         // Pass the notification itself as the second argument if required by the signature
         // The signature in the class is toWebPush($notifiable, $notification)
-        // But usually Laravel calls logic differently. 
+        // But usually Laravel calls logic differently.
         // Wait, the signature in the class is `toWebPush(object $notifiable, Notification $notification)`.
         // This is weird. Usually it's just `toWebPush($notifiable)`.
         // Let's check the code: public function toWebPush(object $notifiable, Notification $notification): WebPushMessage
-        
+
         $message = $notification->toWebPush($notifiable, $notification);
 
         expect($message)->toBeInstanceOf(WebPushMessage::class);
@@ -36,10 +36,10 @@ describe('DailyEventsNotification', function () {
     it('uses default action url if not provided', function () {
         $notification = new DailyEventsNotification([], 'Title', 'Body');
         $notifiable = User::factory()->make();
-        
+
         $message = $notification->toWebPush($notifiable, $notification);
-        
-        $expectedUrl = config('app.url') . '/dashboard';
+
+        $expectedUrl = config('app.url').'/dashboard';
         expect($message->toArray()['data']['url'])->toBe($expectedUrl);
     });
 });

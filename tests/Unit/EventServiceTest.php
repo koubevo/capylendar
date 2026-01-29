@@ -11,7 +11,6 @@ use App\services\EventService;
 use App\services\EventTagService;
 use App\services\EventUserService;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ValidatedInput;
 use shweshi\OpenGraph\OpenGraph;
 
@@ -37,7 +36,7 @@ describe('EventService store', function () {
         $request->shouldReceive('user')->andReturn(null);
 
         $result = $this->eventService->store($request);
-        
+
         expect($result)->toBeNull();
     });
 });
@@ -50,13 +49,13 @@ describe('EventService update', function () {
         $request = Mockery::mock(UpdateEventRequest::class);
         $request->shouldReceive('safe')->andReturn($validatedInput);
         $request->shouldReceive('boolean')->andReturn(false);
-         $request->shouldReceive('input')->with('tags', [])->andReturn([]);
+        $request->shouldReceive('input')->with('tags', [])->andReturn([]);
         $request->shouldReceive('user')->andReturn(null);
 
-        $event = new Event();
+        $event = new Event;
 
         $result = $this->eventService->update($event, $request);
-        
+
         expect($result)->toBeNull();
     });
 });
@@ -65,7 +64,7 @@ describe('EventService resolveMetadata', function () {
     it('resolves map preview from google maps url', function () {
         $url = 'https://maps.app.goo.gl/test';
         $description = "Location: $url";
-        
+
         $this->openGraph->shouldReceive('fetch')
             ->once()
             // ->with($url) // Argument matching might be strict, let's relax or ensure exact match
@@ -77,9 +76,9 @@ describe('EventService resolveMetadata', function () {
         // Reflect to access private method
         $method = new ReflectionMethod(EventService::class, 'resolveMetadata');
         $method->setAccessible(true);
-        
+
         $result = $method->invoke($this->eventService, $description);
-        
+
         expect($result['map_preview']['title'])->toBe('Map Location');
         expect($result['map_preview']['url'])->toBe($url);
     });
@@ -87,9 +86,9 @@ describe('EventService resolveMetadata', function () {
     it('returns null when no map url', function () {
         $method = new ReflectionMethod(EventService::class, 'resolveMetadata');
         $method->setAccessible(true);
-        
+
         $result = $method->invoke($this->eventService, 'Just description');
-        
+
         expect($result)->toBeNull();
     });
 
@@ -146,7 +145,7 @@ describe('EventService getAssignedEvents', function () {
 
     // ... other existing tests ...
     // Since I'm overwriting, I must include all tests.
-    
+
     it('filters upcoming events correctly', function () {
         $upcomingEvent = Event::factory()->create([
             'author_id' => $this->user->id,

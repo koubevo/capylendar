@@ -192,7 +192,7 @@ describe('NotificationService', function () {
         it('sends notifications to subscribed users', function () {
             $user = User::factory()->create(['notifications_enabled' => true]);
             $user->updatePushSubscription('http://endpoint', 'key', 'auth');
-            
+
             // Add event tomorrow
             $tomorrow = Carbon::tomorrow()->startOfDay();
             $event = Event::factory()->create([
@@ -200,11 +200,11 @@ describe('NotificationService', function () {
                 'start_at' => $tomorrow->copy()->setHour(10),
             ]);
             $user->assignedEvents()->attach($event->id);
-            
+
             Notification::fake();
-            
+
             $this->service->sendEveningNotifications();
-            
+
             Notification::assertSentTo($user, App\Notifications\DailyEventsNotification::class);
         });
     });
@@ -220,9 +220,9 @@ describe('NotificationService', function () {
                 'start_at' => $today->copy()->setHour(10),
             ]);
             $user->assignedEvents()->attach($event->id);
-            
+
             $content = $this->service->getMorningNotificationContent($user);
-            
+
             expect($content)->not->toBeNull();
             expect($content['title'])->toContain('Dnes:');
             expect($content['body'])->toContain('Today Event');
@@ -230,9 +230,9 @@ describe('NotificationService', function () {
 
         it('returns null if no events today', function () {
             $user = User::factory()->create();
-            
+
             $content = $this->service->getMorningNotificationContent($user);
-            
+
             expect($content)->toBeNull();
         });
     });
@@ -241,7 +241,7 @@ describe('NotificationService', function () {
         it('sends notifications to subscribed users', function () {
             $user = User::factory()->create(['notifications_enabled' => true]);
             $user->updatePushSubscription('http://endpoint', 'key', 'auth');
-            
+
             // Add event today
             $today = Carbon::today()->startOfDay();
             $event = Event::factory()->create([
@@ -249,11 +249,11 @@ describe('NotificationService', function () {
                 'start_at' => $today->copy()->setHour(10),
             ]);
             $user->assignedEvents()->attach($event->id);
-            
+
             Notification::fake();
-            
+
             $this->service->sendMorningNotifications();
-            
+
             Notification::assertSentTo($user, App\Notifications\DailyEventsNotification::class);
         });
     });
@@ -268,11 +268,11 @@ describe('NotificationService', function () {
                 'start_at' => $tomorrow->copy()->setHour(10),
             ]);
             $user->assignedEvents()->attach($event->id);
-            
+
             Notification::fake();
-            
+
             $this->service->sendDailyNotifications();
-            
+
             Notification::assertSentTo($user, App\Notifications\DailyEventsNotification::class);
         });
     });
@@ -280,16 +280,16 @@ describe('NotificationService', function () {
     it('catches exceptions during notification sending', function () {
         $user = User::factory()->create(['notifications_enabled' => true]);
         $user->updatePushSubscription('http://endpoint', 'key', 'auth');
-        
+
         $method = new ReflectionMethod(NotificationService::class, 'sendNotifications');
         $method->setAccessible(true);
-        
+
         Log::shouldReceive('error')->once();
-        
+
         $result = $method->invoke($this->service, function ($u) {
-            throw new Exception("Fail");
+            throw new Exception('Fail');
         });
-        
+
         expect($result['errors'])->toBe(1);
         expect($result['users_notified'])->toBe(0);
     });

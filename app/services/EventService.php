@@ -145,13 +145,13 @@ class EventService
             ->where('start_at', $eventType->operator(), Carbon::now()->startOfDay());
 
         if ($filters) {
-            if (isset($filters['search'])) {
-            $operator = DB::connection()->getDriverName() === 'sqlite' ? 'like' : 'ilike';
-            $query->where(function (Builder $query) use ($filters, $operator) {
-                $query->where('title', $operator, "%{$filters['search']}%")
-                    ->orWhere('description', $operator, "%{$filters['search']}%");
-            });
-        }
+            if (! empty($filters['search'])) {
+                $operator = DB::connection()->getDriverName() === 'sqlite' ? 'like' : 'ilike';
+                $query->where(function (Builder $query) use ($filters, $operator) {
+                    $query->where('title', $operator, "%{$filters['search']}%")
+                        ->orWhere('description', $operator, "%{$filters['search']}%");
+                });
+            }
 
             if (! empty($filters['capybara'])) {
                 $query->where('capybara', $filters['capybara']);

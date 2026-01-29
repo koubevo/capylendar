@@ -12,6 +12,7 @@ use App\services\EventTagService;
 use App\services\TagService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,6 +22,8 @@ class EventController extends Controller
 
     public function show(Event $event): Response
     {
+        Gate::authorize('view', $event);
+
         return Inertia::render('events/EventShow', [
             'event' => EventResource::make($event)->resolve(),
         ]);
@@ -33,6 +36,7 @@ class EventController extends Controller
         if ($request->has('duplicate_event_id')) {
             $foundEvent = Event::findOrFail($request->input('duplicate_event_id'));
             if ($foundEvent instanceof Event) {
+                Gate::authorize('view', $foundEvent);
                 $event = new EventResource($foundEvent);
             }
         }
@@ -53,6 +57,8 @@ class EventController extends Controller
 
     public function edit(Event $event): Response
     {
+        Gate::authorize('update', $event);
+
         return Inertia::render('events/EventEdit', [
             'capybaraOptions' => Capybara::options(),
             'event' => EventResource::make($event)->resolve(),
@@ -62,6 +68,8 @@ class EventController extends Controller
 
     public function update(Event $event, UpdateEventRequest $request): RedirectResponse
     {
+        Gate::authorize('update', $event);
+
         $this->eventService->update($event, $request);
 
         return to_route('event.show', $event)->with('success', 'Event úspěšně aktualizován');
@@ -69,6 +77,8 @@ class EventController extends Controller
 
     public function destroy(Event $event): RedirectResponse
     {
+        Gate::authorize('delete', $event);
+
         $event->delete();
 
         return to_route('dashboard')->with('success', 'Event úspěšně smazán');
@@ -86,6 +96,8 @@ class EventController extends Controller
 
     public function restore(Event $event): RedirectResponse
     {
+        Gate::authorize('restore', $event);
+
         $this->eventService->restore($event);
 
         return to_route('event.deletedIndex')->with('success', 'Event úspěšně obnoven');

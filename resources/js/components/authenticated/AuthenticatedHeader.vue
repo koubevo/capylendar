@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
 import EventController from '@/actions/App/Http/Controllers/EventController';
+import MessageController from '@/actions/App/Http/Controllers/MessageController';
 import TagController from '@/actions/App/Http/Controllers/TagController';
 import MenuItem from '@/components/authenticated/MenuItem.vue';
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
@@ -14,6 +15,11 @@ const links = computed(() => [
     {
         label: 'Dashboard',
         to: DashboardController(),
+    },
+    {
+        label: 'Chat',
+        to: MessageController.index(),
+        isNew: true,
     },
     {
         label: 'Můj Profil',

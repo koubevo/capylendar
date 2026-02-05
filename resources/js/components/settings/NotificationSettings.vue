@@ -73,10 +73,9 @@ init();
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <div class="flex-1">
-                <h3 class="text-base font-medium">Denní notifikace</h3>
+                <h3 class="text-base font-medium">Push notifikace</h3>
                 <p class="text-sm text-neutral-500 dark:text-neutral-400">
-                    Každý den obdržíte upozornění na eventy naplánované na další
-                    den.
+                    Upozornění na eventy a nové zprávy v chatu.
                 </p>
             </div>
             <USwitch
@@ -107,8 +106,9 @@ init();
         >
             <p class="flex items-center gap-2">
                 <UIcon name="i-lucide-info" class="h-4 w-4" />
-                Notifikace budou odeslány každý den ráno (s dnešními eventy) a
-                večer (s přehledem eventů na další den).
+                Notifikace budou odeslány každý den ráno (s dnešními eventy),
+                večer (s přehledem eventů na další den) a při přijetí nové
+                zprávy v chatu.
             </p>
         </div>
 

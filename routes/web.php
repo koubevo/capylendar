@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,6 +25,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('/event', EventController::class)
         ->only(['create', 'store', 'edit', 'update', 'destroy', 'show']);
+
+    Route::resource('/chat', MessageController::class)->only(['index', 'store']);
 });
 
 require __DIR__.'/settings.php';

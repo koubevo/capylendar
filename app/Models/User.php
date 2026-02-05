@@ -60,6 +60,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
             'notifications_enabled' => 'boolean',
+            'capybara' => Capybara::class,
         ];
     }
 

@@ -21,7 +21,7 @@ class EventFactory extends Factory
     {
         return [
             'title' => $this->faker->word(),
-            'author_id' => User::all()->random()->id,
+            'author_id' => User::exists() ? User::inRandomOrder()->first()->id : User::factory(),
             'capybara' => Capybara::Blue,
             'start_at' => $this->faker->dateTimeBetween('2025-01-01', '2025-12-31'),
             'end_at' => $this->faker->dateTimeBetween('2025-01-01', '2025-12-31'),

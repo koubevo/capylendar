@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->enum('capybara', [Capybara::Blue, Capybara::Pink])->unique();
+            $table->enum('capybara', [Capybara::Blue->value, Capybara::Pink->value, Capybara::Yellow->value]);
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

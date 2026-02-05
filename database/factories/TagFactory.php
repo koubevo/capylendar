@@ -18,7 +18,7 @@ class TagFactory extends Factory
     public function definition(): array
     {
         return [
-            'label' => ucfirst($this->faker->unique()->word()),
+            'label' => ucfirst($this->faker->unique()->word),
             'color' => $this->faker->hexColor(),
         ];
     }

@@ -5,6 +5,9 @@ namespace App\services;
 use App\Http\Requests\StoreMessageRequest;
 use App\Models\Message;
 use App\Models\User;
+use App\Notifications\ChatMessageNotification;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class MessageService
 {
@@ -38,9 +41,34 @@ class MessageService
             return null;
         }
 
-        return Message::create([
+        $message = Message::create([
             'user_id' => $user->id,
             'content' => $request->validated('content'),
         ]);
+
+        $this->notifyOtherUsers($message, $user);
+
+        return $message;
+    }
+
+    private function notifyOtherUsers(Message $message, User $sender): void
+    {
+        $recipients = User::query()
+            ->where('id', '!=', $sender->id)
+            ->where('notifications_enabled', true)
+            ->whereHas('pushSubscriptions')
+            ->get();
+
+        foreach ($recipients as $recipient) {
+            try {
+                $recipient->notify(new ChatMessageNotification($message));
+            } catch (Throwable $e) {
+                Log::error('Failed to send chat notification', [
+                    'user_id' => $recipient->id,
+                    'message_id' => $message->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
     }
 }

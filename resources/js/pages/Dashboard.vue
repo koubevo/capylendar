@@ -17,6 +17,7 @@ interface Props {
     eventFilters: EventFilters;
     capybaraOptions: Capybara[];
     availableTags: Tag[];
+    scrollToDate?: string;
 }
 
 const props = defineProps<Props>();
@@ -28,6 +29,14 @@ const handleFilterChange = (newFilters: typeof props.eventFilters) => {
         replace: true,
         only: ['upcomingEvents', 'historyEvents', 'eventFilters'],
     });
+};
+
+const clearScrollToDate = () => {
+    if (props.scrollToDate) {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('scrollToDate');
+        window.history.replaceState({}, '', url.toString());
+    }
 };
 
 const activeEventFiltersCount = computed(() => {
@@ -81,6 +90,8 @@ const items = [
                     heading="Nadcházející"
                     :events="props.upcomingEvents"
                     :create-event-if-empty="true"
+                    :scroll-to-date="props.scrollToDate"
+                    @scrolled="clearScrollToDate"
                 />
             </template>
 
@@ -89,6 +100,8 @@ const items = [
                     heading="Historické"
                     :events="props.historyEvents"
                     :create-event-if-empty="true"
+                    :scroll-to-date="props.scrollToDate"
+                    @scrolled="clearScrollToDate"
                 />
             </template>
         </UTabs>

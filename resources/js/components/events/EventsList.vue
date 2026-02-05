@@ -4,17 +4,29 @@ import EventCard from '@/components/events/EventCard.vue';
 import Nothing from '@/components/Nothing.vue';
 import type { Event } from '@/types/Event';
 import { Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import {
+    type ComponentPublicInstance,
+    computed,
+    nextTick,
+    onMounted,
+    ref,
+} from 'vue';
 
 interface Props {
     heading: string;
     events: Event[];
     createEventIfEmpty?: boolean;
+    scrollToDate?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     createEventIfEmpty: false,
+    scrollToDate: undefined,
 });
+
+const emit = defineEmits<{
+    scrolled: [];
+}>();
 
 const button = props.createEventIfEmpty
     ? { to: EventController.create(), label: 'Přidat event' }
@@ -34,13 +46,54 @@ const groupedEvents = computed(() => {
         return acc;
     }, {} as GroupedEvents);
 });
+
+const dateSectionRefs = ref<Record<string, HTMLElement>>({});
+
+const setDateSectionRef = (
+    el: Element | ComponentPublicInstance | null,
+    dateKey: string,
+) => {
+    if (el instanceof HTMLElement) {
+        dateSectionRefs.value[dateKey] = el;
+    }
+};
+
+const scrollToDateSection = async () => {
+    if (!props.scrollToDate) return;
+
+    await nextTick();
+
+    const targetSection = dateSectionRefs.value[props.scrollToDate];
+    if (targetSection) {
+        const headerOffset = 80;
+        const elementPosition = targetSection.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.scrollY - headerOffset;
+
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth',
+        });
+
+        setTimeout(() => {
+            emit('scrolled');
+        }, 500);
+    }
+};
+
+onMounted(() => {
+    scrollToDateSection();
+});
 </script>
 
 <template>
     <h2 class="mt-4">{{ props.heading }}</h2>
 
     <div v-if="props.events.length" class="space-y-4">
-        <section v-for="(events, dateKey) in groupedEvents" :key="dateKey">
+        <section
+            v-for="(events, dateKey) in groupedEvents"
+            :key="dateKey"
+            :ref="(el) => setDateSectionRef(el, dateKey as string)"
+        >
             <h3 class="lowercase">
                 {{ events[0].date.label }}
             </h3>

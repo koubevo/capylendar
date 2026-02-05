@@ -26,6 +26,7 @@ class DashboardController extends Controller
             'eventFilters' => $filters,
             'capybaraOptions' => Capybara::options(),
             'availableTags' => $this->tagService->getAvailableTags(),
+            'scrollToDate' => $request->query('scrollToDate'),
         ]);
     }
 }

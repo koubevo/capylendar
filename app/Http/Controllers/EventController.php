@@ -52,7 +52,8 @@ class EventController extends Controller
     {
         $event = $this->eventService->store($request);
 
-        return redirect('dashboard')->with('success', 'Event úspěšně přidán');
+        return to_route('dashboard', ['scrollToDate' => $event->start_at->format('Y-m-d')])
+            ->with('success', 'Event úspěšně přidán');
     }
 
     public function edit(Event $event): Response

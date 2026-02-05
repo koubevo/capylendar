@@ -3,12 +3,16 @@
 namespace App\Notifications;
 
 use App\Models\Message;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushChannel;
 use NotificationChannels\WebPush\WebPushMessage;
 
-class ChatMessageNotification extends Notification
+class ChatMessageNotification extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(
         protected Message $message
     ) {}

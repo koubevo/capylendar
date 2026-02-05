@@ -14,7 +14,10 @@ const props = defineProps<Props>();
 
 <template>
     <Head title="Chat" />
-    <AuthenticatedLayout :display-footer="false" :display-floating-action-button="false">
+    <AuthenticatedLayout
+        :display-footer="false"
+        :display-floating-action-button="false"
+    >
         <div class="flex h-[calc(100vh-8rem)] flex-col">
             <ChatMessageList :messages="props.messages" />
             <ChatMessageInput />

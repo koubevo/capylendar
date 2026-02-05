@@ -4,7 +4,13 @@ import EventCard from '@/components/events/EventCard.vue';
 import Nothing from '@/components/Nothing.vue';
 import type { Event } from '@/types/Event';
 import { Link } from '@inertiajs/vue3';
-import { type ComponentPublicInstance, computed, nextTick, onMounted, ref } from 'vue';
+import {
+    type ComponentPublicInstance,
+    computed,
+    nextTick,
+    onMounted,
+    ref,
+} from 'vue';
 
 interface Props {
     heading: string;
@@ -43,7 +49,10 @@ const groupedEvents = computed(() => {
 
 const dateSectionRefs = ref<Record<string, HTMLElement>>({});
 
-const setDateSectionRef = (el: Element | ComponentPublicInstance | null, dateKey: string) => {
+const setDateSectionRef = (
+    el: Element | ComponentPublicInstance | null,
+    dateKey: string,
+) => {
     if (el instanceof HTMLElement) {
         dateSectionRefs.value[dateKey] = el;
     }
@@ -56,20 +65,18 @@ const scrollToDateSection = async () => {
 
     const targetSection = dateSectionRefs.value[props.scrollToDate];
     if (targetSection) {
-        setTimeout(() => {
-            const headerOffset = 80;
-            const elementPosition = targetSection.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.scrollY - headerOffset;
+        const headerOffset = 80;
+        const elementPosition = targetSection.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.scrollY - headerOffset;
 
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
-            
-            setTimeout(() => {
-                emit('scrolled');
-            }, 500);
-        }, 100);
+        window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth',
+        });
+
+        setTimeout(() => {
+            emit('scrolled');
+        }, 500);
     }
 };
 

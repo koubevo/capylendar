@@ -52,6 +52,10 @@ class EventController extends Controller
     {
         $event = $this->eventService->store($request);
 
+        if (! $event) {
+            return back()->withErrors(['error' => 'Nepodařilo se vytvořit event']);
+        }
+
         return to_route('dashboard', ['scrollToDate' => $event->start_at->format('Y-m-d')])
             ->with('success', 'Event úspěšně přidán');
     }

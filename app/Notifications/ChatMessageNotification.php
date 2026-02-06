@@ -15,7 +15,12 @@ class ChatMessageNotification extends Notification implements ShouldQueue
     public function __construct(
         protected string $senderName,
         protected string $content
-    ) {}
+    ) {
+        \Log::info('ChatMessageNotification created', [
+            'sender' => $this->senderName,
+            'content_length' => strlen($this->content),
+        ]);
+    }
 
     /**
      * @return array<int, string>
@@ -27,13 +32,18 @@ class ChatMessageNotification extends Notification implements ShouldQueue
 
     public function toWebPush(object $notifiable, Notification $notification): WebPushMessage
     {
+        \Log::info('toWebPush called', [
+            'notifiable_id' => $notifiable->id ?? 'unknown',
+            'sender' => $this->senderName,
+        ]);
+
         $content = $this->content;
 
         if (strlen($content) > 100) {
             $content = substr($content, 0, 97).'...';
         }
 
-        return (new WebPushMessage)
+        $message = (new WebPushMessage)
             ->title("Nová zpráva od {$this->senderName}")
             ->icon('/capicon.png')
             ->body($content)
@@ -50,5 +60,9 @@ class ChatMessageNotification extends Notification implements ShouldQueue
                     return $url.'/chat';
                 })(),
             ]);
+
+        \Log::info('WebPush message created successfully');
+
+        return $message;
     }
 }

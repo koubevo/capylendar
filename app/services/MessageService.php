@@ -69,7 +69,6 @@ class MessageService
             ]);
 
             $recipient->notify(new ChatMessageNotification(
-                $message,
                 $sender->name,
                 $message->content
             ));

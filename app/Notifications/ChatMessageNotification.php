@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Models\Message;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
@@ -14,12 +13,9 @@ class ChatMessageNotification extends Notification implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        protected Message $message,
         protected string $senderName,
         protected string $content
-    ) {
-        $this->message->loadMissing('user');
-    }
+    ) {}
 
     /**
      * @return array<int, string>

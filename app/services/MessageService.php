@@ -68,7 +68,11 @@ class MessageService
                 'message_id' => $message->id,
             ]);
 
-            $recipient->notify(new ChatMessageNotification($message));
+            $recipient->notify(new ChatMessageNotification(
+                $message,
+                $sender->name,
+                $message->content
+            ));
         });
     }
 }

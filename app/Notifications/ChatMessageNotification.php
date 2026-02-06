@@ -14,7 +14,9 @@ class ChatMessageNotification extends Notification implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        protected Message $message
+        protected Message $message,
+        protected string $senderName,
+        protected string $content
     ) {
         $this->message->loadMissing('user');
     }
@@ -29,15 +31,14 @@ class ChatMessageNotification extends Notification implements ShouldQueue
 
     public function toWebPush(object $notifiable, Notification $notification): WebPushMessage
     {
-        $senderName = $this->message->user->name;
-        $content = $this->message->content;
+        $content = $this->content;
 
         if (strlen($content) > 100) {
             $content = substr($content, 0, 97).'...';
         }
 
         return (new WebPushMessage)
-            ->title("Nová zpráva od {$senderName}")
+            ->title("Nová zpráva od {$this->senderName}")
             ->icon('/capicon.png')
             ->body($content)
             ->action('Zobrazit', 'view')

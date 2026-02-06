@@ -62,13 +62,16 @@ class MessageService
             'recipients_count' => $recipients->count(),
         ]);
 
-        $recipients->cursor()->each(function (User $recipient) use ($message) {
+        $recipients->cursor()->each(function (User $recipient) use ($message, $sender) {
             \Log::info('Sending chat notification', [
                 'recipient_id' => $recipient->id,
                 'message_id' => $message->id,
             ]);
 
-            $recipient->notify(new ChatMessageNotification($message));
+            $recipient->notify(new ChatMessageNotification(
+                $sender->name,
+                $message->content
+            ));
         });
     }
 }

@@ -54,24 +54,21 @@ class MessageService
         $recipients = User::query()
             ->where('id', '!=', $sender->id)
             ->where('notifications_enabled', true)
-            ->whereHas('pushSubscriptions')
-            ->get();
+            ->whereHas('pushSubscriptions');
 
         \Log::info('Chat notification debug', [
             'message_id' => $message->id,
             'sender_id' => $sender->id,
             'recipients_count' => $recipients->count(),
-            'recipients' => $recipients->pluck('id', 'name')->toArray(),
         ]);
 
-        foreach ($recipients as $recipient) {
+        $recipients->cursor()->each(function (User $recipient) use ($message) {
             \Log::info('Sending chat notification', [
                 'recipient_id' => $recipient->id,
-                'recipient_name' => $recipient->name,
                 'message_id' => $message->id,
             ]);
 
             $recipient->notify(new ChatMessageNotification($message));
-        }
+        });
     }
 }

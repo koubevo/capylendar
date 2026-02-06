@@ -51,11 +51,24 @@ class MessageService
 
     private function notifyOtherUsers(Message $message, User $sender): void
     {
-        User::query()
+        $recipients = User::query()
             ->where('id', '!=', $sender->id)
             ->where('notifications_enabled', true)
-            ->whereHas('pushSubscriptions')
-            ->cursor()
-            ->each(fn (User $recipient) => $recipient->notify(new ChatMessageNotification($message)));
+            ->whereHas('pushSubscriptions');
+
+        \Log::info('Chat notification debug', [
+            'message_id' => $message->id,
+            'sender_id' => $sender->id,
+            'recipients_count' => $recipients->count(),
+        ]);
+
+        $recipients->cursor()->each(function (User $recipient) use ($message) {
+            \Log::info('Sending chat notification', [
+                'recipient_id' => $recipient->id,
+                'message_id' => $message->id,
+            ]);
+
+            $recipient->notify(new ChatMessageNotification($message));
+        });
     }
 }

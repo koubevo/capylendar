@@ -15,7 +15,9 @@ class ChatMessageNotification extends Notification implements ShouldQueue
 
     public function __construct(
         protected Message $message
-    ) {}
+    ) {
+        $this->message->loadMissing('user');
+    }
 
     /**
      * @return array<int, string>

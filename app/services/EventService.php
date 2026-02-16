@@ -44,19 +44,29 @@ class EventService
         $tags = $request->input('tags', []);
         $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
 
+        $newImagePath = null;
         if ($request->hasFile('image')) {
-            $eventData['image_path'] = $this->compressAndStoreImage($request->file('image'));
+            $newImagePath = $this->compressAndStoreImage($request->file('image'));
+            $eventData['image_path'] = $newImagePath;
         }
 
-        return DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $tags) {
-            $event = $author->authoredEvents()->create($eventData);
+        try {
+            return DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $tags) {
+                $event = $author->authoredEvents()->create($eventData);
 
-            $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
+                $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
 
-            $this->eventTagService->assignTags($event, $tags);
+                $this->eventTagService->assignTags($event, $tags);
 
-            return $event;
-        });
+                return $event;
+            });
+        } catch (Exception $e) {
+            if ($newImagePath) {
+                Storage::disk('local')->delete($newImagePath);
+            }
+
+            throw $e;
+        }
     }
 
     public function update(Event $event, UpdateEventRequest $request): ?Event
@@ -74,25 +84,39 @@ class EventService
         $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
 
         $oldImagePath = $event->image_path;
-        if ($oldImagePath && ($request->hasFile('image') || $request->boolean('remove_image'))) {
-            Storage::disk('local')->delete($oldImagePath);
-        }
+        $newImagePath = null;
 
         if ($request->hasFile('image')) {
-            $eventData['image_path'] = $this->compressAndStoreImage($request->file('image'));
+            $newImagePath = $this->compressAndStoreImage($request->file('image'));
+            $eventData['image_path'] = $newImagePath;
         } elseif ($request->boolean('remove_image') && $oldImagePath) {
             $eventData['image_path'] = null;
         }
 
-        return DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $event, $tags) {
-            $event->update($eventData);
+        try {
+            $result = DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $event, $tags) {
+                $event->update($eventData);
 
-            $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
+                $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
 
-            $this->eventTagService->assignTags($event, $tags);
+                $this->eventTagService->assignTags($event, $tags);
 
-            return $event;
-        });
+                return $event;
+            });
+
+            // Delete old image only after transaction succeeds
+            if ($oldImagePath && ($request->hasFile('image') || $request->boolean('remove_image'))) {
+                Storage::disk('local')->delete($oldImagePath);
+            }
+
+            return $result;
+        } catch (Exception $e) {
+            if ($newImagePath) {
+                Storage::disk('local')->delete($newImagePath);
+            }
+
+            throw $e;
+        }
     }
 
     private const IMAGE_MAX_WIDTH = 1920;

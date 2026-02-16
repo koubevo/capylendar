@@ -24,10 +24,14 @@ const form = useForm<EventFormData>({
     is_private: props.event.is_private,
     description: props.event.description,
     tags: props.event.tags?.map((tag) => tag.id) || [],
+    image: null,
+    remove_image: false,
 });
 
 function submit() {
-    form.patch(EventController.update(props.event));
+    form.put(EventController.update(props.event), {
+        forceFormData: true,
+    });
 }
 </script>
 
@@ -44,6 +48,8 @@ function submit() {
             :capybara-options="props.capybaraOptions"
             @submit="submit"
             :available-tags="props.availableTags"
+            :event-id="props.event.id"
+            :image-url="props.event.image_url"
         />
     </AuthenticatedLayout>
 </template>

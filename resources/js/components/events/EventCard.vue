@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import TagsList from '@/components/tags/TagsList.vue';
+import { hasLinks as checkLinks } from '@/composables/useLinkify';
 import type { Event, View } from '@/types/Event';
 import { computed } from 'vue';
 interface Props {
@@ -13,6 +14,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const showListItems = computed(() => props.view === 'list');
 const showDetailItems = computed(() => props.view === 'detail');
+const hasLinks = computed(() =>
+    checkLinks(props.event.description_without_meta ?? ''),
+);
 </script>
 
 <template>
@@ -40,6 +44,16 @@ const showDetailItems = computed(() => props.view === 'detail');
                     <UIcon
                         name="i-lucide-map-pinned"
                         v-if="props.event.has_map_meta && showListItems"
+                        class="size-3"
+                    />
+                    <UIcon
+                        name="i-lucide-link"
+                        v-if="hasLinks && showListItems"
+                        class="size-3"
+                    />
+                    <UIcon
+                        name="i-lucide-image"
+                        v-if="props.event.image_url && showListItems"
                         class="size-3"
                     />
                     <p class="text-xs">

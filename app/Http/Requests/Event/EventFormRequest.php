@@ -53,6 +53,8 @@ abstract class EventFormRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'tags' => ['nullable', 'array'],
             'tags.*' => ['exists:tags,id'],
+            'image' => ['nullable', 'image', 'max:5120'],
+            'remove_image' => ['boolean'],
         ];
     }
 }

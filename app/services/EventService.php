@@ -12,8 +12,12 @@ use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Intervention\Image\Laravel\Facades\Image;
 use shweshi\OpenGraph\OpenGraph;
 
 class EventService
@@ -28,7 +32,7 @@ class EventService
 
     public function store(StoreEventRequest $request): ?Event
     {
-        $eventData = $request->safe()->except(['is_private', 'tags']);
+        $eventData = $request->safe()->except(['is_private', 'tags', 'image', 'remove_image']);
         $isPrivateEvent = $request->boolean('is_private');
         $author = $request->user();
 
@@ -40,20 +44,34 @@ class EventService
         $tags = $request->input('tags', []);
         $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
 
-        return DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $tags) {
-            $event = $author->authoredEvents()->create($eventData);
+        $newImagePath = null;
+        if ($request->hasFile('image')) {
+            $newImagePath = $this->compressAndStoreImage($request->file('image'));
+            $eventData['image_path'] = $newImagePath;
+        }
 
-            $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
+        try {
+            return DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $tags) {
+                $event = $author->authoredEvents()->create($eventData);
 
-            $this->eventTagService->assignTags($event, $tags);
+                $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
 
-            return $event;
-        });
+                $this->eventTagService->assignTags($event, $tags);
+
+                return $event;
+            });
+        } catch (Exception $e) {
+            if ($newImagePath) {
+                Storage::disk('local')->delete($newImagePath);
+            }
+
+            throw $e;
+        }
     }
 
     public function update(Event $event, UpdateEventRequest $request): ?Event
     {
-        $eventData = $request->safe()->except(['is_private', 'tags']);
+        $eventData = $request->safe()->except(['is_private', 'tags', 'image', 'remove_image']);
         $isPrivateEvent = $request->boolean('is_private');
         $author = $request->user();
 
@@ -65,15 +83,62 @@ class EventService
         $tags = $request->input('tags', []);
         $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
 
-        return DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $event, $tags) {
-            $event->update($eventData);
+        $oldImagePath = $event->image_path;
+        $newImagePath = null;
 
-            $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
+        if ($request->hasFile('image')) {
+            $newImagePath = $this->compressAndStoreImage($request->file('image'));
+            $eventData['image_path'] = $newImagePath;
+        } elseif ($request->boolean('remove_image') && $oldImagePath) {
+            $eventData['image_path'] = null;
+        }
 
-            $this->eventTagService->assignTags($event, $tags);
+        try {
+            $result = DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $event, $tags) {
+                $event->update($eventData);
 
-            return $event;
-        });
+                $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
+
+                $this->eventTagService->assignTags($event, $tags);
+
+                return $event;
+            });
+
+            // Delete old image only after transaction succeeds
+            if ($oldImagePath && ($request->hasFile('image') || $request->boolean('remove_image'))) {
+                Storage::disk('local')->delete($oldImagePath);
+            }
+
+            return $result;
+        } catch (Exception $e) {
+            if ($newImagePath) {
+                Storage::disk('local')->delete($newImagePath);
+            }
+
+            throw $e;
+        }
+    }
+
+    private const IMAGE_MAX_WIDTH = 1920;
+
+    private const IMAGE_QUALITY = 80;
+
+    /**
+     * Compress, resize, and convert the uploaded image to WebP format.
+     */
+    private function compressAndStoreImage(UploadedFile $file): string
+    {
+        $image = Image::read($file)
+            ->scaleDown(width: self::IMAGE_MAX_WIDTH);
+
+        $filename = 'event-images/'.Str::uuid()->toString().'.webp';
+
+        Storage::disk('local')->put(
+            $filename,
+            $image->toWebp(quality: self::IMAGE_QUALITY)->toString()
+        );
+
+        return $filename;
     }
 
     /**
@@ -81,21 +146,19 @@ class EventService
      */
     private function resolveMetadata(?string $description): ?array
     {
-        $meta = [];
-
         if (! $description) {
             return null;
         }
 
         if ($mapPreview = $this->resolveMapPreview($description)) {
-            $meta['map_preview'] = $mapPreview;
+            return ['map_preview' => $mapPreview];
         }
 
-        return $meta ?: null;
+        return null;
     }
 
     /**
-     * @return array<string, mixed>|null
+     * @return array{title: string, image: string, url: string}|null
      */
     private function resolveMapPreview(string $description): ?array
     {
@@ -110,17 +173,18 @@ class EventService
         try {
             $data = $this->openGraph->fetch($mapUrl);
 
-            $result = [];
-            $result['title'] = $data['title'] ?? null;
-            $result['image'] = $data['image'] ?? null;
+            $title = $data['title'] ?? null;
+            $image = $data['image'] ?? null;
 
-            if (! $result['title'] || ! $result['image']) {
+            if (! $title || ! $image) {
                 return null;
             }
 
-            $result['url'] = $mapUrl;
-
-            return $result;
+            return [
+                'title' => $title,
+                'image' => $image,
+                'url' => $mapUrl,
+            ];
         } catch (Exception $e) {
             Log::error('Failed to fetch OpenGraph data for map preview.', ['exception' => $e]);
 

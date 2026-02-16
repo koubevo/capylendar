@@ -24,7 +24,18 @@ const props = defineProps<{
                 :updated_at_human="props.event.updated_at_human"
                 :description="props.event.description_without_meta"
                 :classes="props.event.capybara.classes"
+                :link-classes="props.event.capybara.link_classes"
             />
+            <UCard
+                v-if="props.event.image_url"
+                :class="props.event.capybara.classes"
+            >
+                <img
+                    :src="props.event.image_url"
+                    alt="Event image"
+                    class="w-full rounded-md object-cover"
+                />
+            </UCard>
             <PreviewCard
                 v-if="props.event.has_map_meta"
                 :url="props.event.meta.map_preview.url"

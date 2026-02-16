@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TagsList from '@/components/tags/TagsList.vue';
-import { hasLinks as checkLinks } from '@/composables/useLinkify';
+import { isOnlyLinks as checkOnlyLinks } from '@/composables/useLinkify';
 import type { Event, View } from '@/types/Event';
 import { computed } from 'vue';
 interface Props {
@@ -14,8 +14,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const showListItems = computed(() => props.view === 'list');
 const showDetailItems = computed(() => props.view === 'detail');
-const hasLinks = computed(() =>
-    checkLinks(props.event.description_without_meta ?? ''),
+const descriptionIsOnlyLinks = computed(() =>
+    checkOnlyLinks(props.event.description_without_meta ?? ''),
 );
 </script>
 
@@ -37,6 +37,7 @@ const hasLinks = computed(() =>
                         name="i-lucide-notepad-text"
                         v-if="
                             props.event.description_without_meta &&
+                            !descriptionIsOnlyLinks &&
                             showListItems
                         "
                         class="size-3"
@@ -48,7 +49,7 @@ const hasLinks = computed(() =>
                     />
                     <UIcon
                         name="i-lucide-link"
-                        v-if="hasLinks && showListItems"
+                        v-if="descriptionIsOnlyLinks && showListItems"
                         class="size-3"
                     />
                     <UIcon

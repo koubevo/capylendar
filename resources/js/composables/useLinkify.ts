@@ -37,6 +37,18 @@ export function hasLinks(text: string): boolean {
 }
 
 /**
+ * Returns true if the text contains only URLs and whitespace, with no other content.
+ */
+export function isOnlyLinks(text: string): boolean {
+    if (!text.trim()) return false;
+    const withoutUrls = text.replace(
+        new RegExp(URL_REGEX.source, URL_REGEX.flags),
+        '',
+    );
+    return withoutUrls.trim().length === 0;
+}
+
+/**
  * Splits a string into text and link segments for safe rendering.
  * No v-html needed — render with v-for using <a> or <span>.
  */

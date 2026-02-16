@@ -27,6 +27,8 @@ const form = useForm<EventFormData>({
     is_private: props.event?.is_private || false,
     description: props.event?.description || '',
     tags: props.event?.tags ? props.event.tags.map((t) => t.id) : [],
+    image: null,
+    remove_image: false,
 });
 
 const title = computed(() => {
@@ -34,7 +36,9 @@ const title = computed(() => {
 });
 
 function submit() {
-    form.post(EventController.store());
+    form.post(EventController.store(), {
+        forceFormData: true,
+    });
 }
 </script>
 

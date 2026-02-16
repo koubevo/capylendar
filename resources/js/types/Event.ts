@@ -22,6 +22,7 @@ export interface Event {
         };
     };
     has_map_meta: boolean;
+    image_url?: string;
     tags?: Tag[];
 }
 

@@ -8,4 +8,6 @@ export interface EventFormData {
     is_private: boolean;
     description: string;
     tags: number[];
+    image: File | null;
+    remove_image: boolean;
 }

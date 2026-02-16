@@ -3,6 +3,7 @@ export interface Capybara {
     label: string;
     avatar: Avatar;
     classes: string;
+    link_classes: string;
 }
 
 interface Avatar {

@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Capybara $capybara
  * @property string|null $description
  * @property bool $is_private
+ * @property string|null $image_path
  * @property Carbon $created_at
  * @property Carbon|null $updated_at
  * @property string $created_at_human
@@ -51,6 +52,7 @@ class Event extends Model
         'description',
         'icon',
         'meta',
+        'image_path',
     ];
 
     /**
@@ -129,6 +131,18 @@ class Event extends Model
     {
         return Attribute::make(
             get: fn () => $this->updated_at?->diffForHumans()
+        );
+    }
+
+    /**
+     * @return Attribute<string|null, never>
+     */
+    protected function imageUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->image_path
+                ? route('event.image.show', $this).'?v='.($this->updated_at?->timestamp ?? 0) // @phpstan-ignore nullsafe.neverNull
+                : null
         );
     }
 }

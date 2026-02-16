@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventImageController;
 use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -22,6 +23,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/event/{event}/restore', [EventController::class, 'restore'])
         ->name('event.restore')
         ->withTrashed();
+
+    Route::get('/event/{event}/image', [EventImageController::class, 'show'])->name('event.image.show');
 
     Route::resource('/event', EventController::class)
         ->only(['create', 'store', 'edit', 'update', 'destroy', 'show']);

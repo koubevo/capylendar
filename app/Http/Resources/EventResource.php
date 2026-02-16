@@ -70,10 +70,13 @@ class EventResource extends JsonResource
                 'value' => $this->resource->capybara->value,
                 'label' => $capybaraData['label'],
                 'classes' => $capybaraData['classes'],
+                'link_classes' => $capybaraData['link_classes'],
                 'avatar' => $capybaraData['avatar'],
             ],
 
             'tags' => $this->resource->tags ?? [],
+
+            'image_url' => $this->resource->image_url,
 
             'created_at_human' => $this->resource->created_at_human,
             'updated_at_human' => $this->resource->updated_at_human,

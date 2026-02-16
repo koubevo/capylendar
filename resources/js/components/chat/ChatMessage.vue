@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import {
-    extractDomain,
-    linkify,
-    toLinkHref,
-} from '@/composables/useLinkify';
+import { extractDomain, linkify, toLinkHref } from '@/composables/useLinkify';
 import type { Message } from '@/types/Message';
 import { computed } from 'vue';
 
@@ -41,9 +37,8 @@ const contentSegments = computed(() => linkify(props.message.content));
                     props.message.created_at_human
                 }}</span>
             </div>
-            <div class="text-sm whitespace-pre-wrap"><template
-                    v-for="(segment, i) in contentSegments"
-                    :key="i"
+            <div class="text-sm whitespace-pre-wrap">
+                <template v-for="(segment, i) in contentSegments" :key="i"
                     ><a
                         v-if="segment.type === 'link'"
                         :href="toLinkHref(segment.value)"
@@ -51,9 +46,13 @@ const contentSegments = computed(() => linkify(props.message.content));
                         rel="noopener noreferrer"
                         class="my-0.5 inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 transition"
                         :class="props.message.user.capybara.link_classes"
-                        ><UIcon name="i-lucide-external-link" class="size-3 shrink-0" />{{ extractDomain(segment.value) }}</a
+                        ><UIcon
+                            name="i-lucide-external-link"
+                            class="size-3 shrink-0"
+                        />{{ extractDomain(segment.value) }}</a
                     ><template v-else>{{ segment.value }}</template></template
-                ></div>
+                >
+            </div>
         </div>
     </div>
 </template>

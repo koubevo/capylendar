@@ -16,6 +16,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
 use shweshi\OpenGraph\OpenGraph;
 
@@ -72,13 +73,14 @@ class EventService
         $tags = $request->input('tags', []);
         $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
 
+        $oldImagePath = $event->image_path;
+        if ($oldImagePath && ($request->hasFile('image') || $request->boolean('remove_image'))) {
+            Storage::disk('local')->delete($oldImagePath);
+        }
+
         if ($request->hasFile('image')) {
-            if ($event->image_path) {
-                Storage::disk('local')->delete($event->image_path);
-            }
             $eventData['image_path'] = $this->compressAndStoreImage($request->file('image'));
-        } elseif ($request->boolean('remove_image') && $event->image_path) {
-            Storage::disk('local')->delete($event->image_path);
+        } elseif ($request->boolean('remove_image') && $oldImagePath) {
             $eventData['image_path'] = null;
         }
 
@@ -105,7 +107,7 @@ class EventService
         $image = Image::read($file)
             ->scaleDown(width: self::IMAGE_MAX_WIDTH);
 
-        $filename = 'event-images/'.uniqid().'.webp';
+        $filename = 'event-images/'.Str::uuid()->toString().'.webp';
 
         Storage::disk('local')->put(
             $filename,

@@ -7,7 +7,7 @@ import { Capybara } from '@/types/Capybara';
 import type { EventFormData } from '@/types/EventFormData';
 import { Tag } from '@/types/Tag';
 import type { Form } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 
 interface Props {
     form: Form<EventFormData>;
@@ -62,11 +62,23 @@ const displayImageUrl = computed(() => {
     return props.imageUrl || null;
 });
 
+function revokePreview() {
+    if (imagePreview.value) {
+        URL.revokeObjectURL(imagePreview.value);
+        imagePreview.value = null;
+    }
+}
+
 function onImageSelected(event: globalThis.Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
 
-    if (!file) return;
+    revokePreview();
+
+    if (!file) {
+        props.form.image = null;
+        return;
+    }
 
     props.form.image = file;
     props.form.remove_image = false;
@@ -75,16 +87,15 @@ function onImageSelected(event: globalThis.Event) {
 
 function clearImage() {
     props.form.image = null;
-    if (imagePreview.value) {
-        URL.revokeObjectURL(imagePreview.value);
-    }
-    imagePreview.value = null;
+    revokePreview();
 
     // If in edit mode with existing image, mark for removal
     if (props.isEditMode && props.imageUrl) {
         props.form.remove_image = true;
     }
 }
+
+onUnmounted(() => revokePreview());
 </script>
 
 <template>
@@ -209,7 +220,11 @@ function clearImage() {
                         class="flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm transition hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
                     >
                         <UIcon name="i-lucide-image-plus" class="size-4" />
-                        {{ displayImageUrl ? 'Změnit obrázek' : 'Přidat obrázek' }}
+                        {{
+                            displayImageUrl
+                                ? 'Změnit obrázek'
+                                : 'Přidat obrázek'
+                        }}
                         <input
                             type="file"
                             accept="image/*"

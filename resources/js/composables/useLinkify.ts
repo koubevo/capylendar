@@ -20,8 +20,8 @@ const TLDS =
  */
 const URL_REGEX = new RegExp(
     '(?:https?:\\/\\/[^\\s<>]+' +
-        '|www\\.[^\\s<>]+\\.[^\\s<>]+' +
-        '|[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.(?:' +
+        '|www\\.[^\\s<>]+' +
+        '|(?:[a-zA-Z0-9-]+\\.)+(?:' +
         TLDS +
         ')(?:\\/[^\\s<>]*)?)',
     'gi',
@@ -57,8 +57,21 @@ export function linkify(text: string): LinkSegment[] {
             });
         }
 
-        // Strip trailing punctuation that's likely not part of the URL
-        const cleaned = matchText.replace(/[.,;:!?)]+$/, '');
+        // Strip trailing punctuation that's likely not part of the URL,
+        // but preserve balanced parentheses (e.g. Wikipedia URLs)
+        let cleaned = matchText.replace(/[.,;:!?]+$/, '');
+
+        // Only strip trailing ')' if parens are unbalanced
+        while (cleaned.endsWith(')')) {
+            const open = (cleaned.match(/\(/g) || []).length;
+            const close = (cleaned.match(/\)/g) || []).length;
+            if (close > open) {
+                cleaned = cleaned.slice(0, -1);
+            } else {
+                break;
+            }
+        }
+
         const trailingChars = matchText.slice(cleaned.length);
 
         segments.push({ type: 'link', value: cleaned });

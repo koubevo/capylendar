@@ -14,7 +14,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const showListItems = computed(() => props.view === 'list');
 const showDetailItems = computed(() => props.view === 'detail');
-const hasLinks = computed(() => checkLinks(props.event.description_without_meta ?? ''));
+const hasLinks = computed(() =>
+    checkLinks(props.event.description_without_meta ?? ''),
+);
 </script>
 
 <template>

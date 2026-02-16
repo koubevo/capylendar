@@ -19,7 +19,6 @@ const links = computed(() => [
     {
         label: 'Chat',
         to: MessageController.index(),
-        isNew: true,
     },
     {
         label: 'Můj Profil',

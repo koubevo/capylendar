@@ -6,7 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
-    Storage::fake('local');
+    Storage::fake();
     $this->user = User::factory()->create();
     $this->event = Event::factory()->create(['author_id' => $this->user->id]);
     $this->event->subscribers()->attach($this->user);
@@ -15,7 +15,7 @@ beforeEach(function () {
 describe('EventImageController show', function () {
     it('returns the image for an authorized user', function () {
         $path = 'event-images/test-image.jpg';
-        Storage::disk('local')->put($path, UploadedFile::fake()->image('test.jpg')->getContent());
+        Storage::disk()->put($path, UploadedFile::fake()->image('test.jpg')->getContent());
         $this->event->update(['image_path' => $path]);
 
         $this->actingAs($this->user)
@@ -32,7 +32,7 @@ describe('EventImageController show', function () {
 
     it('forbids unauthorized user from viewing image', function () {
         $path = 'event-images/test-image.jpg';
-        Storage::disk('local')->put($path, UploadedFile::fake()->image('test.jpg')->getContent());
+        Storage::disk()->put($path, UploadedFile::fake()->image('test.jpg')->getContent());
         $this->event->update(['image_path' => $path]);
 
         $otherUser = User::factory()->create();
@@ -67,7 +67,7 @@ describe('Event image upload via EventController', function () {
         $event = Event::where('title', 'Event with Image')->first();
         expect($event)->not->toBeNull();
         expect($event->image_path)->not->toBeNull();
-        Storage::disk('local')->assertExists($event->image_path);
+        Storage::disk()->assertExists($event->image_path);
     });
 
     it('updates an event with a new image', function () {
@@ -86,12 +86,12 @@ describe('Event image upload via EventController', function () {
 
         $this->event->refresh();
         expect($this->event->image_path)->not->toBeNull();
-        Storage::disk('local')->assertExists($this->event->image_path);
+        Storage::disk()->assertExists($this->event->image_path);
     });
 
     it('replaces an existing image when updating with a new one', function () {
         $oldPath = 'event-images/old-image.jpg';
-        Storage::disk('local')->put($oldPath, UploadedFile::fake()->image('old.jpg')->getContent());
+        Storage::disk()->put($oldPath, UploadedFile::fake()->image('old.jpg')->getContent());
         $this->event->update(['image_path' => $oldPath]);
 
         $newFile = UploadedFile::fake()->image('new-capybara.png');
@@ -109,13 +109,13 @@ describe('Event image upload via EventController', function () {
 
         $this->event->refresh();
         expect($this->event->image_path)->not->toBe($oldPath);
-        Storage::disk('local')->assertMissing($oldPath);
-        Storage::disk('local')->assertExists($this->event->image_path);
+        Storage::disk()->assertMissing($oldPath);
+        Storage::disk()->assertExists($this->event->image_path);
     });
 
     it('removes an image when remove_image is true', function () {
         $path = 'event-images/to-remove.jpg';
-        Storage::disk('local')->put($path, UploadedFile::fake()->image('test.jpg')->getContent());
+        Storage::disk()->put($path, UploadedFile::fake()->image('test.jpg')->getContent());
         $this->event->update(['image_path' => $path]);
 
         $this->actingAs($this->user)
@@ -131,7 +131,7 @@ describe('Event image upload via EventController', function () {
 
         $this->event->refresh();
         expect($this->event->image_path)->toBeNull();
-        Storage::disk('local')->assertMissing($path);
+        Storage::disk()->assertMissing($path);
     });
 
     it('rejects non-image files on store', function () {

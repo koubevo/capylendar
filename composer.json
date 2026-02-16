@@ -19,6 +19,7 @@
         "laravel/telescope": "^5.15",
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.9",
+        "league/flysystem-aws-s3-v3": "^3.31",
         "shweshi/opengraph": "^1.2"
     },
     "require-dev": {

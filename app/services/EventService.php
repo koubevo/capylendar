@@ -62,7 +62,7 @@ class EventService
             });
         } catch (Exception $e) {
             if ($newImagePath) {
-                Storage::disk('local')->delete($newImagePath);
+                Storage::disk()->delete($newImagePath);
             }
 
             throw $e;
@@ -106,13 +106,13 @@ class EventService
 
             // Delete old image only after transaction succeeds
             if ($oldImagePath && ($request->hasFile('image') || $request->boolean('remove_image'))) {
-                Storage::disk('local')->delete($oldImagePath);
+                Storage::disk()->delete($oldImagePath);
             }
 
             return $result;
         } catch (Exception $e) {
             if ($newImagePath) {
-                Storage::disk('local')->delete($newImagePath);
+                Storage::disk()->delete($newImagePath);
             }
 
             throw $e;
@@ -133,7 +133,7 @@ class EventService
 
         $filename = 'event-images/'.Str::uuid()->toString().'.webp';
 
-        Storage::disk('local')->put(
+        Storage::disk()->put(
             $filename,
             $image->toWebp(quality: self::IMAGE_QUALITY)->toString()
         );

@@ -13,10 +13,10 @@ class EventImageController extends Controller
     {
         Gate::authorize('view', $event);
 
-        if (! $event->image_path || ! Storage::disk('local')->exists($event->image_path)) {
+        if (! $event->image_path || ! Storage::disk()->exists($event->image_path)) {
             abort(404);
         }
 
-        return Storage::disk('local')->response($event->image_path);
+        return Storage::disk()->response($event->image_path);
     }
 }

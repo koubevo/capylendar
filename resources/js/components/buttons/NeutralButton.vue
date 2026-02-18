@@ -5,7 +5,12 @@ defineProps<{
 </script>
 
 <template>
-    <UButton color="neutral" variant="outline" v-bind="$attrs" :loading="loading">
+    <UButton
+        color="neutral"
+        variant="outline"
+        v-bind="$attrs"
+        :loading="loading"
+    >
         <slot />
     </UButton>
 </template>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import MessageController from '@/actions/App/Http/Controllers/MessageController';
+import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import { Form } from '@inertiajs/vue3';
 </script>
 
@@ -17,7 +18,7 @@ import { Form } from '@inertiajs/vue3';
                 placeholder="Napiš zprávu..."
                 class="flex-1"
             />
-            <UButton
+            <PrimaryButton
                 type="submit"
                 icon="i-lucide-send"
                 :loading="processing"

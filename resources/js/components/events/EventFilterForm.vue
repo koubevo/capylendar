@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NeutralButton from '@/components/buttons/NeutralButton.vue';
 import { Capybara } from '@/types/Capybara';
 import { EventFilters } from '@/types/Filters';
 import { Tag } from '@/types/Tag';
@@ -77,15 +78,14 @@ const reset = () => {
             </USelectMenu>
         </UFormField>
         <div class="flex justify-end text-sm">
-            <UButton
-                color="neutral"
+            <NeutralButton
                 variant="ghost"
                 icon="i-lucide-x"
                 size="sm"
                 @click="reset"
             >
                 Vyresetovat filtry
-            </UButton>
+            </NeutralButton>
         </div>
     </div>
 </template>

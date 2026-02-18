@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import NeutralButton from '@/components/buttons/NeutralButton.vue';
+import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import { Action } from '@/types/Button';
 import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
@@ -44,15 +46,9 @@ const handleAction = (close: () => void) => {
         </template>
 
         <template #footer="{ close }">
-            <UButton
-                label="Zrušit"
-                color="neutral"
-                variant="outline"
-                @click="close"
-            />
-            <UButton
+            <NeutralButton label="Zrušit" @click="close" />
+            <PrimaryButton
                 :label="props.action.titleShort ?? 'Smazat'"
-                color="primary"
                 :loading="processing"
                 @click="handleAction(close)"
             />

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
+import SecondaryButton from '@/components/buttons/SecondaryButton.vue';
 import EventFilterForm from '@/components/events/EventFilterForm.vue';
 import EventsList from '@/components/events/EventsList.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
@@ -65,10 +66,14 @@ const items = [
 </script>
 
 <template>
-    <AuthenticatedLayout :display-footer="true">
+    <AuthenticatedLayout
+        :display-footer="true"
+        :display-floating-action-button="true"
+    >
         <UCollapsible class="mb-4 flex w-full flex-col gap-2">
-            <UButton
+            <SecondaryButton
                 :label="eventFiltersLabel"
+                color="neutral"
                 variant="soft"
                 trailing-icon="i-lucide-chevron-down"
                 block

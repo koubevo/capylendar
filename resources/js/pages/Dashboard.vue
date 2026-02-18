@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
-import SecondaryButton from '@/components/buttons/SecondaryButton.vue';
 import EventFilterForm from '@/components/events/EventFilterForm.vue';
 import EventsList from '@/components/events/EventsList.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
@@ -24,7 +23,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const handleFilterChange = (newFilters: typeof props.eventFilters) => {
-    router.get(DashboardController(), newFilters, {
+    router.get(DashboardController(), newFilters as any, {
         preserveState: true,
         preserveScroll: true,
         replace: true,
@@ -66,10 +65,7 @@ const items = [
 </script>
 
 <template>
-    <AuthenticatedLayout
-        :display-footer="true"
-        :display-floating-action-button="true"
-    >
+    <AuthenticatedLayout :display-footer="true">
         <UCollapsible class="mb-4 flex w-full flex-col gap-2">
             <SecondaryButton
                 :label="eventFiltersLabel"

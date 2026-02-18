@@ -1,6 +1,6 @@
 export interface EventFormData {
     title: string;
-    capybara: string;
+    capybara: 'blue' | 'pink' | 'yellow';
     date: string;
     start_at: string;
     end_at: string;

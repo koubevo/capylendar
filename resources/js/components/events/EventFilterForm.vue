@@ -20,7 +20,7 @@ const emit = defineEmits<{
 
 const form = ref({
     search: props.eventFilters?.search || '',
-    capybara: props.eventFilters?.capybara || null,
+    capybara: props.eventFilters?.capybara || undefined,
     tags: props.eventFilters?.tags?.map(Number) || [],
 });
 
@@ -33,7 +33,7 @@ watch(form, () => emitChange(), { deep: true });
 const reset = () => {
     form.value = {
         search: '',
-        capybara: null,
+        capybara: undefined,
         tags: [],
     };
 };
@@ -68,12 +68,12 @@ const reset = () => {
                 placeholder="Filtrovat štítky..."
                 class="w-full"
             >
-                <template #option="{ option }">
+                <template #item="{ item }">
                     <span
                         class="h-2 w-2 rounded-full"
-                        :style="{ backgroundColor: option.color }"
+                        :style="{ backgroundColor: item.color }"
                     ></span>
-                    <span class="truncate">{{ option.label }}</span>
+                    <span class="truncate">{{ item.label }}</span>
                 </template>
             </USelectMenu>
         </UFormField>

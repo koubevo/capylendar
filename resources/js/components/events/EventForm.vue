@@ -245,12 +245,12 @@ onUnmounted(() => revokePreview());
                     :search-input="{ placeholder: 'Hledat štítek...' }"
                     class="w-full"
                 >
-                    <template #option="{ option }">
+                    <template #item="{ item }">
                         <span
                             class="h-2 w-2 flex-shrink-0 rounded-full"
-                            :style="{ backgroundColor: option.color }"
+                            :style="{ backgroundColor: item.color }"
                         ></span>
-                        <span class="truncate">{{ option.label }}</span>
+                        <span class="truncate">{{ item.label }}</span>
                     </template>
 
                     <template #label>

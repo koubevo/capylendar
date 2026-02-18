@@ -2,17 +2,19 @@
 import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
 import EventFilterForm from '@/components/events/EventFilterForm.vue';
 import EventsList from '@/components/events/EventsList.vue';
+import TodosList from '@/components/todos/TodosList.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import { Capybara } from '@/types/Capybara';
 import type { Event } from '@/types/Event';
+import type { Todo } from '@/types/Todo';
 import { EventFilters } from '@/types/Filters';
 import { Tag } from '@/types/Tag';
 import { router } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
-//TODO: pinia
 interface Props {
     upcomingEvents: Event[];
+    unfinishedTodos: Todo[];
     historyEvents: Event[];
     eventFilters: EventFilters;
     capybaraOptions: Capybara[];
@@ -27,7 +29,12 @@ const handleFilterChange = (newFilters: typeof props.eventFilters) => {
         preserveState: true,
         preserveScroll: true,
         replace: true,
-        only: ['upcomingEvents', 'historyEvents', 'eventFilters'],
+        only: [
+            'upcomingEvents',
+            'unfinishedTodos',
+            'historyEvents',
+            'eventFilters',
+        ],
     });
 };
 
@@ -55,6 +62,11 @@ const items = [
         label: 'Nadcházející',
         icon: 'i-lucide-rocket',
         slot: 'upcoming',
+    },
+    {
+        label: 'Todos',
+        icon: 'i-lucide-list-todo',
+        slot: 'todos',
     },
     {
         label: 'Historické',
@@ -96,6 +108,15 @@ const items = [
                 />
             </template>
 
+            <template #todos>
+                <TodosList
+                    heading="Todos"
+                    :todos="props.unfinishedTodos"
+                    :create-todo-if-empty="true"
+                    :show-finish-button="true"
+                />
+            </template>
+
             <template #history>
                 <EventsList
                     heading="Historické"
@@ -108,3 +129,4 @@ const items = [
         </UTabs>
     </AuthenticatedLayout>
 </template>
+

@@ -3,18 +3,23 @@ import DashboardController from '@/actions/App/Http/Controllers/DashboardControl
 import EventController from '@/actions/App/Http/Controllers/EventController';
 import MessageController from '@/actions/App/Http/Controllers/MessageController';
 import TagController from '@/actions/App/Http/Controllers/TagController';
+import TodoController from '@/actions/App/Http/Controllers/TodoController';
 import MenuItem from '@/components/authenticated/MenuItem.vue';
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import Logo from '@/components/Logo.vue';
 import AvatarSection from '@/components/ui/AvatarSection.vue';
 import { profile } from '@/routes';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const links = computed(() => [
     {
         label: 'Dashboard',
         to: DashboardController(),
+    },
+    {
+        label: 'Todos',
+        to: TodoController.index(),
     },
     {
         label: 'Chat',
@@ -32,7 +37,26 @@ const links = computed(() => [
         label: 'Obnovit eventy',
         to: EventController.deletedIndex(),
     },
+    {
+        label: 'Obnovit todos',
+        to: TodoController.deletedIndex(),
+    },
 ]);
+
+const addMenuItems = [
+    [
+        {
+            label: 'Přidat event',
+            icon: 'i-lucide-calendar-plus',
+            onSelect: () => router.visit(EventController.create.url()),
+        },
+        {
+            label: 'Přidat todo',
+            icon: 'i-lucide-list-plus',
+            onSelect: () => router.visit(TodoController.create.url()),
+        },
+    ],
+];
 </script>
 
 <template>
@@ -66,13 +90,12 @@ const links = computed(() => [
         </template>
 
         <template #right>
-            <PrimaryButton
-                class="hidden md:flex"
-                icon="i-lucide-plus"
-                :to="EventController.create()"
-            >
-                Přidat event
-            </PrimaryButton>
+            <UDropdownMenu :items="addMenuItems">
+                <PrimaryButton class="hidden md:flex" icon="i-lucide-plus">
+                    Přidat
+                </PrimaryButton>
+            </UDropdownMenu>
         </template>
     </UHeader>
 </template>
+

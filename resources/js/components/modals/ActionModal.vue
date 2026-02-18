@@ -1,19 +1,26 @@
 <script setup lang="ts">
 import { Action } from '@/types/Button';
 import { router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 const props = defineProps<{
     action: Action;
 }>();
 
+const processing = ref(false);
+
 const handleAction = (close: () => void) => {
     const method = props.action.method || 'delete';
+    processing.value = true;
     router[method](
         props.action.url,
         {},
         {
             onSuccess: () => {
                 close();
+            },
+            onFinish: () => {
+                processing.value = false;
             },
         },
     );
@@ -46,6 +53,7 @@ const handleAction = (close: () => void) => {
             <UButton
                 :label="props.action.titleShort ?? 'Smazat'"
                 color="primary"
+                :loading="processing"
                 @click="handleAction(close)"
             />
         </template>

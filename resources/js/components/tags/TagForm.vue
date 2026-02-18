@@ -2,10 +2,10 @@
 /* eslint-disable vue/no-mutating-props */
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import { TagFormData } from '@/types/TagFormData';
-import type { Form } from '@inertiajs/vue3';
+import type { InertiaForm } from '@inertiajs/vue3';
 
 interface Props {
-    form: Form<TagFormData>;
+    form: InertiaForm<TagFormData>;
     isEditMode: boolean;
 }
 
@@ -37,7 +37,11 @@ const emit = defineEmits<{
                 <UColorPicker v-model="props.form.color" />
             </UFormField>
 
-            <PrimaryButton class="w-full justify-center" type="submit">
+            <PrimaryButton
+                class="w-full justify-center"
+                type="submit"
+                :loading="props.form.processing"
+            >
                 {{ props.isEditMode ? 'Upravit' : 'Přidat' }}
             </PrimaryButton>
         </div>

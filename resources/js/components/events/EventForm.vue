@@ -6,11 +6,11 @@ import { hasGoogleMapUrl } from '@/lib/utils';
 import { Capybara } from '@/types/Capybara';
 import type { EventFormData } from '@/types/EventFormData';
 import { Tag } from '@/types/Tag';
-import type { Form } from '@inertiajs/vue3';
+import type { InertiaForm } from '@inertiajs/vue3';
 import { computed, onUnmounted, ref } from 'vue';
 
 interface Props {
-    form: Form<EventFormData>;
+    form: InertiaForm<EventFormData>;
     isEditMode: boolean;
     capybaraOptions: Capybara[];
     availableTags?: Tag[];
@@ -180,7 +180,7 @@ onUnmounted(() => revokePreview());
                 <UTextarea
                     v-model="props.form.description"
                     class="w-full"
-                    rows="5"
+                    :rows="5"
                 />
                 <MacroAlert
                     v-show="mapDetected"
@@ -245,12 +245,12 @@ onUnmounted(() => revokePreview());
                     :search-input="{ placeholder: 'Hledat štítek...' }"
                     class="w-full"
                 >
-                    <template #option="{ option }">
+                    <template #item="{ item }">
                         <span
                             class="h-2 w-2 flex-shrink-0 rounded-full"
-                            :style="{ backgroundColor: option.color }"
+                            :style="{ backgroundColor: item.color }"
                         ></span>
-                        <span class="truncate">{{ option.label }}</span>
+                        <span class="truncate">{{ item.label }}</span>
                     </template>
 
                     <template #label>
@@ -286,7 +286,11 @@ onUnmounted(() => revokePreview());
                 :error="props.form.errors.is_private"
             />
 
-            <PrimaryButton class="w-full justify-center" type="submit">
+            <PrimaryButton
+                class="w-full justify-center"
+                type="submit"
+                :loading="props.form.processing"
+            >
                 {{ props.isEditMode ? 'Upravit' : 'Přidat' }}
             </PrimaryButton>
         </div>

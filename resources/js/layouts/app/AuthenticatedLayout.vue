@@ -7,8 +7,8 @@ import Container from '@/components/Container.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 
 interface Props {
-    displayFooter: boolean;
-    displayFloatingActionButton: boolean;
+    displayFooter?: boolean;
+    displayFloatingActionButton?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
 
         <FloatingActionButton
             v-if="props.displayFloatingActionButton"
-            aria-label="Přidat event"
+            ariaLabel="Přidat event"
             :to="EventController.create()"
         />
 

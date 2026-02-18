@@ -23,7 +23,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const handleFilterChange = (newFilters: typeof props.eventFilters) => {
-    router.get(DashboardController(), newFilters, {
+    router.get(DashboardController(), newFilters as any, {
         preserveState: true,
         preserveScroll: true,
         replace: true,
@@ -67,8 +67,9 @@ const items = [
 <template>
     <AuthenticatedLayout :display-footer="true">
         <UCollapsible class="mb-4 flex w-full flex-col gap-2">
-            <UButton
+            <SecondaryButton
                 :label="eventFiltersLabel"
+                color="neutral"
                 variant="soft"
                 trailing-icon="i-lucide-chevron-down"
                 block

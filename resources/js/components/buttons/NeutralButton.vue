@@ -10,8 +10,8 @@ defineProps<{
 
 <template>
     <UButton
-        color="primary"
-        class="justify-center"
+        color="neutral"
+        variant="outline"
         v-bind="$attrs"
         :loading="loading"
     >

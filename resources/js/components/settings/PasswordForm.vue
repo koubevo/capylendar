@@ -71,7 +71,9 @@ const onSubmit = () => {
                     class="w-full"
                 />
             </UFormField>
-            <PrimaryButton type="submit"> Změnit heslo </PrimaryButton>
+            <PrimaryButton type="submit" :loading="form.processing">
+                Změnit heslo
+            </PrimaryButton>
         </div>
     </form>
 </template>

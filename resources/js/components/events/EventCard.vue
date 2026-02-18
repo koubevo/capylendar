@@ -25,7 +25,7 @@ const descriptionIsOnlyLinks = computed(() =>
             class="flex items-center justify-between p-4"
             :class="event.has_hearts ? 'bg-hearts' : ''"
         >
-            <div>
+            <div class="min-w-0 flex-1">
                 <h3 class="font-bold">{{ props.event.title }}</h3>
                 <div class="flex items-center gap-x-1">
                     <UIcon
@@ -81,7 +81,7 @@ const descriptionIsOnlyLinks = computed(() =>
                     v-if="props.event.tags"
                 />
             </div>
-            <div>
+            <div class="ml-4 shrink-0">
                 <img
                     class="h-14 w-14 rounded-md"
                     :src="props.event.capybara.avatar.src"

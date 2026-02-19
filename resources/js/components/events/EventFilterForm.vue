@@ -3,6 +3,7 @@ import NeutralButton from '@/components/buttons/NeutralButton.vue';
 import { Capybara } from '@/types/Capybara';
 import { EventFilters } from '@/types/Filters';
 import { Tag } from '@/types/Tag';
+import TagSelectMenu from '@/components/tags/TagSelectMenu.vue';
 import { useDebounceFn } from '@vueuse/core';
 import { ref, watch } from 'vue';
 
@@ -60,22 +61,12 @@ const reset = () => {
         </UFormField>
 
         <UFormField label="Štítky" name="tags">
-            <USelectMenu
+            <TagSelectMenu
                 v-model="form.tags"
                 :items="props.availableTags"
-                multiple
-                value-key="id"
                 placeholder="Filtrovat štítky..."
-                class="w-full"
-            >
-                <template #item="{ item }">
-                    <span
-                        class="h-2 w-2 rounded-full"
-                        :style="{ backgroundColor: item.color }"
-                    ></span>
-                    <span class="truncate">{{ item.label }}</span>
-                </template>
-            </USelectMenu>
+                search-input-placeholder="Hledat štítek..."
+            />
         </UFormField>
         <div class="flex justify-end text-sm">
             <NeutralButton

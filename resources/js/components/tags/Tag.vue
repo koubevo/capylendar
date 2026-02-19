@@ -5,9 +5,12 @@ import { computed } from 'vue';
 
 interface Props {
     tag: Tag;
+    size?: 'xs' | 'sm' | 'md' | 'lg';
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    size: 'sm',
+});
 const textColor = computed(() => getContrastingTextColor(props.tag.color));
 </script>
 
@@ -17,7 +20,7 @@ const textColor = computed(() => getContrastingTextColor(props.tag.color));
             backgroundColor: props.tag.color,
             color: textColor,
         }"
-        size="sm"
+        :size="props.size"
         class="relative overflow-hidden transition-all"
         :class="$slots['delete-button'] ? 'cursor-pointer pr-7' : ''"
     >

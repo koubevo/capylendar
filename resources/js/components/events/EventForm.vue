@@ -6,6 +6,7 @@ import { hasGoogleMapUrl } from '@/lib/utils';
 import { Capybara } from '@/types/Capybara';
 import type { EventFormData } from '@/types/EventFormData';
 import { Tag } from '@/types/Tag';
+import TagSelectMenu from '@/components/tags/TagSelectMenu.vue';
 import type { InertiaForm } from '@inertiajs/vue3';
 import { computed, onUnmounted, ref } from 'vue';
 
@@ -39,12 +40,7 @@ const selectedTags = computed({
     },
 });
 
-const availableTagsMap = computed(() => {
-    if (!props.availableTags) {
-        return new Map<number, Tag>();
-    }
-    return new Map(props.availableTags.map((tag) => [tag.id, tag]));
-});
+
 
 const emit = defineEmits<{
     (e: 'submit'): void;
@@ -217,7 +213,7 @@ onUnmounted(() => revokePreview());
                     </div>
 
                     <label
-                        class="flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm transition hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
+                        class="flex h-10 cursor-pointer items-center gap-2 rounded-md border border-gray-300 px-3 text-sm transition hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
                     >
                         <UIcon name="i-lucide-image-plus" class="size-4" />
                         {{
@@ -236,48 +232,12 @@ onUnmounted(() => revokePreview());
             </UFormField>
 
             <UFormField label="Štítky" name="tags">
-                <USelectMenu
+                <TagSelectMenu
                     v-model="selectedTags"
                     :items="props.availableTags || []"
-                    multiple
                     placeholder="Vyber štítky..."
-                    value-key="id"
-                    :search-input="{ placeholder: 'Hledat štítek...' }"
-                    class="w-full"
-                >
-                    <template #item="{ item }">
-                        <span
-                            class="h-2 w-2 flex-shrink-0 rounded-full"
-                            :style="{ backgroundColor: item.color }"
-                        ></span>
-                        <span class="truncate">{{ item.label }}</span>
-                    </template>
-
-                    <template #label>
-                        <div
-                            v-if="selectedTags.length"
-                            class="flex flex-wrap gap-1"
-                        >
-                            <span
-                                v-for="tagId in selectedTags"
-                                :key="tagId"
-                                class="flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-700"
-                            >
-                                <span
-                                    class="h-1.5 w-1.5 rounded-full"
-                                    :style="{
-                                        backgroundColor:
-                                            availableTagsMap.get(tagId)?.color,
-                                    }"
-                                ></span>
-                                {{ availableTagsMap.get(tagId)?.label }}
-                            </span>
-                        </div>
-                        <span v-else class="text-gray-500"
-                            >Vyber štítky...</span
-                        >
-                    </template>
-                </USelectMenu>
+                    search-input-placeholder="Hledat štítek..."
+                />
             </UFormField>
 
             <USwitch

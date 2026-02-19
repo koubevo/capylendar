@@ -67,13 +67,13 @@ const items = [
 <template>
     <AuthenticatedLayout :display-footer="true">
         <UCollapsible class="mb-4 flex w-full flex-col gap-2">
-            <SecondaryButton
-                :label="eventFiltersLabel"
-                color="neutral"
-                variant="soft"
-                trailing-icon="i-lucide-chevron-down"
-                block
-            />
+                <UButton
+                    :label="eventFiltersLabel"
+                    color="primary"
+                    variant="subtle"
+                    trailing-icon="i-lucide-chevron-down"
+                    block
+                />
 
             <template #content>
                 <EventFilterForm

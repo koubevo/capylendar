@@ -170,12 +170,16 @@ function handleFinish(event: MouseEvent) {
 <style scoped>
 /* Scoped button colors for the new full-height accent bar style */
 
-/* Low Priority (Green) */
-.todo-button-green:hover {
-    background-color: rgba(34, 197, 94, 0.08);
+/* Low Priority (Teal) */
+.todo-button-teal:hover {
+    background-color: color-mix(
+        in oklab,
+        var(--color-teal-500, #14b8a6) 8%,
+        transparent
+    );
 }
-.todo-button-green.checked {
-    background-color: #22c55e;
+.todo-button-teal.checked {
+    background-color: var(--color-teal-500, #14b8a6);
 }
 
 /* Medium Priority (Yellow) */

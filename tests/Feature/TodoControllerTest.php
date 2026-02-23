@@ -73,7 +73,7 @@ describe('TodoController store', function () {
                 'is_private' => false,
                 'description' => 'Todo description',
             ])
-            ->assertRedirect(route('todo.index'));
+            ->assertRedirect(route('dashboard'));
 
         $this->assertDatabaseHas('todos', [
             'title' => 'Test Todo',

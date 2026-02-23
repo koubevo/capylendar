@@ -33,7 +33,7 @@ enum Priority: string
     public function borderClass(): string
     {
         return match ($this) {
-            self::Low => 'border-l-green-400',
+            self::Low => 'border-l-teal-400',
             self::Medium => 'border-l-yellow-400',
             self::High => 'border-l-red-400',
         };
@@ -42,7 +42,7 @@ enum Priority: string
     public function iconColor(): string
     {
         return match ($this) {
-            self::Low => 'text-green-500',
+            self::Low => 'text-teal-500',
             self::Medium => 'text-yellow-500',
             self::High => 'text-red-500',
         };
@@ -51,7 +51,7 @@ enum Priority: string
     public function checkboxColor(): string
     {
         return match ($this) {
-            self::Low => 'todo-button-green',
+            self::Low => 'todo-button-teal',
             self::Medium => 'todo-button-yellow',
             self::High => 'todo-button-red',
         };

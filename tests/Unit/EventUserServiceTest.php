@@ -2,7 +2,7 @@
 
 use App\Models\Event;
 use App\Models\User;
-use App\services\EventUserService;
+use App\Services\EventUserService;
 
 beforeEach(function () {
     $this->eventUserService = new EventUserService;

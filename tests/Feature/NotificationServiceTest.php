@@ -2,7 +2,7 @@
 
 use App\Models\Event;
 use App\Models\User;
-use App\services\NotificationService;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Notification;
 

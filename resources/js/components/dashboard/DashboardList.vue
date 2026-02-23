@@ -13,7 +13,6 @@ import {
     nextTick,
     onMounted,
     ref,
-    watch,
 } from 'vue';
 
 interface Props {
@@ -31,28 +30,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
     scrolled: [];
+    toggled: [todoId: number];
 }>();
 
 const button = props.createIfEmpty
     ? { to: EventController.create(), label: 'Přidat event' }
     : undefined;
 
-// Local reactive copy of todos so toggle works properly
-const localTodos = ref<Todo[]>([...props.todos]);
 
-watch(
-    () => props.todos,
-    (newVal) => {
-        localTodos.value = [...newVal];
-    },
-);
-
-function handleToggled(todoId: number) {
-    const todo = localTodos.value.find((t) => t.id === todoId);
-    if (todo) {
-        todo.is_finished = !todo.is_finished;
-    }
-}
 
 interface DashboardItem {
     type: 'event' | 'todo';
@@ -73,7 +58,7 @@ const mergedItems = computed<DashboardItem[]>(() => {
         });
     }
 
-    for (const todo of localTodos.value) {
+    for (const todo of props.todos) {
         items.push({
             type: 'todo',
             dateKey: todo.deadline.key,
@@ -168,7 +153,7 @@ onMounted(() => {
                         <TodoCard
                             :todo="(item.data as Todo)"
                             :show-finish-button="true"
-                            @toggled="handleToggled"
+                            @toggled="emit('toggled', $event)"
                         />
                     </Link>
                 </template>

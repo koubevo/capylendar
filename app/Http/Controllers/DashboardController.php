@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Enums\Capybara;
 use App\Enums\EventType;
-use App\services\EventService;
-use App\services\TagService;
-use App\services\TodoService;
+use App\Services\EventService;
+use App\Services\TagService;
+use App\Services\TodoService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;

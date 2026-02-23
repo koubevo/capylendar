@@ -121,7 +121,7 @@ const columns: TableColumn<Event>[] = [
                 Smazané eventy
             </h2>
 
-            <UCard :ui="{ body: { padding: '' } }">
+            <UCard :ui="{ body: 'p-0' }">
                 <div class="overflow-x-auto">
                     <UTable
                         :data="props.deletedEvents"

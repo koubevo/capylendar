@@ -1,6 +1,6 @@
 <?php
 
-namespace App\services;
+namespace App\Services;
 
 use App\Http\Requests\Todo\StoreTodoRequest;
 use App\Http\Requests\Todo\UpdateTodoRequest;
@@ -128,10 +128,10 @@ class TodoService
             }
         }
 
-        $events = $query->orderBy('deadline', $finished ? 'desc' : 'asc')
+        $todos = $query->orderBy('deadline', $finished ? 'desc' : 'asc')
             ->get();
 
-        return TodoResource::collection($events)->resolve();
+        return TodoResource::collection($todos)->resolve();
     }
 
     /**
@@ -145,7 +145,8 @@ class TodoService
 
         $query = $user
             ->assignedTodos()
-            ->with(['tags', 'author']);
+            ->with(['tags', 'author'])
+            ->withCount('subscribers');
 
         $todos = $query->orderBy('deleted_at', 'desc')
             ->onlyTrashed()

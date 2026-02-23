@@ -1,6 +1,6 @@
 <?php
 
-namespace App\services;
+namespace App\Services;
 
 use App\Enums\EventType;
 use App\Http\Requests\Event\StoreEventRequest;
@@ -246,7 +246,8 @@ class EventService
 
         $query = $user
             ->assignedEvents()
-            ->with(['tags', 'author']);
+            ->with(['tags', 'author'])
+            ->withCount('subscribers');
 
         $events = $query->orderBy('deleted_at', 'desc')
             ->onlyTrashed()

@@ -3,7 +3,7 @@
 use App\Models\Event;
 use App\Models\Tag;
 use App\Models\User;
-use App\services\EventTagService;
+use App\Services\EventTagService;
 
 beforeEach(function () {
     $this->eventTagService = new EventTagService;

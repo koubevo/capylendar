@@ -26,37 +26,55 @@
         padding: 0 !important;
     }
 
+    :root {
+        --todo-green: oklch(0.723 0.191 149.579);
+        --todo-green-alpha: oklch(0.723 0.191 149.579 / 0.15);
+        --todo-yellow: oklch(0.795 0.184 86.047);
+        --todo-yellow-alpha: oklch(0.795 0.184 86.047 / 0.15);
+        --todo-red: oklch(0.637 0.237 25.331);
+        --todo-red-alpha: oklch(0.637 0.237 25.331 / 0.15);
+    }
+
+    .dark {
+        --todo-green: oklch(0.65 0.17 149.579);
+        --todo-green-alpha: oklch(0.65 0.17 149.579 / 0.2);
+        --todo-yellow: oklch(0.72 0.16 86.047);
+        --todo-yellow-alpha: oklch(0.72 0.16 86.047 / 0.2);
+        --todo-red: oklch(0.58 0.2 25.331);
+        --todo-red-alpha: oklch(0.58 0.2 25.331 / 0.2);
+    }
+
     .todo-checkbox-green {
-        border-color: oklch(0.723 0.191 149.579);
+        border-color: var(--todo-green);
     }
     .todo-checkbox-green:hover {
-        background-color: oklch(0.723 0.191 149.579 / 0.15);
+        background-color: var(--todo-green-alpha);
     }
     .todo-checkbox-green.checked {
-        background-color: oklch(0.723 0.191 149.579);
-        border-color: oklch(0.723 0.191 149.579);
+        background-color: var(--todo-green);
+        border-color: var(--todo-green);
     }
 
     .todo-checkbox-yellow {
-        border-color: oklch(0.795 0.184 86.047);
+        border-color: var(--todo-yellow);
     }
     .todo-checkbox-yellow:hover {
-        background-color: oklch(0.795 0.184 86.047 / 0.15);
+        background-color: var(--todo-yellow-alpha);
     }
     .todo-checkbox-yellow.checked {
-        background-color: oklch(0.795 0.184 86.047);
-        border-color: oklch(0.795 0.184 86.047);
+        background-color: var(--todo-yellow);
+        border-color: var(--todo-yellow);
     }
 
     .todo-checkbox-red {
-        border-color: oklch(0.637 0.237 25.331);
+        border-color: var(--todo-red);
     }
     .todo-checkbox-red:hover {
-        background-color: oklch(0.637 0.237 25.331 / 0.15);
+        background-color: var(--todo-red-alpha);
     }
     .todo-checkbox-red.checked {
-        background-color: oklch(0.637 0.237 25.331);
-        border-color: oklch(0.637 0.237 25.331);
+        background-color: var(--todo-red);
+        border-color: var(--todo-red);
     }
 
     .bg-hearts {

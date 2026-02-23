@@ -1,6 +1,6 @@
 <?php
 
-namespace App\services;
+namespace App\Services;
 
 use App\Models\Event;
 use App\Models\User;
@@ -12,6 +12,7 @@ class EventUserService
         if ($isPrivateEvent) {
             $event->subscribers()->sync($author);
         } else {
+            // Intentional: sync all users for non-private events in this small-scale app
             $event->subscribers()->sync(User::pluck('id'));
         }
     }

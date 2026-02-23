@@ -8,18 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
+/**
+ * @mixin Todo
+ */
 class TodoResource extends JsonResource
 {
-    /**
-     * @var Todo
-     */
-    public $resource;
-
-    public function __construct(Todo $resource)
-    {
-        parent::__construct($resource);
-    }
-
     /**
      * @return array<string, mixed>
      */

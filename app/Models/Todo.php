@@ -110,7 +110,7 @@ class Todo extends Model
     {
         return Attribute::make(
             get: fn ($value, $attributes) => array_key_exists('subscribers_count', $attributes)
-                ? $attributes['subscribers_count'] === 1
+                ? (int) $attributes['subscribers_count'] === 1
                 : $this->subscribers()->count() === 1
         );
     }

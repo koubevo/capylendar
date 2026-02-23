@@ -1,6 +1,6 @@
 <?php
 
-namespace App\services;
+namespace App\Services;
 
 use App\Models\Todo;
 use App\Models\User;
@@ -12,6 +12,7 @@ class TodoUserService
         if ($isPrivateTodo) {
             $todo->subscribers()->sync($author);
         } else {
+            // Intentional: sync all users for non-private todos in this small-scale app
             $todo->subscribers()->sync(User::pluck('id'));
         }
     }

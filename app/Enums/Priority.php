@@ -58,7 +58,7 @@ enum Priority: string
     }
 
     /**
-     * @return Collection<int, array<string, mixed>>
+     * @return Collection<int, array{value: string, label: string, icon: string, border_class: string, icon_color: string, checkbox_color: string}>
      */
     public static function options(): Collection
     {

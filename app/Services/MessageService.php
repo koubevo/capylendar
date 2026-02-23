@@ -1,6 +1,6 @@
 <?php
 
-namespace App\services;
+namespace App\Services;
 
 use App\Http\Requests\StoreMessageRequest;
 use App\Models\Message;

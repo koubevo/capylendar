@@ -11,7 +11,7 @@ import type { Todo } from '@/types/Todo';
 import { EventFilters } from '@/types/Filters';
 import { Tag } from '@/types/Tag';
 import { router } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 interface Props {
     upcomingEvents: Event[];
@@ -73,6 +73,20 @@ const items = [
         slot: 'todos',
     },
 ];
+const localTodos = ref<Todo[]>(props.unfinishedTodos.map(t => ({ ...t })));
+
+watch(
+    () => props.unfinishedTodos,
+    (newVal) => {
+        localTodos.value = newVal.map(t => ({ ...t }));
+    },
+);
+
+function handleToggled(todoId: number) {
+    localTodos.value = localTodos.value.map((t) =>
+        t.id === todoId ? { ...t, is_finished: !t.is_finished } : t,
+    );
+}
 </script>
 
 <template>
@@ -101,10 +115,11 @@ const items = [
                 <DashboardList
                     heading="Aktuální"
                     :events="props.upcomingEvents"
-                    :todos="props.unfinishedTodos"
+                    :todos="localTodos"
                     :create-if-empty="true"
                     :scroll-to-date="props.scrollToDate"
                     @scrolled="clearScrollToDate"
+                    @toggled="handleToggled"
                 />
             </template>
 
@@ -121,9 +136,10 @@ const items = [
             <template #todos>
                 <TodosList
                     heading="Todos"
-                    :todos="props.unfinishedTodos"
+                    :todos="localTodos"
                     :create-todo-if-empty="true"
                     :show-finish-button="true"
+                    @toggled="handleToggled"
                 />
             </template>
         </UTabs>

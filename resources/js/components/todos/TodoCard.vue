@@ -3,6 +3,7 @@ import { finish } from '@/actions/App/Http/Controllers/TodoController';
 import TagsList from '@/components/tags/TagsList.vue';
 import { isOnlyLinks as checkOnlyLinks } from '@/composables/useLinkify';
 import type { Todo } from '@/types/Todo';
+import axios from 'axios';
 import { computed } from 'vue';
 
 interface Props {
@@ -28,20 +29,7 @@ function handleFinish(event: MouseEvent) {
 
     emit('toggled', props.todo.id);
 
-    const { url, method } = finish(props.todo);
-    const xsrfToken = document.cookie
-        .split('; ')
-        .find((c) => c.startsWith('XSRF-TOKEN='))
-        ?.split('=')[1];
-
-    fetch(url, {
-        method: method.toUpperCase(),
-        credentials: 'same-origin',
-        headers: {
-            'X-XSRF-TOKEN': xsrfToken ? decodeURIComponent(xsrfToken) : '',
-            Accept: 'application/json',
-        },
-    });
+    axios.post(finish(props.todo).url);
 }
 </script>
 

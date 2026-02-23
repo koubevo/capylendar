@@ -7,7 +7,6 @@ use App\Http\Requests\Event\StoreEventRequest;
 use App\Http\Requests\Event\UpdateEventRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
-use App\Models\Tag;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -40,7 +39,7 @@ class EventService
             return null;
         }
 
-        /** @var array<Tag> $tags */
+        /** @var array<int> $tags */
         $tags = $request->input('tags', []);
         $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
 
@@ -79,7 +78,7 @@ class EventService
             return null;
         }
 
-        /** @var array<Tag> $tags */
+        /** @var array<int> $tags */
         $tags = $request->input('tags', []);
         $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
 

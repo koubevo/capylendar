@@ -9,7 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
 /**
- * @mixin Todo
+ * @property Todo $resource
  */
 class TodoResource extends JsonResource
 {

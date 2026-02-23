@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Http\Requests\Todo\StoreTodoRequest;
 use App\Http\Requests\Todo\UpdateTodoRequest;
 use App\Http\Resources\TodoResource;
-use App\Models\Tag;
 use App\Models\Todo;
 use App\Models\User;
 use Carbon\Carbon;
@@ -33,7 +32,7 @@ class TodoService
             return null;
         }
 
-        /** @var array<Tag> $tags */
+        /** @var array<int> $tags */
         $tags = $request->input('tags', []);
         $todoData['meta'] = $this->resolveMetadata($todoData['description'] ?? null);
 
@@ -58,7 +57,7 @@ class TodoService
             return null;
         }
 
-        /** @var array<Tag> $tags */
+        /** @var array<int> $tags */
         $tags = $request->input('tags', []);
         $todoData['meta'] = $this->resolveMetadata($todoData['description'] ?? null);
 

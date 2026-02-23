@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /* eslint-disable vue/no-mutating-props */
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
+import TagSelectMenu from '@/components/tags/TagSelectMenu.vue';
 import MacroAlert from '@/components/ui/MacroAlert.vue';
 import { hasGoogleMapUrl } from '@/lib/utils';
 import { Capybara } from '@/types/Capybara';
@@ -37,13 +38,6 @@ const selectedTags = computed({
     set: (value) => {
         props.form.tags = value;
     },
-});
-
-const availableTagsMap = computed(() => {
-    if (!props.availableTags) {
-        return new Map<number, Tag>();
-    }
-    return new Map(props.availableTags.map((tag) => [tag.id, tag]));
 });
 
 const emit = defineEmits<{
@@ -123,48 +117,12 @@ const emit = defineEmits<{
             </UFormField>
 
             <UFormField label="Štítky" name="tags">
-                <USelectMenu
+                <TagSelectMenu
                     v-model="selectedTags"
                     :items="props.availableTags || []"
-                    multiple
                     placeholder="Vyber štítky..."
-                    value-key="id"
-                    :search-input="{ placeholder: 'Hledat štítek...' }"
-                    class="w-full"
-                >
-                    <template #option="{ option }">
-                        <span
-                            class="h-2 w-2 flex-shrink-0 rounded-full"
-                            :style="{ backgroundColor: option.color }"
-                        ></span>
-                        <span class="truncate">{{ option.label }}</span>
-                    </template>
-
-                    <template #label>
-                        <div
-                            v-if="selectedTags.length"
-                            class="flex flex-wrap gap-1"
-                        >
-                            <span
-                                v-for="tagId in selectedTags"
-                                :key="tagId"
-                                class="flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-700"
-                            >
-                                <span
-                                    class="h-1.5 w-1.5 rounded-full"
-                                    :style="{
-                                        backgroundColor:
-                                            availableTagsMap.get(tagId)?.color,
-                                    }"
-                                ></span>
-                                {{ availableTagsMap.get(tagId)?.label }}
-                            </span>
-                        </div>
-                        <span v-else class="text-gray-500"
-                            >Vyber štítky...</span
-                        >
-                    </template>
-                </USelectMenu>
+                    search-input-placeholder="Hledat štítek..."
+                />
             </UFormField>
 
             <USwitch

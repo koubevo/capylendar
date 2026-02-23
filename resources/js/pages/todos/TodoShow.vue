@@ -7,17 +7,36 @@ import PreviewCard from '@/components/ui/PreviewCard.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import type { Todo } from '@/types/Todo';
 import { Head } from '@inertiajs/vue3';
+import { ref, watch } from 'vue';
 
 const props = defineProps<{
     todo: Todo;
 }>();
+
+const localTodo = ref<Todo>({ ...props.todo });
+
+watch(
+    () => props.todo,
+    (newVal) => {
+        localTodo.value = { ...newVal };
+    },
+    { deep: true }
+);
+
+function handleToggled() {
+    localTodo.value.is_finished = !localTodo.value.is_finished;
+}
 </script>
 
 <template>
-    <Head :title="props.todo.title" />
+    <Head :title="localTodo.title" />
     <AuthenticatedLayout>
         <div class="flex flex-col gap-y-4">
-            <TodoCard :todo="props.todo" :show-finish-button="true" />
+            <TodoCard 
+                :todo="localTodo" 
+                :show-finish-button="true" 
+                @toggled="handleToggled" 
+            />
             <InfoCard
                 :author="props.todo.author"
                 :created_at_human="props.todo.created_at_human"
@@ -39,7 +58,7 @@ const props = defineProps<{
                         query: {
                             duplicate_todo_id: props.todo.id,
                         },
-                    }),
+                    }).url,
                 }"
                 :edit-action="{ url: TodoController.edit.url(props.todo) }"
                 :delete-action="{

@@ -51,9 +51,9 @@ enum Priority: string
     public function checkboxColor(): string
     {
         return match ($this) {
-            self::Low => 'todo-checkbox-green',
-            self::Medium => 'todo-checkbox-yellow',
-            self::High => 'todo-checkbox-red',
+            self::Low => 'todo-button-green',
+            self::Medium => 'todo-button-yellow',
+            self::High => 'todo-button-red',
         };
     }
 

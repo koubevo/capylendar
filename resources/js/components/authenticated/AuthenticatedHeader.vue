@@ -56,7 +56,7 @@ const addMenuItems = [
         },
         {
             label: 'Přidat todo',
-            icon: 'i-lucide-list-plus',
+            icon: 'i-lucide-list-todo',
             onSelect: () => router.visit(TodoController.create.url()),
         },
     ],

@@ -48,6 +48,15 @@ enum Priority: string
         };
     }
 
+    public function checkboxColor(): string
+    {
+        return match ($this) {
+            self::Low => 'todo-checkbox-green',
+            self::Medium => 'todo-checkbox-yellow',
+            self::High => 'todo-checkbox-red',
+        };
+    }
+
     /**
      * @return Collection<int, array<string, mixed>>
      */
@@ -60,6 +69,7 @@ enum Priority: string
                 'icon' => $case->icon(),
                 'border_class' => $case->borderClass(),
                 'icon_color' => $case->iconColor(),
+                'checkbox_color' => $case->checkboxColor(),
             ];
         });
     }

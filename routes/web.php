@@ -20,6 +20,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', DashboardController::class)
         ->name('dashboard');
 
+    Route::get('/event/history', [DashboardController::class, 'historyIndex'])->name('event.historyIndex');
+
     Route::get('/event/deleted', [EventController::class, 'deletedIndex'])->name('event.deletedIndex');
     Route::post('/event/{event}/restore', [EventController::class, 'restore'])
         ->name('event.restore')

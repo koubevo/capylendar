@@ -8,6 +8,7 @@ export interface TodoPriority {
     icon: string;
     border_class: string;
     icon_color: string;
+    checkbox_color: string;
 }
 
 export interface TodoDeadline {
@@ -38,6 +39,5 @@ export interface Todo {
         };
     };
     has_map_meta: boolean;
-    image_url?: string;
     tags?: Tag[];
 }

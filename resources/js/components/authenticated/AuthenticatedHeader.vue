@@ -34,6 +34,10 @@ const links = computed(() => [
         to: TagController.index(),
     },
     {
+        label: 'Historické eventy',
+        to: DashboardController.historyIndex(),
+    },
+    {
         label: 'Obnovit eventy',
         to: EventController.deletedIndex(),
     },

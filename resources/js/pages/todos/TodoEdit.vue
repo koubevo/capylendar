@@ -23,14 +23,10 @@ const form = useForm<TodoFormData>({
     is_private: props.todo.is_private,
     description: props.todo.description || '',
     tags: props.todo.tags ? props.todo.tags.map((t) => t.id) : [],
-    image: null,
-    remove_image: false,
 });
 
 function submit() {
-    form.put(TodoController.update.url(props.todo), {
-        forceFormData: true,
-    });
+    form.put(TodoController.update.url(props.todo));
 }
 </script>
 
@@ -45,8 +41,6 @@ function submit() {
             :priority-options="props.priorityOptions"
             @submit="submit"
             :available-tags="props.availableTags"
-            :todo-id="props.todo.id"
-            :image-url="props.todo.image_url"
         />
     </AuthenticatedLayout>
 </template>

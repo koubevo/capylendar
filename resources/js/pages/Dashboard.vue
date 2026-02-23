@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
+import DashboardList from '@/components/dashboard/DashboardList.vue';
 import EventFilterForm from '@/components/events/EventFilterForm.vue';
 import EventsList from '@/components/events/EventsList.vue';
 import TodosList from '@/components/todos/TodosList.vue';
@@ -15,7 +16,6 @@ import { computed } from 'vue';
 interface Props {
     upcomingEvents: Event[];
     unfinishedTodos: Todo[];
-    historyEvents: Event[];
     eventFilters: EventFilters;
     capybaraOptions: Capybara[];
     availableTags: Tag[];
@@ -32,7 +32,6 @@ const handleFilterChange = (newFilters: typeof props.eventFilters) => {
         only: [
             'upcomingEvents',
             'unfinishedTodos',
-            'historyEvents',
             'eventFilters',
         ],
     });
@@ -59,19 +58,19 @@ const eventFiltersLabel = computed(() => {
 
 const items = [
     {
-        label: 'Nadcházející',
+        label: 'Vše',
         icon: 'i-lucide-rocket',
-        slot: 'upcoming',
+        slot: 'all',
+    },
+    {
+        label: 'Eventy',
+        icon: 'i-lucide-calendar',
+        slot: 'events',
     },
     {
         label: 'Todos',
         icon: 'i-lucide-list-todo',
         slot: 'todos',
-    },
-    {
-        label: 'Historické',
-        icon: 'i-lucide-history',
-        slot: 'history',
     },
 ];
 </script>
@@ -98,9 +97,20 @@ const items = [
         </UCollapsible>
 
         <UTabs :items="items">
-            <template #upcoming>
+            <template #all>
+                <DashboardList
+                    heading="Aktuální"
+                    :events="props.upcomingEvents"
+                    :todos="props.unfinishedTodos"
+                    :create-if-empty="true"
+                    :scroll-to-date="props.scrollToDate"
+                    @scrolled="clearScrollToDate"
+                />
+            </template>
+
+            <template #events>
                 <EventsList
-                    heading="Nadcházející"
+                    heading="Eventy"
                     :events="props.upcomingEvents"
                     :create-event-if-empty="true"
                     :scroll-to-date="props.scrollToDate"
@@ -116,17 +126,6 @@ const items = [
                     :show-finish-button="true"
                 />
             </template>
-
-            <template #history>
-                <EventsList
-                    heading="Historické"
-                    :events="props.historyEvents"
-                    :create-event-if-empty="true"
-                    :scroll-to-date="props.scrollToDate"
-                    @scrolled="clearScrollToDate"
-                />
-            </template>
         </UTabs>
     </AuthenticatedLayout>
 </template>
-

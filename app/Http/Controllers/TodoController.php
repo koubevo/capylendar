@@ -11,6 +11,7 @@ use App\Models\Todo;
 use App\services\TagService;
 use App\services\TodoService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -38,11 +39,22 @@ class TodoController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(Request $request): Response
     {
+        $todo = null;
+
+        if ($request->has('duplicate_todo_id')) {
+            $foundTodo = Todo::findOrFail($request->input('duplicate_todo_id'));
+            if ($foundTodo instanceof Todo) {
+                Gate::authorize('view', $foundTodo);
+                $todo = new TodoResource($foundTodo);
+            }
+        }
+
         return Inertia::render('todos/TodoCreate', [
             'capybaraOptions' => Capybara::options(),
             'priorityOptions' => Priority::options(),
+            'todo' => $todo?->resolve(),
             'availableTags' => $this->tagService->getAvailableTags(),
         ]);
     }

@@ -26,16 +26,6 @@ const props = defineProps<{
                 :classes="props.todo.capybara.classes"
                 :link-classes="props.todo.capybara.link_classes"
             />
-            <UCard
-                v-if="props.todo.image_url"
-                :class="props.todo.capybara.classes"
-            >
-                <img
-                    :src="props.todo.image_url"
-                    alt="Todo image"
-                    class="w-full rounded-md object-cover"
-                />
-            </UCard>
             <PreviewCard
                 v-if="props.todo.has_map_meta"
                 :url="props.todo.meta?.map_preview?.url ?? ''"
@@ -44,6 +34,13 @@ const props = defineProps<{
                 :classes="props.todo.capybara.classes"
             />
             <ActionButtons
+                :duplicate-action="{
+                    url: TodoController.create({
+                        query: {
+                            duplicate_todo_id: props.todo.id,
+                        },
+                    }),
+                }"
                 :edit-action="{ url: TodoController.edit.url(props.todo) }"
                 :delete-action="{
                     url: TodoController.destroy.url(props.todo),

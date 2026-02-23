@@ -70,6 +70,7 @@ class TodoResource extends JsonResource
                 'icon' => $priorityEnum->icon(),
                 'border_class' => $priorityEnum->borderClass(),
                 'icon_color' => $priorityEnum->iconColor(),
+                'checkbox_color' => $priorityEnum->checkboxColor(),
             ],
 
             'capybara' => [
@@ -84,8 +85,6 @@ class TodoResource extends JsonResource
 
             'is_finished' => $this->resource->is_finished,
             'finished_at' => $this->resource->finished_at?->toISOString(),
-
-            'image_url' => $this->resource->image_url ?? null,
 
             'created_at_human' => $this->resource->created_at_human,
             'updated_at_human' => $this->resource->updated_at_human,

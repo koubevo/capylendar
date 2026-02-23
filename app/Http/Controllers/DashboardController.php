@@ -24,11 +24,24 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'upcomingEvents' => $this->eventService->getAssignedEvents($user, EventType::Upcoming, $filters),
             'unfinishedTodos' => $this->todoService->getAssignedTodos($user, finished: false, filters: $filters),
-            'historyEvents' => $this->eventService->getAssignedEvents($user, EventType::History, $filters),
             'eventFilters' => $filters,
             'capybaraOptions' => Capybara::options(),
             'availableTags' => $this->tagService->getAvailableTags(),
             'scrollToDate' => $request->query('scrollToDate'),
+        ]);
+    }
+
+    public function historyIndex(Request $request): Response
+    {
+        $user = auth()->user();
+
+        $filters = $request->only(['search', 'capybara', 'tags']);
+
+        return Inertia::render('events/EventHistoryIndex', [
+            'historyEvents' => $this->eventService->getAssignedEvents($user, EventType::History, $filters),
+            'eventFilters' => $filters,
+            'capybaraOptions' => Capybara::options(),
+            'availableTags' => $this->tagService->getAvailableTags(),
         ]);
     }
 }

@@ -8,7 +8,7 @@ import type { TodoFormData } from '@/types/TodoFormData';
 import type { TodoPriority } from '@/types/Todo';
 import { Tag } from '@/types/Tag';
 import type { InertiaForm } from '@inertiajs/vue3';
-import { computed, onUnmounted, ref } from 'vue';
+import { computed } from 'vue';
 
 interface Props {
     form: InertiaForm<TodoFormData>;
@@ -16,8 +16,6 @@ interface Props {
     capybaraOptions: Capybara[];
     priorityOptions: TodoPriority[];
     availableTags?: Tag[];
-    todoId?: number;
-    imageUrl?: string;
 }
 
 const props = defineProps<Props>();
@@ -51,53 +49,6 @@ const availableTagsMap = computed(() => {
 const emit = defineEmits<{
     (e: 'submit'): void;
 }>();
-
-// Image preview state (local preview before form submit)
-const imagePreview = ref<string | null>(null);
-
-const displayImageUrl = computed(() => {
-    // If user marked for removal, show nothing
-    if (props.form.remove_image) return null;
-    // If a new file was picked, show its local preview
-    if (imagePreview.value) return imagePreview.value;
-    // Otherwise show existing server image
-    return props.imageUrl || null;
-});
-
-function revokePreview() {
-    if (imagePreview.value) {
-        URL.revokeObjectURL(imagePreview.value);
-        imagePreview.value = null;
-    }
-}
-
-function onImageSelected(event: globalThis.Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-
-    revokePreview();
-
-    if (!file) {
-        props.form.image = null;
-        return;
-    }
-
-    props.form.image = file;
-    props.form.remove_image = false;
-    imagePreview.value = URL.createObjectURL(file);
-}
-
-function clearImage() {
-    props.form.image = null;
-    revokePreview();
-
-    // If in edit mode with existing image, mark for removal
-    if (props.isEditMode && props.imageUrl) {
-        props.form.remove_image = true;
-    }
-}
-
-onUnmounted(() => revokePreview());
 </script>
 
 <template>
@@ -169,52 +120,6 @@ onUnmounted(() => revokePreview());
                     icon="i-lucide-map-pinned"
                     label="Bude vytvořena náhledová karta mapy"
                 />
-            </UFormField>
-
-            <!-- Image Section -->
-            <UFormField
-                label="Obrázek"
-                name="image"
-                :error="props.form.errors.image"
-            >
-                <div class="flex flex-col gap-3">
-                    <!-- Image preview -->
-                    <div
-                        v-if="displayImageUrl"
-                        class="relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700"
-                    >
-                        <img
-                            :src="displayImageUrl"
-                            alt="Todo image"
-                            class="h-48 w-full object-cover"
-                        />
-                        <button
-                            type="button"
-                            class="absolute top-2 right-2 flex items-center gap-1 rounded-md bg-red-500/90 px-2 py-1 text-xs text-white transition hover:bg-red-600"
-                            @click="clearImage()"
-                        >
-                            <UIcon name="i-lucide-trash-2" class="size-3" />
-                            Odebrat
-                        </button>
-                    </div>
-
-                    <label
-                        class="flex cursor-pointer items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm transition hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
-                    >
-                        <UIcon name="i-lucide-image-plus" class="size-4" />
-                        {{
-                            displayImageUrl
-                                ? 'Změnit obrázek'
-                                : 'Přidat obrázek'
-                        }}
-                        <input
-                            type="file"
-                            accept="image/*"
-                            class="hidden"
-                            @change="onImageSelected"
-                        />
-                    </label>
-                </div>
             </UFormField>
 
             <UFormField label="Štítky" name="tags">

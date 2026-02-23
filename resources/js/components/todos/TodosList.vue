@@ -18,6 +18,10 @@ const props = withDefaults(defineProps<Props>(), {
     showFinishButton: false,
 });
 
+const emit = defineEmits<{
+    (e: 'toggled', todoId: number): void;
+}>();
+
 const button = props.createTodoIfEmpty
     ? { to: TodoController.create(), label: 'Přidat todo' }
     : undefined;
@@ -59,6 +63,7 @@ const groupedTodos = computed(() => {
                     <TodoCard
                         :todo="todo"
                         :show-finish-button="props.showFinishButton"
+                        @toggled="emit('toggled', $event)"
                     />
                 </Link>
             </div>

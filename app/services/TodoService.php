@@ -11,12 +11,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Intervention\Image\Laravel\Facades\Image;
 use shweshi\OpenGraph\OpenGraph;
 
 class TodoService
@@ -29,7 +25,7 @@ class TodoService
 
     public function store(StoreTodoRequest $request): ?Todo
     {
-        $todoData = $request->safe()->except(['is_private', 'tags', 'image', 'remove_image']);
+        $todoData = $request->safe()->except(['is_private', 'tags']);
         $isPrivateTodo = $request->boolean('is_private');
         $author = $request->user();
 
@@ -41,34 +37,20 @@ class TodoService
         $tags = $request->input('tags', []);
         $todoData['meta'] = $this->resolveMetadata($todoData['description'] ?? null);
 
-        $newImagePath = null;
-        if ($request->hasFile('image')) {
-            $newImagePath = $this->compressAndStoreImage($request->file('image'));
-            $todoData['image_path'] = $newImagePath;
-        }
+        return DB::transaction(function () use ($author, $todoData, $isPrivateTodo, $tags) {
+            $todo = $author->authoredTodos()->create($todoData);
 
-        try {
-            return DB::transaction(function () use ($author, $todoData, $isPrivateTodo, $tags) {
-                $todo = $author->authoredTodos()->create($todoData);
+            $this->todoUserService->assignSubscribers($todo, $isPrivateTodo, $author);
 
-                $this->todoUserService->assignSubscribers($todo, $isPrivateTodo, $author);
+            $this->todoTagService->assignTags($todo, $tags);
 
-                $this->todoTagService->assignTags($todo, $tags);
-
-                return $todo;
-            });
-        } catch (Exception $e) {
-            if ($newImagePath) {
-                Storage::disk()->delete($newImagePath);
-            }
-
-            throw $e;
-        }
+            return $todo;
+        });
     }
 
     public function update(Todo $todo, UpdateTodoRequest $request): ?Todo
     {
-        $todoData = $request->safe()->except(['is_private', 'tags', 'image', 'remove_image']);
+        $todoData = $request->safe()->except(['is_private', 'tags']);
         $isPrivateTodo = $request->boolean('is_private');
         $author = $request->user();
 
@@ -80,40 +62,15 @@ class TodoService
         $tags = $request->input('tags', []);
         $todoData['meta'] = $this->resolveMetadata($todoData['description'] ?? null);
 
-        $oldImagePath = $todo->image_path;
-        $newImagePath = null;
+        return DB::transaction(function () use ($author, $todoData, $isPrivateTodo, $todo, $tags) {
+            $todo->update($todoData);
 
-        if ($request->hasFile('image')) {
-            $newImagePath = $this->compressAndStoreImage($request->file('image'));
-            $todoData['image_path'] = $newImagePath;
-        } elseif ($request->boolean('remove_image') && $oldImagePath) {
-            $todoData['image_path'] = null;
-        }
+            $this->todoUserService->assignSubscribers($todo, $isPrivateTodo, $author);
 
-        try {
-            $result = DB::transaction(function () use ($author, $todoData, $isPrivateTodo, $todo, $tags) {
-                $todo->update($todoData);
+            $this->todoTagService->assignTags($todo, $tags);
 
-                $this->todoUserService->assignSubscribers($todo, $isPrivateTodo, $author);
-
-                $this->todoTagService->assignTags($todo, $tags);
-
-                return $todo;
-            });
-
-            // Delete old image only after transaction succeeds
-            if ($oldImagePath && ($request->hasFile('image') || $request->boolean('remove_image'))) {
-                Storage::disk()->delete($oldImagePath);
-            }
-
-            return $result;
-        } catch (Exception $e) {
-            if ($newImagePath) {
-                Storage::disk()->delete($newImagePath);
-            }
-
-            throw $e;
-        }
+            return $todo;
+        });
     }
 
     public function finish(Todo $todo): Todo
@@ -202,28 +159,6 @@ class TodoService
         $todo->restore();
 
         return $todo;
-    }
-
-    private const IMAGE_MAX_WIDTH = 1920;
-
-    private const IMAGE_QUALITY = 80;
-
-    /**
-     * Compress, resize, and convert the uploaded image to WebP format.
-     */
-    private function compressAndStoreImage(UploadedFile $file): string
-    {
-        $image = Image::read($file)
-            ->scaleDown(width: self::IMAGE_MAX_WIDTH);
-
-        $filename = 'todo-images/'.Str::uuid()->toString().'.webp';
-
-        Storage::disk()->put(
-            $filename,
-            $image->toWebp(quality: self::IMAGE_QUALITY)->toString()
-        );
-
-        return $filename;
     }
 
     /**

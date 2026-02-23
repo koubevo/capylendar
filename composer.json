@@ -90,6 +90,12 @@
             "phpstan analyze",
             "npm run format",
             "pint"
+        ],
+        "check": [
+            "phpstan analyze",
+            "npm run format",
+            "pint",
+            "@php artisan test"
         ]
     },
     "extra": {

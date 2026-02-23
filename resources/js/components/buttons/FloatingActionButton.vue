@@ -20,7 +20,7 @@ const addMenuItems = [
 </script>
 
 <template>
-    <UDropdownMenu :items="addMenuItems" :content="{ side: 'top' }">
+    <UDropdownMenu :items="addMenuItems" :content="{ side: 'top' }" :ui="{ itemLeadingIcon: 'size-5', item: 'text-base py-3 px-4 gap-3' }">
         <UButton
             icon="i-lucide-plus"
             size="xl"

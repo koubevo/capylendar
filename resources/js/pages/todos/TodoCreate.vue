@@ -21,8 +21,7 @@ const props = defineProps<{
 const form = useForm<TodoFormData>({
     title: props.todo?.title || '',
     capybara: props.todo?.capybara.value || page.props.auth.user.capybara,
-    deadline:
-        props.todo?.deadline.key || new Date().toISOString().split('T')[0],
+    deadline: props.todo?.deadline.key || '',
     priority: props.todo?.priority.value || 'medium',
     is_private: props.todo?.is_private || false,
     description: props.todo?.description || '',

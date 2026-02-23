@@ -43,32 +43,34 @@ const groupedTodos = computed(() => {
 </script>
 
 <template>
-    <h2 class="mt-4">{{ props.heading }}</h2>
+    <div>
+        <h2 class="mt-4">{{ props.heading }}</h2>
 
-    <div v-if="props.todos.length" class="space-y-4">
-        <section
-            v-for="(todos, deadlineKey) in groupedTodos"
-            :key="deadlineKey"
-        >
-            <h3 class="lowercase">
-                {{ todos[0].deadline.label }}
-            </h3>
+        <div v-if="props.todos.length" class="space-y-4">
+            <section
+                v-for="(todos, deadlineKey) in groupedTodos"
+                :key="deadlineKey"
+            >
+                <h3 class="lowercase">
+                    {{ todos[0].deadline.label }}
+                </h3>
 
-            <div class="grid grid-cols-1 gap-4">
-                <Link
-                    :href="TodoController.show(todo)"
-                    v-for="todo in todos"
-                    :key="todo.id"
-                >
-                    <TodoCard
-                        :todo="todo"
-                        :show-finish-button="props.showFinishButton"
-                        @toggled="emit('toggled', $event)"
-                    />
-                </Link>
-            </div>
-        </section>
+                <div class="grid grid-cols-1 gap-4">
+                    <Link
+                        :href="TodoController.show(todo)"
+                        v-for="todo in todos"
+                        :key="todo.id"
+                    >
+                        <TodoCard
+                            :todo="todo"
+                            :show-finish-button="props.showFinishButton"
+                            @toggled="emit('toggled', $event)"
+                        />
+                    </Link>
+                </div>
+            </section>
+        </div>
+
+        <Nothing v-else :button="button" />
     </div>
-
-    <Nothing v-if="!props.todos.length" :button="button" />
 </template>

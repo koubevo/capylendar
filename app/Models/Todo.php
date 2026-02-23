@@ -52,7 +52,6 @@ class Todo extends Model
         'description',
         'priority',
         'finished_at',
-        'image_path',
         'meta',
     ];
 

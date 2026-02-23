@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
+import { historyIndex } from '@/actions/App/Http/Controllers/DashboardController';
 import EventFilterForm from '@/components/events/EventFilterForm.vue';
 import EventsList from '@/components/events/EventsList.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
@@ -20,7 +20,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const handleFilterChange = (newFilters: typeof props.eventFilters) => {
-    router.get(DashboardController.historyIndex(), newFilters, {
+    router.get(historyIndex().url, newFilters, {
         preserveState: true,
         preserveScroll: true,
         replace: true,

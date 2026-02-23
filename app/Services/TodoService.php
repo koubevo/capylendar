@@ -2,24 +2,23 @@
 
 namespace App\Services;
 
+use App\Concerns\ResolvesOpenGraphMetadata;
 use App\Http\Requests\Todo\StoreTodoRequest;
 use App\Http\Requests\Todo\UpdateTodoRequest;
 use App\Http\Resources\TodoResource;
 use App\Models\Todo;
 use App\Models\User;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use shweshi\OpenGraph\OpenGraph;
 
 class TodoService
 {
+    use ResolvesOpenGraphMetadata;
+
     public function __construct(
         protected TodoUserService $todoUserService,
         protected TodoTagService $todoTagService,
-        protected OpenGraph $openGraph
     ) {}
 
     public function store(StoreTodoRequest $request): ?Todo
@@ -159,56 +158,5 @@ class TodoService
         $todo->restore();
 
         return $todo;
-    }
-
-    /**
-     * @return array<string, mixed>|null
-     */
-    private function resolveMetadata(?string $description): ?array
-    {
-        if (! $description) {
-            return null;
-        }
-
-        if ($mapPreview = $this->resolveMapPreview($description)) {
-            return ['map_preview' => $mapPreview];
-        }
-
-        return null;
-    }
-
-    /**
-     * @return array{title: string, image: string, url: string}|null
-     */
-    private function resolveMapPreview(string $description): ?array
-    {
-        $pattern = '/https?:\/\/(?:www\.)?(?:google\.(?:com|cz)\/maps\/[^\s]+|maps\.app\.goo\.gl\/[^\s]+)/';
-
-        if (! preg_match($pattern, $description, $matches)) {
-            return null;
-        }
-
-        $mapUrl = $matches[0];
-
-        try {
-            $data = $this->openGraph->fetch($mapUrl);
-
-            $title = $data['title'] ?? null;
-            $image = $data['image'] ?? null;
-
-            if (! $title || ! $image) {
-                return null;
-            }
-
-            return [
-                'title' => $title,
-                'image' => $image,
-                'url' => $mapUrl,
-            ];
-        } catch (Exception $e) {
-            Log::error('Failed to fetch OpenGraph data for map preview.', ['exception' => $e]);
-
-            return null;
-        }
     }
 }

@@ -16,10 +16,11 @@ use shweshi\OpenGraph\OpenGraph;
 
 beforeEach(function () {
     $this->openGraph = Mockery::mock(OpenGraph::class);
+    app()->instance(OpenGraph::class, $this->openGraph);
+
     $this->eventService = new EventService(
         new EventUserService,
         new EventTagService,
-        $this->openGraph
     );
     $this->user = User::factory()->create();
 });

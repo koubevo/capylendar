@@ -48,6 +48,7 @@ function handleFinish(event: MouseEvent) {
                 type="button"
                 class="group relative flex w-12 shrink-0 items-center justify-center border-r transition-all duration-300 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset sm:w-16"
                 :class="[
+                    props.todo.priority.checkbox_color,
                     props.todo.is_finished
                         ? 'checked bg-black/10 opacity-60 dark:bg-white/10'
                         : 'hover:bg-black/5 dark:hover:bg-white/5',

@@ -20,6 +20,7 @@ const links = computed(() => [
     {
         label: 'Todos',
         to: TodoController.index(),
+        isNew: true,
     },
     {
         label: 'Chat',
@@ -36,6 +37,7 @@ const links = computed(() => [
     {
         label: 'Historické eventy',
         to: DashboardController.historyIndex(),
+        isNew: true,
     },
     {
         label: 'Obnovit eventy',
@@ -44,6 +46,7 @@ const links = computed(() => [
     {
         label: 'Obnovit todos',
         to: TodoController.deletedIndex(),
+        isNew: true,
     },
 ]);
 

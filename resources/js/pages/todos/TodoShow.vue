@@ -20,7 +20,7 @@ watch(
     (newVal) => {
         localTodo.value = { ...newVal };
     },
-    { deep: true }
+    { deep: true },
 );
 
 function handleToggled() {
@@ -32,10 +32,10 @@ function handleToggled() {
     <Head :title="localTodo.title" />
     <AuthenticatedLayout>
         <div class="flex flex-col gap-y-4">
-            <TodoCard 
-                :todo="localTodo" 
-                :show-finish-button="true" 
-                @toggled="handleToggled" 
+            <TodoCard
+                :todo="localTodo"
+                :show-finish-button="true"
+                @toggled="handleToggled"
             />
             <InfoCard
                 :author="props.todo.author"

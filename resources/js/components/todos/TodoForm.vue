@@ -4,9 +4,9 @@ import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import MacroAlert from '@/components/ui/MacroAlert.vue';
 import { hasGoogleMapUrl } from '@/lib/utils';
 import { Capybara } from '@/types/Capybara';
-import type { TodoFormData } from '@/types/TodoFormData';
-import type { TodoPriority } from '@/types/Todo';
 import { Tag } from '@/types/Tag';
+import type { TodoPriority } from '@/types/Todo';
+import type { TodoFormData } from '@/types/TodoFormData';
 import type { InertiaForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
 

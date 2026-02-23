@@ -2,8 +2,8 @@
 import EventController from '@/actions/App/Http/Controllers/EventController';
 import TodoController from '@/actions/App/Http/Controllers/TodoController';
 import EventCard from '@/components/events/EventCard.vue';
-import TodoCard from '@/components/todos/TodoCard.vue';
 import Nothing from '@/components/Nothing.vue';
+import TodoCard from '@/components/todos/TodoCard.vue';
 import type { Event } from '@/types/Event';
 import type { Todo } from '@/types/Todo';
 import { Link } from '@inertiajs/vue3';
@@ -36,8 +36,6 @@ const emit = defineEmits<{
 const button = props.createIfEmpty
     ? { to: EventController.create(), label: 'Přidat event' }
     : undefined;
-
-
 
 interface DashboardItem {
     type: 'event' | 'todo';
@@ -139,19 +137,19 @@ onMounted(() => {
             </h3>
 
             <div class="grid grid-cols-1 gap-4">
-                <template v-for="item in items" :key="`${item.type}-${item.data.id}`">
+                <template
+                    v-for="item in items"
+                    :key="`${item.type}-${item.data.id}`"
+                >
                     <Link
                         v-if="item.type === 'event'"
                         :href="EventController.show(item.data as Event)"
                     >
-                        <EventCard :event="(item.data as Event)" view="list" />
+                        <EventCard :event="item.data as Event" view="list" />
                     </Link>
-                    <Link
-                        v-else
-                        :href="TodoController.show(item.data as Todo)"
-                    >
+                    <Link v-else :href="TodoController.show(item.data as Todo)">
                         <TodoCard
-                            :todo="(item.data as Todo)"
+                            :todo="item.data as Todo"
                             :show-finish-button="true"
                             @toggled="emit('toggled', $event)"
                         />

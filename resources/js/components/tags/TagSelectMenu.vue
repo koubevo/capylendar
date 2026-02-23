@@ -19,7 +19,9 @@ const selected = computed({
     set: (value) => emit('update:modelValue', value),
 });
 
-const tagsMap = computed(() => new Map(props.items.map((tag) => [tag.id, tag])));
+const tagsMap = computed(
+    () => new Map(props.items.map((tag) => [tag.id, tag])),
+);
 </script>
 
 <template>

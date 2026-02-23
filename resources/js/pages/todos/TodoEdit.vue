@@ -3,9 +3,9 @@ import TodoController from '@/actions/App/Http/Controllers/TodoController';
 import TodoForm from '@/components/todos/TodoForm.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import { Capybara } from '@/types/Capybara';
+import { Tag } from '@/types/Tag';
 import type { Todo, TodoPriority } from '@/types/Todo';
 import type { TodoFormData } from '@/types/TodoFormData';
-import { Tag } from '@/types/Tag';
 import { Head, useForm } from '@inertiajs/vue3';
 
 const props = defineProps<{

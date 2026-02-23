@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TodoController from '@/actions/App/Http/Controllers/TodoController';
-import TodoCard from '@/components/todos/TodoCard.vue';
 import Nothing from '@/components/Nothing.vue';
+import TodoCard from '@/components/todos/TodoCard.vue';
 import type { Todo } from '@/types/Todo';
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';

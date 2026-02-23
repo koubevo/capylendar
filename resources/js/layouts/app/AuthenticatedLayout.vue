@@ -32,4 +32,3 @@ const props = withDefaults(defineProps<Props>(), {
         <UNotifications />
     </AppLayout>
 </template>
-

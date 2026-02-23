@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TodoController from '@/actions/App/Http/Controllers/TodoController';
-import TodoCard from '@/components/todos/TodoCard.vue';
 import ActionModal from '@/components/modals/ActionModal.vue';
+import TodoCard from '@/components/todos/TodoCard.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import type { Action } from '@/types/Button';
 import type { Todo } from '@/types/Todo';
@@ -66,13 +66,17 @@ const columns: TableColumn<Todo>[] = [
         header: 'Priorita',
         size: 100,
         cell: ({ row }) => {
-            return h('div', { class: 'min-w-[100px] flex items-center gap-1' }, [
-                h('span', {
-                    class: row.original.priority.icon_color,
-                    innerHTML: '●',
-                }),
-                h('span', row.original.priority.label),
-            ]);
+            return h(
+                'div',
+                { class: 'min-w-[100px] flex items-center gap-1' },
+                [
+                    h('span', {
+                        class: row.original.priority.icon_color,
+                        innerHTML: '●',
+                    }),
+                    h('span', row.original.priority.label),
+                ],
+            );
         },
     },
     {

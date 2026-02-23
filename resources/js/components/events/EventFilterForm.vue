@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import NeutralButton from '@/components/buttons/NeutralButton.vue';
+import TagSelectMenu from '@/components/tags/TagSelectMenu.vue';
 import { Capybara } from '@/types/Capybara';
 import { EventFilters } from '@/types/Filters';
 import { Tag } from '@/types/Tag';
-import TagSelectMenu from '@/components/tags/TagSelectMenu.vue';
 import { useDebounceFn } from '@vueuse/core';
 import { ref, watch } from 'vue';
 

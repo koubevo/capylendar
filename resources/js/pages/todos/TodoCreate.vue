@@ -3,9 +3,9 @@ import TodoController from '@/actions/App/Http/Controllers/TodoController';
 import TodoForm from '@/components/todos/TodoForm.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import { Capybara } from '@/types/Capybara';
-import type { TodoFormData } from '@/types/TodoFormData';
-import type { Todo, TodoPriority } from '@/types/Todo';
 import { Tag } from '@/types/Tag';
+import type { Todo, TodoPriority } from '@/types/Todo';
+import type { TodoFormData } from '@/types/TodoFormData';
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -21,7 +21,8 @@ const props = defineProps<{
 const form = useForm<TodoFormData>({
     title: props.todo?.title || '',
     capybara: props.todo?.capybara.value || page.props.auth.user.capybara,
-    deadline: props.todo?.deadline.key || new Date().toISOString().split('T')[0],
+    deadline:
+        props.todo?.deadline.key || new Date().toISOString().split('T')[0],
     priority: props.todo?.priority.value || 'medium',
     is_private: props.todo?.is_private || false,
     description: props.todo?.description || '',

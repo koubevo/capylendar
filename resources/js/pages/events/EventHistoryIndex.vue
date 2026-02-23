@@ -7,8 +7,7 @@ import { Capybara } from '@/types/Capybara';
 import type { Event } from '@/types/Event';
 import { EventFilters } from '@/types/Filters';
 import { Tag } from '@/types/Tag';
-import { router } from '@inertiajs/vue3';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 interface Props {
@@ -62,9 +61,6 @@ const eventFiltersLabel = computed(() => {
             </template>
         </UCollapsible>
 
-        <EventsList
-            heading="Historické eventy"
-            :events="props.historyEvents"
-        />
+        <EventsList heading="Historické eventy" :events="props.historyEvents" />
     </AuthenticatedLayout>
 </template>

@@ -41,9 +41,7 @@ function handleToggled(todoId: number) {
     }
 
     // Check if it's in finished
-    const finishedIdx = localFinished.value.findIndex(
-        (t) => t.id === todoId,
-    );
+    const finishedIdx = localFinished.value.findIndex((t) => t.id === todoId);
     if (finishedIdx !== -1) {
         const todo = localFinished.value[finishedIdx];
         todo.is_finished = false;
@@ -64,13 +62,8 @@ function handleTabChange() {
     // Move unfinished items from finished list to unfinished list
     const nowUnfinished = localFinished.value.filter((t) => !t.is_finished);
     if (nowUnfinished.length > 0) {
-        localFinished.value = localFinished.value.filter(
-            (t) => t.is_finished,
-        );
-        localUnfinished.value = [
-            ...localUnfinished.value,
-            ...nowUnfinished,
-        ];
+        localFinished.value = localFinished.value.filter((t) => t.is_finished);
+        localUnfinished.value = [...localUnfinished.value, ...nowUnfinished];
     }
 }
 

@@ -7,9 +7,9 @@ import TodosList from '@/components/todos/TodosList.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import { Capybara } from '@/types/Capybara';
 import type { Event } from '@/types/Event';
-import type { Todo } from '@/types/Todo';
 import { EventFilters } from '@/types/Filters';
 import { Tag } from '@/types/Tag';
+import type { Todo } from '@/types/Todo';
 import { router } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 
@@ -29,11 +29,7 @@ const handleFilterChange = (newFilters: typeof props.eventFilters) => {
         preserveState: true,
         preserveScroll: true,
         replace: true,
-        only: [
-            'upcomingEvents',
-            'unfinishedTodos',
-            'eventFilters',
-        ],
+        only: ['upcomingEvents', 'unfinishedTodos', 'eventFilters'],
     });
 };
 
@@ -73,12 +69,12 @@ const items = [
         slot: 'todos',
     },
 ];
-const localTodos = ref<Todo[]>(props.unfinishedTodos.map(t => ({ ...t })));
+const localTodos = ref<Todo[]>(props.unfinishedTodos.map((t) => ({ ...t })));
 
 watch(
     () => props.unfinishedTodos,
     (newVal) => {
-        localTodos.value = newVal.map(t => ({ ...t }));
+        localTodos.value = newVal.map((t) => ({ ...t }));
     },
 );
 
@@ -92,13 +88,13 @@ function handleToggled(todoId: number) {
 <template>
     <AuthenticatedLayout :display-footer="true">
         <UCollapsible class="mb-4 flex w-full flex-col gap-2">
-                <UButton
-                    :label="eventFiltersLabel"
-                    color="primary"
-                    variant="subtle"
-                    trailing-icon="i-lucide-chevron-down"
-                    block
-                />
+            <UButton
+                :label="eventFiltersLabel"
+                color="primary"
+                variant="subtle"
+                trailing-icon="i-lucide-chevron-down"
+                block
+            />
 
             <template #content>
                 <EventFilterForm

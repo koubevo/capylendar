@@ -1,31 +1,30 @@
 <?php
 
-namespace App\services;
+namespace App\Services;
 
+use App\Concerns\ResolvesOpenGraphMetadata;
 use App\Enums\EventType;
 use App\Http\Requests\Event\StoreEventRequest;
 use App\Http\Requests\Event\UpdateEventRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
-use App\Models\Tag;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
-use shweshi\OpenGraph\OpenGraph;
 
 class EventService
 {
+    use ResolvesOpenGraphMetadata;
+
     public function __construct(
         protected EventUserService $eventUserService,
         protected EventTagService $eventTagService,
-        protected OpenGraph $openGraph
     ) {}
 
     private const HISTORY_EVENTS_LIMIT = 20;
@@ -40,7 +39,7 @@ class EventService
             return null;
         }
 
-        /** @var array<Tag> $tags */
+        /** @var array<int> $tags */
         $tags = $request->input('tags', []);
         $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
 
@@ -79,7 +78,7 @@ class EventService
             return null;
         }
 
-        /** @var array<Tag> $tags */
+        /** @var array<int> $tags */
         $tags = $request->input('tags', []);
         $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
 
@@ -142,57 +141,6 @@ class EventService
     }
 
     /**
-     * @return array<string, mixed>|null
-     */
-    private function resolveMetadata(?string $description): ?array
-    {
-        if (! $description) {
-            return null;
-        }
-
-        if ($mapPreview = $this->resolveMapPreview($description)) {
-            return ['map_preview' => $mapPreview];
-        }
-
-        return null;
-    }
-
-    /**
-     * @return array{title: string, image: string, url: string}|null
-     */
-    private function resolveMapPreview(string $description): ?array
-    {
-        $pattern = '/https?:\/\/(?:www\.)?(?:google\.(?:com|cz)\/maps\/[^\s]+|maps\.app\.goo\.gl\/[^\s]+)/';
-
-        if (! preg_match($pattern, $description, $matches)) {
-            return null;
-        }
-
-        $mapUrl = $matches[0];
-
-        try {
-            $data = $this->openGraph->fetch($mapUrl);
-
-            $title = $data['title'] ?? null;
-            $image = $data['image'] ?? null;
-
-            if (! $title || ! $image) {
-                return null;
-            }
-
-            return [
-                'title' => $title,
-                'image' => $image,
-                'url' => $mapUrl,
-            ];
-        } catch (Exception $e) {
-            Log::error('Failed to fetch OpenGraph data for map preview.', ['exception' => $e]);
-
-            return null;
-        }
-    }
-
-    /**
      * @param  array<string, string>|null  $filters
      * @return array<EventResource>
      */
@@ -246,7 +194,8 @@ class EventService
 
         $query = $user
             ->assignedEvents()
-            ->with(['tags', 'author']);
+            ->with(['tags', 'author'])
+            ->withCount('subscribers');
 
         $events = $query->orderBy('deleted_at', 'desc')
             ->onlyTrashed()

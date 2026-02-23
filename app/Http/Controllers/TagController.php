@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Settings\StoreTagRequest;
 use App\Models\Tag;
-use App\services\TagService;
+use App\Services\TagService;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;

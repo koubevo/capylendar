@@ -85,6 +85,17 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
+        "lint": [
+            "phpstan analyze",
+            "npm run format",
+            "pint"
+        ],
+        "check": [
+            "phpstan analyze",
+            "npm run format",
+            "pint",
+            "@test"
         ]
     },
     "extra": {

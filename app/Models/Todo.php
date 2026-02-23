@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use App\Enums\Capybara;
+use App\Enums\Priority;
 use Carbon\Carbon;
-use Database\Factories\EventFactory;
+use Database\Factories\TodoFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,24 +16,25 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * @property int $id
  * @property string $title
- * @property Carbon $start_at
- * @property Carbon|null $end_at
- * @property bool $is_all_day
+ * @property Carbon $deadline
  * @property Capybara $capybara
+ * @property Priority $priority
  * @property string|null $description
  * @property bool $is_private
  * @property string|null $image_path
+ * @property Carbon|null $finished_at
  * @property Carbon $created_at
  * @property Carbon|null $updated_at
  * @property string $created_at_human
  * @property string|null $updated_at_human
+ * @property bool $is_finished
  * @property User $author
  * @property array<string, array<string, string>>|null $meta
  * @property array<Tag> $tags
  */
-class Event extends Model
+class Todo extends Model
 {
-    /** @use HasFactory<EventFactory> */
+    /** @use HasFactory<TodoFactory> */
     use HasFactory;
 
     use SoftDeletes;
@@ -46,35 +48,33 @@ class Event extends Model
         'title',
         'author_id',
         'capybara',
-        'start_at',
-        'end_at',
-        'is_all_day',
+        'deadline',
         'description',
-        'icon',
+        'priority',
+        'finished_at',
         'meta',
-        'image_path',
     ];
 
     /**
-     * @return array<string, string|Capybara>
+     * @return array<string, string|Capybara|Priority>
      */
     protected function casts(): array
     {
         return [
-            'start_at' => 'datetime',
-            'end_at' => 'datetime',
+            'deadline' => 'date',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
-            'is_all_day' => 'boolean',
+            'finished_at' => 'datetime',
             'capybara' => Capybara::class,
+            'priority' => Priority::class,
             'meta' => 'array',
         ];
     }
 
     protected static function booted(): void
     {
-        static::creating(function (Event $event) {
-            $event->updated_at = null;
+        static::creating(function (Todo $todo) {
+            $todo->updated_at = null;
         });
     }
 
@@ -91,7 +91,7 @@ class Event extends Model
      */
     public function subscribers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'event_user');
+        return $this->belongsToMany(User::class, 'todo_user');
     }
 
     /**
@@ -99,7 +99,7 @@ class Event extends Model
      */
     public function tags(): BelongsToMany
     {
-        return $this->belongsToMany(Tag::class, 'event_tag')->orderBy('label', 'asc');
+        return $this->belongsToMany(Tag::class, 'todo_tag')->orderBy('label', 'asc');
     }
 
     /**
@@ -117,6 +117,16 @@ class Event extends Model
     /**
      * @return Attribute<bool, never>
      */
+    protected function isFinished(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->finished_at !== null
+        );
+    }
+
+    /**
+     * @return Attribute<string, never>
+     */
     protected function createdAtHuman(): Attribute
     {
         return Attribute::make(
@@ -125,24 +135,12 @@ class Event extends Model
     }
 
     /**
-     * @return Attribute<bool, never>
+     * @return Attribute<string|null, never>
      */
     protected function updatedAtHuman(): Attribute
     {
         return Attribute::make(
             get: fn () => $this->updated_at?->diffForHumans()
-        );
-    }
-
-    /**
-     * @return Attribute<string|null, never>
-     */
-    protected function imageUrl(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->image_path
-                ? route('event.image.show', $this).'?v='.($this->updated_at?->timestamp ?? 0) // @phpstan-ignore nullsafe.neverNull
-                : null
         );
     }
 }

@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
+import DashboardList from '@/components/dashboard/DashboardList.vue';
 import EventFilterForm from '@/components/events/EventFilterForm.vue';
 import EventsList from '@/components/events/EventsList.vue';
+import TodosList from '@/components/todos/TodosList.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import { Capybara } from '@/types/Capybara';
 import type { Event } from '@/types/Event';
 import { EventFilters } from '@/types/Filters';
 import { Tag } from '@/types/Tag';
+import type { Todo } from '@/types/Todo';
 import { router } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 
-//TODO: pinia
 interface Props {
     upcomingEvents: Event[];
-    historyEvents: Event[];
+    unfinishedTodos: Todo[];
     eventFilters: EventFilters;
     capybaraOptions: Capybara[];
     availableTags: Tag[];
@@ -27,7 +29,7 @@ const handleFilterChange = (newFilters: typeof props.eventFilters) => {
         preserveState: true,
         preserveScroll: true,
         replace: true,
-        only: ['upcomingEvents', 'historyEvents', 'eventFilters'],
+        only: ['upcomingEvents', 'unfinishedTodos', 'eventFilters'],
     });
 };
 
@@ -52,28 +54,47 @@ const eventFiltersLabel = computed(() => {
 
 const items = [
     {
-        label: 'Nadcházející',
+        label: 'Vše',
         icon: 'i-lucide-rocket',
-        slot: 'upcoming',
+        slot: 'all',
     },
     {
-        label: 'Historické',
-        icon: 'i-lucide-history',
-        slot: 'history',
+        label: 'Eventy',
+        icon: 'i-lucide-calendar',
+        slot: 'events',
+    },
+    {
+        label: 'Todos',
+        icon: 'i-lucide-list-todo',
+        slot: 'todos',
     },
 ];
+const localTodos = ref<Todo[]>(props.unfinishedTodos.map((t) => ({ ...t })));
+
+watch(
+    () => props.unfinishedTodos,
+    (newVal) => {
+        localTodos.value = newVal.map((t) => ({ ...t }));
+    },
+);
+
+function handleToggled(todoId: number) {
+    localTodos.value = localTodos.value.map((t) =>
+        t.id === todoId ? { ...t, is_finished: !t.is_finished } : t,
+    );
+}
 </script>
 
 <template>
     <AuthenticatedLayout :display-footer="true">
         <UCollapsible class="mb-4 flex w-full flex-col gap-2">
-                <UButton
-                    :label="eventFiltersLabel"
-                    color="primary"
-                    variant="subtle"
-                    trailing-icon="i-lucide-chevron-down"
-                    block
-                />
+            <UButton
+                :label="eventFiltersLabel"
+                color="primary"
+                variant="subtle"
+                trailing-icon="i-lucide-chevron-down"
+                block
+            />
 
             <template #content>
                 <EventFilterForm
@@ -86,9 +107,21 @@ const items = [
         </UCollapsible>
 
         <UTabs :items="items">
-            <template #upcoming>
+            <template #all>
+                <DashboardList
+                    heading="Aktuální"
+                    :events="props.upcomingEvents"
+                    :todos="localTodos"
+                    :create-if-empty="true"
+                    :scroll-to-date="props.scrollToDate"
+                    @scrolled="clearScrollToDate"
+                    @toggled="handleToggled"
+                />
+            </template>
+
+            <template #events>
                 <EventsList
-                    heading="Nadcházející"
+                    heading="Eventy"
                     :events="props.upcomingEvents"
                     :create-event-if-empty="true"
                     :scroll-to-date="props.scrollToDate"
@@ -96,13 +129,13 @@ const items = [
                 />
             </template>
 
-            <template #history>
-                <EventsList
-                    heading="Historické"
-                    :events="props.historyEvents"
-                    :create-event-if-empty="true"
-                    :scroll-to-date="props.scrollToDate"
-                    @scrolled="clearScrollToDate"
+            <template #todos>
+                <TodosList
+                    heading="Todos"
+                    :todos="localTodos"
+                    :create-todo-if-empty="true"
+                    :show-finish-button="true"
+                    @toggled="handleToggled"
                 />
             </template>
         </UTabs>

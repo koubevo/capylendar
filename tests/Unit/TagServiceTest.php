@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Tag;
-use App\services\TagService;
+use App\Services\TagService;
 
 beforeEach(function () {
     $this->tagService = new TagService;

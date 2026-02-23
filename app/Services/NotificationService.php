@@ -1,6 +1,6 @@
 <?php
 
-namespace App\services;
+namespace App\Services;
 
 use App\Http\Resources\EventResource;
 use App\Models\Event;

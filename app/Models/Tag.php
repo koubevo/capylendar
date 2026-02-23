@@ -31,4 +31,12 @@ class Tag extends Model
     {
         return $this->belongsToMany(Event::class, 'event_tag');
     }
+
+    /**
+     * @return BelongsToMany<Todo, $this>
+     */
+    public function todos(): BelongsToMany
+    {
+        return $this->belongsToMany(Todo::class, 'todo_tag');
+    }
 }

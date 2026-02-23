@@ -79,4 +79,20 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Event::class, 'event_user');
     }
+
+    /**
+     * @return HasMany<Todo, $this>
+     */
+    public function authoredTodos(): HasMany
+    {
+        return $this->hasMany(Todo::class, 'author_id');
+    }
+
+    /**
+     * @return BelongsToMany<Todo, $this>
+     */
+    public function assignedTodos(): BelongsToMany
+    {
+        return $this->belongsToMany(Todo::class, 'todo_user');
+    }
 }

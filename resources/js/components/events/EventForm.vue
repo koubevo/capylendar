@@ -1,12 +1,12 @@
 <script setup lang="ts">
 /* eslint-disable vue/no-mutating-props */
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
+import TagSelectMenu from '@/components/tags/TagSelectMenu.vue';
 import MacroAlert from '@/components/ui/MacroAlert.vue';
 import { hasGoogleMapUrl } from '@/lib/utils';
 import { Capybara } from '@/types/Capybara';
 import type { EventFormData } from '@/types/EventFormData';
 import { Tag } from '@/types/Tag';
-import TagSelectMenu from '@/components/tags/TagSelectMenu.vue';
 import type { InertiaForm } from '@inertiajs/vue3';
 import { computed, onUnmounted, ref } from 'vue';
 
@@ -39,8 +39,6 @@ const selectedTags = computed({
         props.form.tags = value;
     },
 });
-
-
 
 const emit = defineEmits<{
     (e: 'submit'): void;

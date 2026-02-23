@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import EventController from '@/actions/App/Http/Controllers/EventController';
-import EventCard from '@/components/events/EventCard.vue';
+import TodoController from '@/actions/App/Http/Controllers/TodoController';
 import ActionModal from '@/components/modals/ActionModal.vue';
+import TodoCard from '@/components/todos/TodoCard.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import type { Action } from '@/types/Button';
-import type { Event } from '@/types/Event';
+import type { Todo } from '@/types/Todo';
 import { Head } from '@inertiajs/vue3';
 import type { TableColumn } from '@nuxt/ui';
 import { h } from 'vue';
 
 const props = defineProps<{
-    deletedEvents: Event[];
+    deletedTodos: Todo[];
 }>();
 
-const getRestoreAction = (event: Event): Action => ({
-    title: 'Obnovit event',
+const getRestoreAction = (todo: Todo): Action => ({
+    title: 'Obnovit todo',
     titleShort: 'Obnovit',
-    url: EventController.restore(event).url,
+    url: TodoController.restore(todo).url,
     method: 'post',
     icon: {
         name: 'i-lucide-undo-2',
@@ -24,7 +24,7 @@ const getRestoreAction = (event: Event): Action => ({
     },
 });
 
-const columns: TableColumn<Event>[] = [
+const columns: TableColumn<Todo>[] = [
     {
         id: 'capybara',
         header: 'Kdo',
@@ -50,37 +50,33 @@ const columns: TableColumn<Event>[] = [
             h('div', { class: 'min-w-[150px]' }, row.original.title),
     },
     {
-        id: 'date',
-        header: 'Datum',
+        id: 'deadline',
+        header: 'Deadline',
         size: 120,
         cell: ({ row }) => {
             return h(
                 'div',
                 { class: 'min-w-[120px]' },
-                h('span', row.original.date.label),
+                h('span', row.original.deadline.label),
             );
         },
     },
     {
-        id: 'time',
-        header: 'Čas',
+        id: 'priority',
+        header: 'Priorita',
         size: 100,
         cell: ({ row }) => {
-            if (row.original.date.is_all_day) {
-                return h(
-                    'div',
-                    { class: 'min-w-[100px]' },
-                    h(
-                        'span',
-                        { class: 'text-gray-600 dark:text-gray-400' },
-                        'Celý den',
-                    ),
-                );
-            }
-            const timeText = row.original.date.end_time
-                ? `${row.original.date.start_time} - ${row.original.date.end_time}`
-                : row.original.date.start_time;
-            return h('div', { class: 'min-w-[100px]' }, h('span', timeText));
+            return h(
+                'div',
+                { class: 'min-w-[100px] flex items-center gap-1' },
+                [
+                    h('span', {
+                        class: row.original.priority.icon_color,
+                        innerHTML: '●',
+                    }),
+                    h('span', row.original.priority.label),
+                ],
+            );
         },
     },
     {
@@ -99,9 +95,8 @@ const columns: TableColumn<Event>[] = [
                         },
                         {
                             body: () =>
-                                h(EventCard, {
-                                    event: row.original,
-                                    view: 'detail',
+                                h(TodoCard, {
+                                    todo: row.original,
                                 }),
                         },
                     ),
@@ -113,18 +108,18 @@ const columns: TableColumn<Event>[] = [
 </script>
 
 <template>
-    <Head title="Smazané eventy" />
+    <Head title="Smazaná todos" />
 
     <AuthenticatedLayout :display-floating-action-button="false">
         <div class="space-y-6">
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-                Smazané eventy
+                Smazaná todos
             </h2>
 
             <UCard :ui="{ body: 'p-0' }">
                 <div class="overflow-x-auto">
                     <UTable
-                        :data="props.deletedEvents"
+                        :data="props.deletedTodos"
                         :columns="columns"
                         class="w-full"
                     />

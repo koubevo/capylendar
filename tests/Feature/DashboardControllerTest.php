@@ -11,8 +11,7 @@ beforeEach(function () {
 });
 
 describe('DashboardController', function () {
-    it('shows upcoming and history events', function () {
-        // Create upcoming event
+    it('shows upcoming events on dashboard', function () {
         $upcomingEvent = Event::factory()->create([
             'author_id' => $this->user->id,
             'title' => 'Upcoming Event',
@@ -20,7 +19,7 @@ describe('DashboardController', function () {
         ]);
         $upcomingEvent->subscribers()->attach($this->user);
 
-        // Create history event
+        // Past events should NOT appear in upcomingEvents on the dashboard
         $historyEvent = Event::factory()->create([
             'author_id' => $this->user->id,
             'title' => 'Past Event',
@@ -34,9 +33,9 @@ describe('DashboardController', function () {
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Dashboard')
                 ->has('upcomingEvents', 1)
-                ->has('historyEvents', 1)
                 ->has('capybaraOptions')
                 ->has('availableTags')
+                ->where('upcomingEvents.0.title', 'Upcoming Event')
             );
     });
 
@@ -217,9 +216,10 @@ describe('DashboardController sorting', function () {
         $recentEvent->subscribers()->attach($this->user);
 
         $this->actingAs($this->user)
-            ->get(route('dashboard'))
+            ->get(route('event.historyIndex'))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
+                ->component('events/EventHistoryIndex')
                 ->has('historyEvents', 2)
                 ->where('historyEvents.0.title', 'Recent Event')
                 ->where('historyEvents.1.title', 'Older Event')

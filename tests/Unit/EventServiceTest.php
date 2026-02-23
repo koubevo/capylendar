@@ -7,19 +7,20 @@ use App\Http\Requests\Event\UpdateEventRequest;
 use App\Models\Event;
 use App\Models\Tag;
 use App\Models\User;
-use App\services\EventService;
-use App\services\EventTagService;
-use App\services\EventUserService;
+use App\Services\EventService;
+use App\Services\EventTagService;
+use App\Services\EventUserService;
 use Carbon\Carbon;
 use Illuminate\Support\ValidatedInput;
 use shweshi\OpenGraph\OpenGraph;
 
 beforeEach(function () {
     $this->openGraph = Mockery::mock(OpenGraph::class);
+    app()->instance(OpenGraph::class, $this->openGraph);
+
     $this->eventService = new EventService(
         new EventUserService,
         new EventTagService,
-        $this->openGraph
     );
     $this->user = User::factory()->create();
 });

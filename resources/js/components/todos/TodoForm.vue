@@ -9,6 +9,7 @@ import { Tag } from '@/types/Tag';
 import type { TodoPriority } from '@/types/Todo';
 import type { TodoFormData } from '@/types/TodoFormData';
 import type { InertiaForm } from '@inertiajs/vue3';
+import { Form } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 interface Props {
@@ -46,7 +47,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <form @submit.prevent="emit('submit')">
+    <Form @submit.prevent="emit('submit')">
         <div class="flex w-full flex-col gap-y-6 md:gap-y-8">
             <UFormField
                 label="Název"
@@ -137,5 +138,5 @@ const emit = defineEmits<{
                 {{ props.isEditMode ? 'Upravit' : 'Přidat' }}
             </PrimaryButton>
         </div>
-    </form>
+    </Form>
 </template>

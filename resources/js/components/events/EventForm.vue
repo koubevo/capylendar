@@ -8,6 +8,7 @@ import { Capybara } from '@/types/Capybara';
 import type { EventFormData } from '@/types/EventFormData';
 import { Tag } from '@/types/Tag';
 import type { InertiaForm } from '@inertiajs/vue3';
+import { Form } from '@inertiajs/vue3';
 import { computed, onUnmounted, ref } from 'vue';
 
 interface Props {
@@ -93,7 +94,7 @@ onUnmounted(() => revokePreview());
 </script>
 
 <template>
-    <form @submit.prevent="emit('submit')">
+    <Form @submit.prevent="emit('submit')">
         <div class="flex w-full flex-col gap-y-6 md:gap-y-8">
             <UFormField
                 label="Název"
@@ -277,5 +278,5 @@ onUnmounted(() => revokePreview());
                 {{ props.isEditMode ? 'Upravit' : 'Přidat' }}
             </PrimaryButton>
         </div>
-    </form>
+    </Form>
 </template>

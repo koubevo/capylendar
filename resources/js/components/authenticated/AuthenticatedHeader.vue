@@ -88,7 +88,9 @@ const addMenuItems = [
         </template>
 
         <template #body>
-            <section class="flex w-full flex-col items-center gap-y-8 px-4 py-6">
+            <section
+                class="flex w-full flex-col items-center gap-y-8 px-4 py-6"
+            >
                 <Link
                     :href="profile().url"
                     class="transition-transform hover:scale-105"

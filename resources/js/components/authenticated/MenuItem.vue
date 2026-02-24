@@ -12,7 +12,10 @@ const props = defineProps<Props>();
 </script>
 
 <template>
-    <Link :href="typeof props.to === 'string' ? props.to : props.to.url()" class="block h-full w-full">
+    <Link
+        :href="typeof props.to === 'string' ? props.to : props.to.url()"
+        class="block h-full w-full"
+    >
         <div
             class="group relative flex h-full flex-row items-center justify-start gap-x-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-primary-500/20 transition-all ring-inset hover:-translate-y-0.5 hover:bg-primary-50 hover:shadow-md sm:gap-x-4 sm:p-4 md:flex-col md:justify-center md:gap-y-2 md:p-5 dark:bg-gray-900 dark:ring-primary-400/20 dark:hover:bg-primary-900/20"
         >

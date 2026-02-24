@@ -125,7 +125,12 @@ onUnmounted(() => revokePreview());
                 :error="props.form.errors.start_at"
                 required
             >
-                <UInput v-model="props.form.date" type="date" class="w-full" size="md" />
+                <UInput
+                    v-model="props.form.date"
+                    type="date"
+                    class="w-full"
+                    size="md"
+                />
             </UFormField>
 
             <USwitch
@@ -197,7 +202,7 @@ onUnmounted(() => revokePreview());
                     <!-- Image preview -->
                     <div
                         v-if="displayImageUrl"
-                        class="relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm"
+                        class="relative overflow-hidden rounded-xl border border-gray-200 shadow-sm dark:border-gray-700"
                     >
                         <img
                             :src="displayImageUrl"
@@ -215,16 +220,29 @@ onUnmounted(() => revokePreview());
                     </div>
 
                     <label
-                        class="flex flex-col items-center justify-center h-32 cursor-pointer gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50/50 px-3 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50 dark:hover:bg-gray-800"
+                        class="flex h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50/50 px-3 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50 dark:hover:bg-gray-800"
                     >
-                        <div class="rounded-full bg-primary-50 p-2 dark:bg-primary-900/30 text-primary-500">
-                            <UIcon name="i-lucide-upload-cloud" class="size-6" />
+                        <div
+                            class="rounded-full bg-primary-50 p-2 text-primary-500 dark:bg-primary-900/30"
+                        >
+                            <UIcon
+                                name="i-lucide-upload-cloud"
+                                class="size-6"
+                            />
                         </div>
                         <div class="text-center">
-                            <span class="text-sm font-medium text-primary-600 dark:text-primary-400">
-                                {{ displayImageUrl ? 'Změnit obrázek' : 'Nahrát obrázek (klikněte)' }}
+                            <span
+                                class="text-sm font-medium text-primary-600 dark:text-primary-400"
+                            >
+                                {{
+                                    displayImageUrl
+                                        ? 'Změnit obrázek'
+                                        : 'Nahrát obrázek (klikněte)'
+                                }}
                             </span>
-                            <p class="mt-1 text-xs text-gray-500">PNG, JPG, GIF do 10MB</p>
+                            <p class="mt-1 text-xs text-gray-500">
+                                PNG, JPG, GIF do 10MB
+                            </p>
                         </div>
                         <input
                             type="file"

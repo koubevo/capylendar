@@ -80,7 +80,7 @@ const addMenuItems = [
         :ui="{
             toggle: 'visible lg:flex',
             content: 'lg:block',
-            header: 'mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full'
+            header: 'mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full',
         }"
     >
         <template #title>
@@ -88,12 +88,17 @@ const addMenuItems = [
         </template>
 
         <template #body>
-            <section class="flex flex-col items-center py-6 px-4 w-full">
-                <Link :href="profile()" class="mb-8 transition-transform hover:scale-105">
+            <section class="flex w-full flex-col items-center px-4 py-6">
+                <Link
+                    :href="profile()"
+                    class="mb-8 transition-transform hover:scale-105"
+                >
                     <AvatarSection size="large" />
                 </Link>
-                
-                <div class="grid w-full max-w-4xl grid-cols-2 gap-2 sm:gap-3 md:gap-4 md:grid-cols-3 lg:grid-cols-4">
+
+                <div
+                    class="grid w-full max-w-4xl grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4"
+                >
                     <MenuItem
                         v-for="link in links"
                         :key="link.to.url"

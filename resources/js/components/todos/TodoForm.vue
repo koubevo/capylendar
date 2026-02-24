@@ -55,7 +55,7 @@ const emit = defineEmits<{
                 :error="props.form.errors.title"
                 required
             >
-                <UInput v-model="props.form.title" class="w-full" size="md" />
+                <UInput v-model="props.form.title" class="w-full" />
             </UFormField>
 
             <UFormField
@@ -83,7 +83,6 @@ const emit = defineEmits<{
                     v-model="props.form.deadline"
                     type="date"
                     class="w-full"
-                    size="md"
                 />
             </UFormField>
 

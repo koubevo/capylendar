@@ -102,7 +102,7 @@ onUnmounted(() => revokePreview());
                 :error="props.form.errors.title"
                 required
             >
-                <UInput v-model="props.form.title" class="w-full" size="md" />
+                <UInput v-model="props.form.title" class="w-full" />
             </UFormField>
 
             <UFormField
@@ -130,7 +130,6 @@ onUnmounted(() => revokePreview());
                     v-model="props.form.date"
                     type="date"
                     class="w-full"
-                    size="md"
                 />
             </UFormField>
 
@@ -155,7 +154,6 @@ onUnmounted(() => revokePreview());
                         v-model="props.form.start_at"
                         type="time"
                         class="w-full"
-                        size="md"
                     />
                 </UFormField>
 
@@ -169,7 +167,6 @@ onUnmounted(() => revokePreview());
                         v-model="props.form.end_at"
                         type="time"
                         class="w-full"
-                        size="md"
                     />
                 </UFormField>
             </div>
@@ -183,7 +180,6 @@ onUnmounted(() => revokePreview());
                     v-model="props.form.description"
                     class="w-full"
                     :rows="5"
-                    size="md"
                 />
                 <MacroAlert
                     v-show="mapDetected"

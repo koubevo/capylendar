@@ -2,10 +2,11 @@
 import TagController from '@/actions/App/Http/Controllers/TagController';
 import ActionModal from '@/components/modals/ActionModal.vue';
 import Tag from '@/components/tags/Tag.vue';
+import type { Tag as TagType } from '@/types/Tag';
 
 interface Props {
-    tags: Tag[];
-    canDelete: boolean;
+    tags: TagType[];
+    canDelete?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {

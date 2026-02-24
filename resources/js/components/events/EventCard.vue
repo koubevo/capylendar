@@ -77,7 +77,6 @@ const descriptionIsOnlyLinks = computed(() =>
                 </div>
                 <TagsList
                     :tags="props.event.tags"
-                    :can-delete="false"
                     class="mt-1"
                     v-if="props.event.tags"
                 />

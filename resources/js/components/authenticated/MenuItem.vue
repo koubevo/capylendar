@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 
+interface WayfinderRoute {
+    url: string;
+    method: string;
+}
+
 interface Props {
-    to: any;
+    to: WayfinderRoute | string;
     label: string;
     icon?: string;
     isNew?: boolean;
@@ -13,7 +18,7 @@ const props = defineProps<Props>();
 
 <template>
     <Link
-        :href="typeof props.to === 'string' ? props.to : props.to.url()"
+        :href="typeof props.to === 'string' ? props.to : props.to.url"
         class="block h-full w-full"
     >
         <div

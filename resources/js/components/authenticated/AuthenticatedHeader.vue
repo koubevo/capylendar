@@ -92,7 +92,7 @@ const addMenuItems = [
                 class="flex w-full flex-col items-center gap-y-8 px-4 py-6"
             >
                 <Link
-                    :href="profile().url"
+                    :href="profile.url()"
                     class="transition-transform hover:scale-105"
                 >
                     <AvatarSection size="large" />

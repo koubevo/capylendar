@@ -47,14 +47,14 @@ const emit = defineEmits<{
 
 <template>
     <form @submit.prevent="emit('submit')">
-        <div class="flex w-full flex-col gap-y-4">
+        <div class="flex w-full flex-col gap-y-6 md:gap-y-8">
             <UFormField
                 label="Název"
                 name="title"
                 :error="props.form.errors.title"
                 required
             >
-                <UInput v-model="props.form.title" class="w-full" />
+                <UInput v-model="props.form.title" class="w-full" size="md" />
             </UFormField>
 
             <UFormField
@@ -82,6 +82,7 @@ const emit = defineEmits<{
                     v-model="props.form.deadline"
                     type="date"
                     class="w-full"
+                    size="md"
                 />
             </UFormField>
 
@@ -107,10 +108,11 @@ const emit = defineEmits<{
                 <UTextarea
                     v-model="props.form.description"
                     class="w-full"
-                    rows="5"
+                    :rows="5"
                 />
                 <MacroAlert
                     v-show="mapDetected"
+                    class="mt-3"
                     icon="i-lucide-map-pinned"
                     label="Bude vytvořena náhledová karta mapy"
                 />

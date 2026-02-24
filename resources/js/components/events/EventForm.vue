@@ -94,14 +94,14 @@ onUnmounted(() => revokePreview());
 
 <template>
     <form @submit.prevent="emit('submit')">
-        <div class="flex w-full flex-col gap-y-4">
+        <div class="flex w-full flex-col gap-y-6 md:gap-y-8">
             <UFormField
                 label="Název"
                 name="title"
                 :error="props.form.errors.title"
                 required
             >
-                <UInput v-model="props.form.title" class="w-full" />
+                <UInput v-model="props.form.title" class="w-full" size="md" />
             </UFormField>
 
             <UFormField
@@ -125,7 +125,7 @@ onUnmounted(() => revokePreview());
                 :error="props.form.errors.start_at"
                 required
             >
-                <UInput v-model="props.form.date" type="date" class="w-full" />
+                <UInput v-model="props.form.date" type="date" class="w-full" size="md" />
             </UFormField>
 
             <USwitch
@@ -149,6 +149,7 @@ onUnmounted(() => revokePreview());
                         v-model="props.form.start_at"
                         type="time"
                         class="w-full"
+                        size="md"
                     />
                 </UFormField>
 
@@ -162,6 +163,7 @@ onUnmounted(() => revokePreview());
                         v-model="props.form.end_at"
                         type="time"
                         class="w-full"
+                        size="md"
                     />
                 </UFormField>
             </div>
@@ -175,9 +177,11 @@ onUnmounted(() => revokePreview());
                     v-model="props.form.description"
                     class="w-full"
                     :rows="5"
+                    size="md"
                 />
                 <MacroAlert
                     v-show="mapDetected"
+                    class="mt-3"
                     icon="i-lucide-map-pinned"
                     label="Bude vytvořena náhledová karta mapy"
                 />
@@ -193,7 +197,7 @@ onUnmounted(() => revokePreview());
                     <!-- Image preview -->
                     <div
                         v-if="displayImageUrl"
-                        class="relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700"
+                        class="relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm"
                     >
                         <img
                             :src="displayImageUrl"
@@ -202,23 +206,26 @@ onUnmounted(() => revokePreview());
                         />
                         <button
                             type="button"
-                            class="absolute top-2 right-2 flex items-center gap-1 rounded-md bg-red-500/90 px-2 py-1 text-xs text-white transition hover:bg-red-600"
+                            class="absolute top-2 right-2 flex items-center gap-1 rounded-md bg-red-500/90 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:bg-red-600 focus:ring-2 focus:ring-red-500 focus:outline-none"
                             @click="clearImage()"
                         >
-                            <UIcon name="i-lucide-trash-2" class="size-3" />
+                            <UIcon name="i-lucide-trash-2" class="size-4" />
                             Odebrat
                         </button>
                     </div>
 
                     <label
-                        class="flex h-10 cursor-pointer items-center gap-2 rounded-md border border-gray-300 px-3 text-sm transition hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                        class="flex flex-col items-center justify-center h-32 cursor-pointer gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50/50 px-3 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50 dark:hover:bg-gray-800"
                     >
-                        <UIcon name="i-lucide-image-plus" class="size-4" />
-                        {{
-                            displayImageUrl
-                                ? 'Změnit obrázek'
-                                : 'Přidat obrázek'
-                        }}
+                        <div class="rounded-full bg-primary-50 p-2 dark:bg-primary-900/30 text-primary-500">
+                            <UIcon name="i-lucide-upload-cloud" class="size-6" />
+                        </div>
+                        <div class="text-center">
+                            <span class="text-sm font-medium text-primary-600 dark:text-primary-400">
+                                {{ displayImageUrl ? 'Změnit obrázek' : 'Nahrát obrázek (klikněte)' }}
+                            </span>
+                            <p class="mt-1 text-xs text-gray-500">PNG, JPG, GIF do 10MB</p>
+                        </div>
                         <input
                             type="file"
                             accept="image/*"

@@ -16,36 +16,44 @@ const links = computed(() => [
     {
         label: 'Dashboard',
         to: DashboardController(),
+        icon: 'i-lucide-layout-dashboard',
     },
     {
         label: 'Todos',
         to: TodoController.index(),
+        icon: 'i-lucide-list-todo',
         isNew: true,
     },
     {
         label: 'Chat',
         to: MessageController.index(),
+        icon: 'i-lucide-message-circle',
     },
     {
         label: 'Můj Profil',
         to: profile(),
+        icon: 'i-lucide-user',
     },
     {
         label: 'Správa štítků',
         to: TagController.index(),
+        icon: 'i-lucide-tags',
     },
     {
-        label: 'Historické eventy',
+        label: 'Historie',
         to: DashboardController.historyIndex(),
+        icon: 'i-lucide-history',
         isNew: true,
     },
     {
-        label: 'Obnovit eventy',
+        label: 'Smazané eventy',
         to: EventController.deletedIndex(),
+        icon: 'i-lucide-calendar-off',
     },
     {
-        label: 'Obnovit todos',
+        label: 'Smazaná todos',
         to: TodoController.deletedIndex(),
+        icon: 'i-lucide-list-x',
         isNew: true,
     },
 ]);
@@ -68,10 +76,11 @@ const addMenuItems = [
 
 <template>
     <UHeader
-        :to="DashboardController()"
+        :to="DashboardController.url()"
         :ui="{
             toggle: 'visible lg:flex',
             content: 'lg:block',
+            header: 'mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full',
         }"
     >
         <template #title>
@@ -79,17 +88,25 @@ const addMenuItems = [
         </template>
 
         <template #body>
-            <section class="md-w-1/5">
-                <Link :href="profile()">
-                    <AvatarSection size="small" />
+            <section
+                class="flex w-full flex-col items-center gap-y-8 px-4 py-6"
+            >
+                <Link
+                    :href="profile.url()"
+                    class="transition-transform hover:scale-105"
+                >
+                    <AvatarSection size="large" />
                 </Link>
-                <USeparator class="my-8" />
-                <div class="flex flex-col gap-y-4">
+
+                <div
+                    class="grid w-full max-w-4xl grid-cols-2 gap-2 sm:gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4"
+                >
                     <MenuItem
                         v-for="link in links"
-                        :key="link.to"
+                        :key="link.to.url"
                         :to="link.to"
                         :label="link.label"
+                        :icon="link.icon"
                         :isNew="link.isNew"
                     />
                 </div>

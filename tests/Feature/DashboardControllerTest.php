@@ -1,8 +1,10 @@
 <?php
 
 use App\Enums\Capybara;
+use App\Enums\Priority;
 use App\Models\Event;
 use App\Models\Tag;
+use App\Models\Todo;
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -197,6 +199,108 @@ describe('DashboardController sorting', function () {
                 ->has('upcomingEvents', 2)
                 ->where('upcomingEvents.0.title', 'Sooner Event')
                 ->where('upcomingEvents.1.title', 'Later Event')
+            );
+    });
+
+    it('orders all-day events before timed events on the same date', function () {
+        $tomorrow = now()->addDay();
+
+        $timedEvent = Event::factory()->create([
+            'author_id' => $this->user->id,
+            'title' => 'Timed Event',
+            'start_at' => $tomorrow->copy()->setTime(14, 0),
+            'is_all_day' => false,
+        ]);
+        $timedEvent->subscribers()->attach($this->user);
+
+        $allDayEvent = Event::factory()->allDay()->create([
+            'author_id' => $this->user->id,
+            'title' => 'All Day Event',
+            'start_at' => $tomorrow->copy()->setTime(14, 0),
+        ]);
+        $allDayEvent->subscribers()->attach($this->user);
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('upcomingEvents', 2)
+                ->where('upcomingEvents.0.title', 'All Day Event')
+                ->where('upcomingEvents.1.title', 'Timed Event')
+            );
+    });
+
+    it('orders events alphabetically by title within the same type', function () {
+        $tomorrow = now()->addDay();
+
+        $eventB = Event::factory()->create([
+            'author_id' => $this->user->id,
+            'title' => 'Bravo Event',
+            'start_at' => $tomorrow->copy()->setTime(10, 0),
+            'is_all_day' => false,
+        ]);
+        $eventB->subscribers()->attach($this->user);
+
+        $eventA = Event::factory()->create([
+            'author_id' => $this->user->id,
+            'title' => 'Alpha Event',
+            'start_at' => $tomorrow->copy()->setTime(10, 0),
+            'is_all_day' => false,
+        ]);
+        $eventA->subscribers()->attach($this->user);
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('upcomingEvents', 2)
+                ->where('upcomingEvents.0.title', 'Alpha Event')
+                ->where('upcomingEvents.1.title', 'Bravo Event')
+            );
+    });
+
+    it('orders unfinished todos by priority then title', function () {
+        $deadline = now()->addDays(3);
+
+        $lowTodo = Todo::factory()->create([
+            'author_id' => $this->user->id,
+            'title' => 'Low Todo',
+            'deadline' => $deadline,
+            'priority' => Priority::Low,
+        ]);
+        $lowTodo->subscribers()->attach($this->user);
+
+        $highTodoB = Todo::factory()->highPriority()->create([
+            'author_id' => $this->user->id,
+            'title' => 'Bravo High',
+            'deadline' => $deadline,
+        ]);
+        $highTodoB->subscribers()->attach($this->user);
+
+        $highTodoA = Todo::factory()->highPriority()->create([
+            'author_id' => $this->user->id,
+            'title' => 'Alpha High',
+            'deadline' => $deadline,
+        ]);
+        $highTodoA->subscribers()->attach($this->user);
+
+        $mediumTodo = Todo::factory()->create([
+            'author_id' => $this->user->id,
+            'title' => 'Medium Todo',
+            'deadline' => $deadline,
+            'priority' => Priority::Medium,
+        ]);
+        $mediumTodo->subscribers()->attach($this->user);
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('unfinishedTodos', 4)
+                ->where('unfinishedTodos.0.title', 'Alpha High')
+                ->where('unfinishedTodos.1.title', 'Bravo High')
+                ->where('unfinishedTodos.2.title', 'Medium Todo')
+                ->where('unfinishedTodos.3.title', 'Low Todo')
             );
     });
 

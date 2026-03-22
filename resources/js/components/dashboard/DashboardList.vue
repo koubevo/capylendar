@@ -65,7 +65,14 @@ const mergedItems = computed<DashboardItem[]>(() => {
         });
     }
 
-    items.sort((a, b) => a.dateKey.localeCompare(b.dateKey));
+    items.sort((a, b) => {
+        const dateCompare = a.dateKey.localeCompare(b.dateKey);
+        if (dateCompare !== 0) return dateCompare;
+
+        if (a.type !== b.type) return a.type === 'event' ? -1 : 1;
+
+        return 0;
+    });
 
     return items;
 });

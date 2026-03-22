@@ -57,6 +57,15 @@ enum Priority: string
         };
     }
 
+    public function sortWeight(): int
+    {
+        return match ($this) {
+            self::High => 1,
+            self::Medium => 2,
+            self::Low => 3,
+        };
+    }
+
     /**
      * @return Collection<int, array{value: string, label: string, icon: string, border_class: string, icon_color: string, checkbox_color: string}>
      */

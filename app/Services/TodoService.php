@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Concerns\ResolvesOpenGraphMetadata;
+use App\Enums\Priority;
 use App\Http\Requests\Todo\StoreTodoRequest;
 use App\Http\Requests\Todo\UpdateTodoRequest;
 use App\Http\Resources\TodoResource;
@@ -126,9 +127,13 @@ class TodoService
             }
         }
 
+        $priorityOrderRaw = collect(Priority::cases())
+            ->map(fn ($priority) => sprintf("WHEN '%s' THEN %d", $priority->value, $priority->sortWeight()))
+            ->implode(' ');
+
         $todos = $query
             ->orderBy('deadline', $finished ? 'desc' : 'asc')
-            ->orderByRaw("CASE priority WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END")
+            ->orderByRaw('CASE priority '.$priorityOrderRaw.' END')
             ->orderBy('title', 'asc')
             ->get();
 

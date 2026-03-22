@@ -126,11 +126,7 @@ onUnmounted(() => revokePreview());
                 :error="props.form.errors.start_at"
                 required
             >
-                <UInput
-                    v-model="props.form.date"
-                    type="date"
-                    class="w-full"
-                />
+                <UInput v-model="props.form.date" type="date" class="w-full" />
             </UFormField>
 
             <USwitch

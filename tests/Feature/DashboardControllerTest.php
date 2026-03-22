@@ -216,7 +216,7 @@ describe('DashboardController sorting', function () {
         $allDayEvent = Event::factory()->allDay()->create([
             'author_id' => $this->user->id,
             'title' => 'All Day Event',
-            'start_at' => $tomorrow->copy()->startOfDay(),
+            'start_at' => $tomorrow->copy()->setTime(14, 0),
         ]);
         $allDayEvent->subscribers()->attach($this->user);
 

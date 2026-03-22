@@ -126,17 +126,11 @@ class TodoService
             }
         }
 
-        $todos = $query->get()
-            ->sortBy(function ($todo) use ($finished) {
-                $timestamp = $todo->deadline->timestamp;
-
-                return [
-                    $finished ? -$timestamp : $timestamp,
-                    $todo->priority->sortWeight(),
-                    $todo->title,
-                ];
-            })
-            ->values();
+        $todos = $query
+            ->orderBy('deadline', $finished ? 'desc' : 'asc')
+            ->orderByRaw("CASE priority WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END")
+            ->orderBy('title', 'asc')
+            ->get();
 
         return TodoResource::collection($todos)->resolve();
     }

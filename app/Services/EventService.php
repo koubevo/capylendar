@@ -177,6 +177,8 @@ class EventService
         }
 
         $events = $query->orderBy('start_at', $eventType->sortDirection())
+            ->orderBy('is_all_day', 'desc')
+            ->orderBy('title', 'asc')
             ->when($eventType === EventType::History, fn ($q) => $q->limit(self::HISTORY_EVENTS_LIMIT))
             ->get();
 

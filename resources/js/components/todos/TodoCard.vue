@@ -90,7 +90,7 @@ function handleFinish(event: MouseEvent) {
             >
                 <div class="min-w-0 flex-1 pr-4">
                     <h3
-                        class="truncate font-bold transition-all duration-300"
+                        class="font-bold transition-all duration-300"
                         :class="
                             props.todo.is_finished
                                 ? 'line-through decoration-2 opacity-60'

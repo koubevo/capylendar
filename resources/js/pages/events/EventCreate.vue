@@ -6,8 +6,9 @@ import { Capybara } from '@/types/Capybara';
 import type { Event } from '@/types/Event';
 import { EventFormData } from '@/types/EventFormData';
 import { Tag } from '@/types/Tag';
-import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { useForm, usePage, Head } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { useUnsavedChangesWarning } from '@/composables/useUnsavedChangesWarning';
 
 const page = usePage();
 
@@ -40,6 +41,8 @@ function submit() {
         forceFormData: true,
     });
 }
+
+useUnsavedChangesWarning(form);
 </script>
 
 <template>

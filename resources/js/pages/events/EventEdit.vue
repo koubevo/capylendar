@@ -6,7 +6,8 @@ import { Capybara } from '@/types/Capybara';
 import type { Event } from '@/types/Event';
 import { EventFormData } from '@/types/EventFormData';
 import { Tag } from '@/types/Tag';
-import { Head, useForm } from '@inertiajs/vue3';
+import { useForm, Head } from '@inertiajs/vue3';
+import { useUnsavedChangesWarning } from '@/composables/useUnsavedChangesWarning';
 
 const props = defineProps<{
     capybaraOptions: Capybara[];
@@ -33,6 +34,8 @@ function submit() {
         forceFormData: true,
     });
 }
+
+useUnsavedChangesWarning(form);
 </script>
 
 <template>

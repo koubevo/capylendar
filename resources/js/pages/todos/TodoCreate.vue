@@ -6,8 +6,9 @@ import { Capybara } from '@/types/Capybara';
 import { Tag } from '@/types/Tag';
 import type { Todo, TodoPriority } from '@/types/Todo';
 import type { TodoFormData } from '@/types/TodoFormData';
-import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { useForm, usePage, Head } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import { useUnsavedChangesWarning } from '@/composables/useUnsavedChangesWarning';
 
 const page = usePage();
 
@@ -35,6 +36,8 @@ const title = computed(() => {
 function submit() {
     form.post(TodoController.store.url());
 }
+
+useUnsavedChangesWarning(form);
 </script>
 
 <template>

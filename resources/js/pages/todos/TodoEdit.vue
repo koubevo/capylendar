@@ -6,7 +6,8 @@ import { Capybara } from '@/types/Capybara';
 import { Tag } from '@/types/Tag';
 import type { Todo, TodoPriority } from '@/types/Todo';
 import type { TodoFormData } from '@/types/TodoFormData';
-import { Head, useForm } from '@inertiajs/vue3';
+import { useForm, Head } from '@inertiajs/vue3';
+import { useUnsavedChangesWarning } from '@/composables/useUnsavedChangesWarning';
 
 const props = defineProps<{
     capybaraOptions: Capybara[];
@@ -28,6 +29,8 @@ const form = useForm<TodoFormData>({
 function submit() {
     form.put(TodoController.update.url(props.todo));
 }
+
+useUnsavedChangesWarning(form);
 </script>
 
 <template>

@@ -19,7 +19,7 @@ const props = defineProps<{
             <InfoParagraph v-if="props.deadline" label="Deadline" :value="props.deadline" />
             <InfoParagraph v-if="props.description" label="Popis" :value="props.description" :link-classes="props.linkClasses" />
             <InfoParagraph v-if="props.updated_at_human" label="Upraveno" :value="props.updated_at_human" />
-            <InfoParagraph v-else label="Přidáno" :value="props.created_at_human" />
+            <InfoParagraph label="Přidáno" :value="props.created_at_human" />
             <InfoParagraph label="Autor" :value="props.author.name" />
         </div>
     </UCard>

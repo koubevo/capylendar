@@ -59,7 +59,10 @@ describe('EventController store', function () {
                 'capybara' => 'blue',
                 'is_private' => false,
             ])
-            ->assertRedirect(route('dashboard', ['scrollToDate' => $tomorrow]))
+            ->assertRedirect(route('dashboard', [
+                'scrollToDate' => $tomorrow,
+                'highlightEvent' => 2,
+            ]))
             ->assertSessionHas('success');
 
         $this->assertDatabaseHas('events', [
@@ -80,7 +83,10 @@ describe('EventController store', function () {
                 'capybara' => 'pink',
                 'is_private' => false,
             ])
-            ->assertRedirect(route('dashboard', ['scrollToDate' => $tomorrow]));
+            ->assertRedirect(route('dashboard', [
+                'scrollToDate' => $tomorrow,
+                'highlightEvent' => 2,
+            ]));
 
         $this->assertDatabaseHas('events', [
             'title' => 'All Day Event',
@@ -101,7 +107,10 @@ describe('EventController store', function () {
                 'capybara' => 'blue',
                 'is_private' => true,
             ])
-            ->assertRedirect(route('dashboard', ['scrollToDate' => $tomorrow]));
+            ->assertRedirect(route('dashboard', [
+                'scrollToDate' => $tomorrow,
+                'highlightEvent' => 2,
+            ]));
 
         $event = Event::where('title', 'Private Event')->first();
         expect($event->subscribers)->toHaveCount(1);
@@ -122,7 +131,10 @@ describe('EventController store', function () {
                 'is_private' => false,
                 'tags' => [$tag->id],
             ])
-            ->assertRedirect(route('dashboard', ['scrollToDate' => $tomorrow]));
+            ->assertRedirect(route('dashboard', [
+                'scrollToDate' => $tomorrow,
+                'highlightEvent' => 2,
+            ]));
 
         $event = Event::where('title', 'Tagged Event')->first();
         expect($event->tags)->toHaveCount(1);

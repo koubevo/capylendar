@@ -56,8 +56,10 @@ class EventController extends Controller
             return back()->withErrors(['error' => 'Nepodařilo se vytvořit event']);
         }
 
-        return to_route('dashboard', ['scrollToDate' => $event->start_at->format('Y-m-d')])
-            ->with('success', 'Event úspěšně přidán');
+        return to_route('dashboard', [
+            'scrollToDate' => $event->start_at->format('Y-m-d'),
+            'highlightEvent' => $event->id,
+        ])->with('success', 'Event úspěšně přidán');
     }
 
     public function edit(Event $event): Response

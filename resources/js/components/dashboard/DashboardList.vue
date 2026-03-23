@@ -21,6 +21,9 @@ interface Props {
     todos: Todo[];
     createIfEmpty?: boolean;
     scrollToDate?: string;
+    highlightEvent?: number;
+    highlightTodo?: number;
+    isScrolled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -125,6 +128,13 @@ const scrollToDateSection = async () => {
     }
 };
 
+const isHighlighted = (item: DashboardItem) => {
+    if (!props.isScrolled) return false;
+    if (item.type === 'event') return props.highlightEvent === item.data.id;
+    if (item.type === 'todo') return props.highlightTodo === item.data.id;
+    return false;
+};
+
 onMounted(() => {
     scrollToDateSection();
 });
@@ -151,13 +161,23 @@ onMounted(() => {
                     <Link
                         v-if="item.type === 'event'"
                         :href="EventController.show(item.data as Event)"
+                        class="block"
                     >
-                        <EventCard :event="item.data as Event" view="list" />
+                        <EventCard
+                            :event="item.data as Event"
+                            view="list"
+                            :class="{ 'card-highlight': isHighlighted(item) }"
+                        />
                     </Link>
-                    <Link v-else :href="TodoController.show(item.data as Todo)">
+                    <Link
+                        v-else
+                        :href="TodoController.show(item.data as Todo)"
+                        class="block"
+                    >
                         <TodoCard
                             :todo="item.data as Todo"
                             :show-finish-button="true"
+                            :class="{ 'card-highlight': isHighlighted(item) }"
                             @toggled="emit('toggled', $event)"
                         />
                     </Link>

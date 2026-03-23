@@ -11,6 +11,9 @@ interface Props {
     todos: Todo[];
     createTodoIfEmpty?: boolean;
     showFinishButton?: boolean;
+    scrollToDate?: string;
+    highlightTodo?: number;
+    isScrolled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -64,6 +67,11 @@ const groupedTodos = computed(() => {
                         <TodoCard
                             :todo="todo"
                             :show-finish-button="props.showFinishButton"
+                            :class="{
+                                'card-highlight':
+                                    props.isScrolled &&
+                                    props.highlightTodo === todo.id,
+                            }"
                             @toggled="emit('toggled', $event)"
                         />
                     </Link>

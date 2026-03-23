@@ -67,7 +67,8 @@ class TodoController extends Controller
             return back()->withErrors(['error' => 'Nepodařilo se vytvořit todo']);
         }
 
-        return to_route('dashboard')->with('success', 'Todo úspěšně přidáno');
+        return to_route('dashboard', ['scrollToDate' => $todo->deadline->format('Y-m-d')])
+            ->with('success', 'Todo úspěšně přidáno');
     }
 
     public function edit(Todo $todo): Response

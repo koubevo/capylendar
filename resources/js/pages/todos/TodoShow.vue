@@ -39,6 +39,7 @@ function handleToggled() {
             />
             <InfoCard
                 :author="props.todo.author"
+                :deadline="props.todo.deadline.label"
                 :created_at_human="props.todo.created_at_human"
                 :updated_at_human="props.todo.updated_at_human"
                 :description="props.todo.description_without_meta"

@@ -82,4 +82,61 @@
         background-repeat: repeat;
         background-position: center;
     }
+
+    @property --border-angle {
+        syntax: '<angle>';
+        inherits: true;
+        initial-value: 0turn;
+    }
+
+    @keyframes border-angle-spin {
+        to {
+            --border-angle: 1turn;
+        }
+    }
+
+    @keyframes highlight-fade {
+        0%,
+        100% {
+            opacity: 0;
+        }
+        10%,
+        90% {
+            opacity: 1;
+        }
+    }
+
+    .card-highlight {
+        position: relative;
+    }
+
+    .card-highlight::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        border: 2px solid transparent;
+        background: conic-gradient(
+                from var(--border-angle),
+                transparent 20%,
+                var(--color-pink-400, #f472b6) 70%,
+                var(--color-pink-500, #ec4899) 85%,
+                transparent 100%
+            )
+            border-box;
+        -webkit-mask:
+            linear-gradient(#fff 0 0) padding-box,
+            linear-gradient(#fff 0 0) border-box;
+        mask:
+            linear-gradient(#fff 0 0) padding-box,
+            linear-gradient(#fff 0 0) border-box;
+        -webkit-mask-composite: destination-out;
+        mask-composite: exclude;
+        pointer-events: none;
+        z-index: 10;
+        opacity: 0;
+        animation:
+            border-angle-spin 2.5s linear infinite,
+            highlight-fade 5s ease-in-out forwards;
+    }
 }

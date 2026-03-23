@@ -73,7 +73,10 @@ describe('TodoController store', function () {
                 'is_private' => false,
                 'description' => 'Todo description',
             ])
-            ->assertRedirect(route('dashboard', ['scrollToDate' => '2026-03-01']));
+            ->assertRedirect(route('dashboard', [
+                'scrollToDate' => '2026-03-01',
+                'highlightTodo' => 1,
+            ]));
 
         $this->assertDatabaseHas('todos', [
             'title' => 'Test Todo',

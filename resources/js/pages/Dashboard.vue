@@ -20,6 +20,8 @@ interface Props {
     capybaraOptions: Capybara[];
     availableTags: Tag[];
     scrollToDate?: string;
+    highlightEvent?: number;
+    highlightTodo?: number;
 }
 
 const props = defineProps<Props>();
@@ -33,10 +35,15 @@ const handleFilterChange = (newFilters: typeof props.eventFilters) => {
     });
 };
 
-const clearScrollToDate = () => {
-    if (props.scrollToDate) {
+const isScrolled = ref(false);
+
+const handleScrollFinished = () => {
+    isScrolled.value = true;
+    if (props.scrollToDate || props.highlightEvent || props.highlightTodo) {
         const url = new URL(window.location.href);
         url.searchParams.delete('scrollToDate');
+        url.searchParams.delete('highlightEvent');
+        url.searchParams.delete('highlightTodo');
         window.history.replaceState({}, '', url.toString());
     }
 };
@@ -114,7 +121,10 @@ function handleToggled(todoId: number) {
                     :todos="localTodos"
                     :create-if-empty="true"
                     :scroll-to-date="props.scrollToDate"
-                    @scrolled="clearScrollToDate"
+                    :highlight-event="props.highlightEvent"
+                    :highlight-todo="props.highlightTodo"
+                    :is-scrolled="isScrolled"
+                    @scrolled="handleScrollFinished"
                     @toggled="handleToggled"
                 />
             </template>
@@ -125,7 +135,9 @@ function handleToggled(todoId: number) {
                     :events="props.upcomingEvents"
                     :create-event-if-empty="true"
                     :scroll-to-date="props.scrollToDate"
-                    @scrolled="clearScrollToDate"
+                    :highlight-event="props.highlightEvent"
+                    :is-scrolled="isScrolled"
+                    @scrolled="handleScrollFinished"
                 />
             </template>
 
@@ -135,6 +147,10 @@ function handleToggled(todoId: number) {
                     :todos="localTodos"
                     :create-todo-if-empty="true"
                     :show-finish-button="true"
+                    :scroll-to-date="props.scrollToDate"
+                    :highlight-todo="props.highlightTodo"
+                    :is-scrolled="isScrolled"
+                    @scrolled="handleScrollFinished"
                     @toggled="handleToggled"
                 />
             </template>

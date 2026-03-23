@@ -17,6 +17,8 @@ interface Props {
     events: Event[];
     createEventIfEmpty?: boolean;
     scrollToDate?: string;
+    highlightEvent?: number;
+    isScrolled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -104,7 +106,15 @@ onMounted(() => {
                     v-for="event in events"
                     :key="event.id"
                 >
-                    <EventCard :event="event" />
+                    <EventCard
+                        :event="event"
+                        view="list"
+                        :class="{
+                            'card-highlight':
+                                props.isScrolled &&
+                                props.highlightEvent === event.id,
+                        }"
+                    />
                 </Link>
             </div>
         </section>

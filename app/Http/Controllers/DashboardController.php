@@ -28,6 +28,8 @@ class DashboardController extends Controller
             'capybaraOptions' => Capybara::options(),
             'availableTags' => $this->tagService->getAvailableTags(),
             'scrollToDate' => $request->query('scrollToDate'),
+            'highlightEvent' => $request->query('highlightEvent') ? (int) $request->query('highlightEvent') : null,
+            'highlightTodo' => $request->query('highlightTodo') ? (int) $request->query('highlightTodo') : null,
         ]);
     }
 

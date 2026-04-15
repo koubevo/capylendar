@@ -18,17 +18,21 @@ async function handleShare(): Promise<void> {
         return;
     }
 
+    const url = new URL(props.shareUrl, window.location.origin).href;
+
     if (navigator.share) {
         try {
-            await navigator.share({ url: props.shareUrl });
-        } catch {
-            // User cancelled the share sheet
+            await navigator.share({ url });
+            return;
+        } catch (error: unknown) {
+            if (error instanceof DOMException && error.name === 'AbortError') {
+                return;
+            }
         }
-        return;
     }
 
     try {
-        await navigator.clipboard.writeText(props.shareUrl);
+        await navigator.clipboard.writeText(url);
         toast.add({
             title: 'Odkaz zkopírován',
             description: 'Odkaz byl zkopírován do schránky.',
@@ -71,6 +75,8 @@ async function handleShare(): Promise<void> {
             </ActionModal>
             <button
                 v-if="props.shareUrl"
+                type="button"
+                aria-label="Sdílet"
                 class="cursor-pointer"
                 @click="handleShare"
             >

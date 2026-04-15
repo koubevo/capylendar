@@ -57,6 +57,7 @@ const props = defineProps<{
                     title: 'Smazat event',
                     titleShort: 'Smazat',
                 }"
+                :share-url="EventController.show.url(props.event)"
                 :class="props.event.capybara.classes"
             >
                 <template #event-modal-body>

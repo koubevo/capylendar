@@ -7,8 +7,43 @@ const props = defineProps<{
     duplicateAction?: DuplicateAction;
     editAction?: EditAction;
     deleteAction?: Action;
+    shareUrl?: string;
     class: string;
 }>();
+
+const toast = useToast();
+
+async function handleShare(): Promise<void> {
+    if (!props.shareUrl) {
+        return;
+    }
+
+    if (navigator.share) {
+        try {
+            await navigator.share({ url: props.shareUrl });
+        } catch {
+            // User cancelled the share sheet
+        }
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(props.shareUrl);
+        toast.add({
+            title: 'Odkaz zkopírován',
+            description: 'Odkaz byl zkopírován do schránky.',
+            color: 'primary',
+            icon: 'i-lucide-check-circle',
+        });
+    } catch {
+        toast.add({
+            title: 'Chyba',
+            description: 'Nepodařilo se zkopírovat odkaz.',
+            color: 'error',
+            icon: 'i-lucide-alert-circle',
+        });
+    }
+}
 </script>
 
 <template>
@@ -34,6 +69,13 @@ const props = defineProps<{
                     <slot name="event-modal-body" />
                 </template>
             </ActionModal>
+            <button
+                v-if="props.shareUrl"
+                class="cursor-pointer"
+                @click="handleShare"
+            >
+                <UIcon name="i-lucide-share-2" class="size-6" />
+            </button>
         </div>
     </UCard>
 </template>

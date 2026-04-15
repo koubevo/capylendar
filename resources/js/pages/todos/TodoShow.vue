@@ -67,6 +67,7 @@ function handleToggled() {
                     title: 'Smazat todo',
                     titleShort: 'Smazat',
                 }"
+                :share-url="TodoController.show.url(props.todo)"
                 :class="props.todo.capybara.classes"
             >
                 <template #event-modal-body>

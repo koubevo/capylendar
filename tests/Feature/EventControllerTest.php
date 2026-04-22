@@ -258,7 +258,10 @@ describe('EventController update', function () {
                 'is_all_day' => false,
                 'capybara' => 'yellow',
             ])
-            ->assertRedirect(route('event.show', $this->event))
+            ->assertRedirect(route('dashboard', [
+                'scrollToDate' => now()->addDay()->format('Y-m-d'),
+                'highlightEvent' => $this->event->id,
+            ]))
             ->assertSessionHas('success');
 
         $this->assertDatabaseHas('events', [

@@ -79,7 +79,12 @@ class EventController extends Controller
 
         $this->eventService->update($event, $request);
 
-        return to_route('event.show', $event)->with('success', 'Event úspěšně aktualizován');
+        $event->refresh();
+
+        return to_route('dashboard', [
+            'scrollToDate' => $event->start_at->format('Y-m-d'),
+            'highlightEvent' => $event->id,
+        ])->with('success', 'Event úspěšně aktualizován');
     }
 
     public function destroy(Event $event): RedirectResponse

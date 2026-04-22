@@ -262,7 +262,10 @@ describe('TodoController update', function () {
                 'priority' => Priority::High->value,
                 'is_private' => false,
             ])
-            ->assertRedirect(route('todo.show', $todo));
+            ->assertRedirect(route('dashboard', [
+                'scrollToDate' => '2026-04-01',
+                'highlightTodo' => $todo->id,
+            ]));
 
         $todo->refresh();
         expect($todo->title)->toBe('Updated Title');

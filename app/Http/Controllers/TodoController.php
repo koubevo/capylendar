@@ -93,7 +93,12 @@ class TodoController extends Controller
 
         $this->todoService->update($todo, $request);
 
-        return to_route('todo.show', $todo)->with('success', 'Todo úspěšně aktualizováno');
+        $todo->refresh();
+
+        return to_route('dashboard', [
+            'scrollToDate' => $todo->deadline->format('Y-m-d'),
+            'highlightTodo' => $todo->id,
+        ])->with('success', 'Todo úspěšně aktualizováno');
     }
 
     public function destroy(Todo $todo): RedirectResponse

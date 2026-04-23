@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import EventController from '@/actions/App/Http/Controllers/EventController';
 import TodoController from '@/actions/App/Http/Controllers/TodoController';
+import NeutralButton from '@/components/buttons/NeutralButton.vue';
+import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import EventCard from '@/components/events/EventCard.vue';
 import Nothing from '@/components/Nothing.vue';
 import TodoCard from '@/components/todos/TodoCard.vue';
 import type { Event } from '@/types/Event';
 import type { Todo } from '@/types/Todo';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import {
     type ComponentPublicInstance,
     computed,
     nextTick,
     onMounted,
     ref,
+    watch,
 } from 'vue';
 
 interface Props {
@@ -135,9 +138,40 @@ const isHighlighted = (item: DashboardItem) => {
     return false;
 };
 
+const hasTodosInGroup = (items: DashboardItem[]) => {
+    return items.some(
+        (item) => item.type === 'todo' && !(item.data as Todo).is_finished,
+    );
+};
+
+const postponingDate = ref<string | null>(null);
+
+const handlePostponeByDate = (dateKey: string, close: () => void) => {
+    postponingDate.value = dateKey;
+    router.post(
+        TodoController.postponeByDate.url(),
+        { date: dateKey },
+        {
+            onSuccess: () => close(),
+            onFinish: () => {
+                postponingDate.value = null;
+            },
+        },
+    );
+};
+
 onMounted(() => {
     scrollToDateSection();
 });
+
+watch(
+    () => props.scrollToDate,
+    (newVal) => {
+        if (newVal) {
+            scrollToDateSection();
+        }
+    },
+);
 </script>
 
 <template>
@@ -149,9 +183,45 @@ onMounted(() => {
             :key="dateKey"
             :ref="(el) => setDateSectionRef(el, dateKey as string)"
         >
-            <h3 class="lowercase">
-                {{ items[0].dateLabel }}
-            </h3>
+            <div class="flex items-center justify-between">
+                <h3 class="lowercase">
+                    {{ items[0].dateLabel }}
+                </h3>
+                <UModal
+                    v-if="hasTodosInGroup(items)"
+                    title="Přesunout todos"
+                    :ui="{ footer: 'justify-end', title: 'm-0' }"
+                >
+                    <button
+                        type="button"
+                        aria-label="Přesunout todos na další den"
+                        class="flex cursor-pointer items-center gap-1 rounded-md px-1.5 py-0.5 text-xs text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                    >
+                        <UIcon name="i-lucide-arrow-right" class="size-3" />
+                    </button>
+
+                    <template #body>
+                        <p>
+                            Opravdu chceš přesunout všechna todos z
+                            <strong class="lowercase">{{
+                                items[0].dateLabel
+                            }}</strong>
+                            na další den?
+                        </p>
+                    </template>
+
+                    <template #footer="{ close }">
+                        <NeutralButton label="Zrušit" @click="close" />
+                        <PrimaryButton
+                            label="Přesunout"
+                            :loading="postponingDate === (dateKey as string)"
+                            @click="
+                                handlePostponeByDate(dateKey as string, close)
+                            "
+                        />
+                    </template>
+                </UModal>
+            </div>
 
             <div class="grid grid-cols-1 gap-4">
                 <template

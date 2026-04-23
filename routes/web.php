@@ -38,6 +38,7 @@ Route::middleware(['auth'])->group(function () {
         ->withTrashed();
     Route::post('/todo/{todo}/finish', [TodoController::class, 'finish'])->name('todo.finish');
     Route::post('/todo/{todo}/postpone', [TodoController::class, 'postpone'])->name('todo.postpone');
+    Route::post('/todo/postpone-by-date', [TodoController::class, 'postponeByDate'])->name('todo.postponeByDate');
 
     Route::resource('/todo', TodoController::class)
         ->only(['index', 'create', 'store', 'edit', 'update', 'destroy', 'show']);

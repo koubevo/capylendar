@@ -361,6 +361,66 @@ describe('TodoController postpone', function () {
     });
 });
 
+describe('TodoController postponeByDate', function () {
+    it('postpones all unfinished todos for a given date', function () {
+        $user = User::factory()->create();
+        $todo1 = Todo::factory()->create(['author_id' => $user->id, 'deadline' => '2026-04-23']);
+        $todo1->subscribers()->attach($user);
+        $todo2 = Todo::factory()->create(['author_id' => $user->id, 'deadline' => '2026-04-23']);
+        $todo2->subscribers()->attach($user);
+
+        $this->actingAs($user)
+            ->post(route('todo.postponeByDate'), ['date' => '2026-04-23'])
+            ->assertRedirect(route('dashboard', ['scrollToDate' => '2026-04-24']));
+
+        $todo1->refresh();
+        $todo2->refresh();
+        expect($todo1->deadline->format('Y-m-d'))->toBe('2026-04-24');
+        expect($todo2->deadline->format('Y-m-d'))->toBe('2026-04-24');
+    });
+
+    it('does not postpone finished todos', function () {
+        $user = User::factory()->create();
+        $finished = Todo::factory()->create([
+            'author_id' => $user->id,
+            'deadline' => '2026-04-23',
+            'finished_at' => now(),
+        ]);
+        $finished->subscribers()->attach($user);
+
+        $this->actingAs($user)
+            ->post(route('todo.postponeByDate'), ['date' => '2026-04-23']);
+
+        $finished->refresh();
+        expect($finished->deadline->format('Y-m-d'))->toBe('2026-04-23');
+    });
+
+    it('does not postpone todos from other dates', function () {
+        $user = User::factory()->create();
+        $otherDate = Todo::factory()->create(['author_id' => $user->id, 'deadline' => '2026-04-25']);
+        $otherDate->subscribers()->attach($user);
+
+        $this->actingAs($user)
+            ->post(route('todo.postponeByDate'), ['date' => '2026-04-23']);
+
+        $otherDate->refresh();
+        expect($otherDate->deadline->format('Y-m-d'))->toBe('2026-04-25');
+    });
+
+    it('requires date parameter', function () {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->post(route('todo.postponeByDate'), [])
+            ->assertSessionHasErrors('date');
+    });
+
+    it('requires authentication', function () {
+        $this->post(route('todo.postponeByDate'), ['date' => '2026-04-23'])
+            ->assertRedirect(route('login'));
+    });
+});
+
 describe('TodoController deletedIndex', function () {
     it('shows deleted todos index page', function () {
         $user = User::factory()->create();

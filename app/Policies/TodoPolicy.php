@@ -40,6 +40,14 @@ class TodoPolicy
     }
 
     /**
+     * Determine whether the user can postpone the model.
+     */
+    public function postpone(User $user, Todo $todo): bool
+    {
+        return $this->isSubscriber($user, $todo);
+    }
+
+    /**
      * Determine whether the user can restore the model.
      */
     public function restore(User $user, Todo $todo): bool

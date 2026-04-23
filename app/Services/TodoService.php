@@ -93,6 +93,20 @@ class TodoService
         return $todo;
     }
 
+    public function postponeByDate(User $user, Carbon $date): int
+    {
+        $todos = $user->assignedTodos()
+            ->whereNull('finished_at')
+            ->whereDate('deadline', $date)
+            ->get();
+
+        foreach ($todos as $todo) {
+            $todo->update(['deadline' => $date->copy()->addDay()]);
+        }
+
+        return $todos->count();
+    }
+
     /**
      * @param  array<string, string>|null  $filters
      * @return array<TodoResource>

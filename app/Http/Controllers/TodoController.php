@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Enums\Capybara;
 use App\Enums\Priority;
+use App\Http\Requests\Todo\PostponeTodosByDateRequest;
 use App\Http\Requests\Todo\StoreTodoRequest;
 use App\Http\Requests\Todo\UpdateTodoRequest;
 use App\Http\Resources\TodoResource;
 use App\Models\Todo;
 use App\Services\TagService;
 use App\Services\TodoService;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -137,6 +139,23 @@ class TodoController extends Controller
             'scrollToDate' => $todo->deadline->format('Y-m-d'),
             'highlightTodo' => $todo->id,
         ])->with('success', 'Todo přesunuto na další den');
+    }
+
+    public function postponeByDate(PostponeTodosByDateRequest $request): RedirectResponse
+    {
+        $date = Carbon::parse($request->string('date'));
+        $nextDate = $date->copy()->addDay();
+
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+        $count = $this->todoService->postponeByDate($user, $date);
+
+        return to_route('dashboard', [
+            'scrollToDate' => $nextDate->format('Y-m-d'),
+        ])->with('success', $count > 0
+            ? "Přesunuto {$count} ".($count === 1 ? 'todo' : 'todos').' na další den'
+            : 'Žádné todos k přesunutí'
+        );
     }
 
     public function deletedIndex(): Response

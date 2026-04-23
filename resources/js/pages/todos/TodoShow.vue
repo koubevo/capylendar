@@ -61,6 +61,9 @@ function handleToggled() {
                         },
                     }).url,
                 }"
+                :postpone-action="{
+                    url: TodoController.postpone.url(props.todo),
+                }"
                 :edit-action="{ url: TodoController.edit.url(props.todo) }"
                 :delete-action="{
                     url: TodoController.destroy.url(props.todo),

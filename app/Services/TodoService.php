@@ -86,6 +86,13 @@ class TodoService
         return $todo;
     }
 
+    public function postpone(Todo $todo): Todo
+    {
+        $todo->update(['deadline' => $todo->deadline->addDay()]);
+
+        return $todo;
+    }
+
     /**
      * @param  array<string, string>|null  $filters
      * @return array<TodoResource>

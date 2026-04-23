@@ -125,6 +125,20 @@ class TodoController extends Controller
         return back()->with('success', 'Todo splněno!');
     }
 
+    public function postpone(Todo $todo): RedirectResponse
+    {
+        Gate::authorize('postpone', $todo);
+
+        $this->todoService->postpone($todo);
+
+        $todo->refresh();
+
+        return to_route('dashboard', [
+            'scrollToDate' => $todo->deadline->format('Y-m-d'),
+            'highlightTodo' => $todo->id,
+        ])->with('success', 'Todo přesunuto na další den');
+    }
+
     public function deletedIndex(): Response
     {
         $user = auth()->user();

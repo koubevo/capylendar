@@ -5,6 +5,7 @@ import { Link } from '@inertiajs/vue3';
 
 const props = defineProps<{
     duplicateAction?: DuplicateAction;
+    postponeAction?: { url: string };
     editAction?: EditAction;
     deleteAction?: Action;
     shareUrl?: string;
@@ -61,6 +62,16 @@ async function handleShare(): Promise<void> {
                     :name="props.duplicateAction.icon ?? 'i-lucide-copy-plus'"
                     class="size-6"
                 />
+            </Link>
+            <Link
+                v-if="props.postponeAction"
+                :href="props.postponeAction.url"
+                method="post"
+                as="button"
+                aria-label="Přesunout na další den"
+                class="cursor-pointer"
+            >
+                <UIcon name="i-lucide-calendar-arrow-down" class="size-6" />
             </Link>
             <Link v-if="props.editAction" :href="props.editAction.url">
                 <UIcon

@@ -336,6 +336,31 @@ describe('TodoController finish', function () {
     });
 });
 
+describe('TodoController postpone', function () {
+    it('postpones a todo to the next day', function () {
+        [$user, $todo] = createUserWithTodo(['deadline' => '2026-04-23']);
+
+        $this->actingAs($user)
+            ->post(route('todo.postpone', $todo))
+            ->assertRedirect(route('dashboard', [
+                'scrollToDate' => '2026-04-24',
+                'highlightTodo' => $todo->id,
+            ]));
+
+        $todo->refresh();
+        expect($todo->deadline->format('Y-m-d'))->toBe('2026-04-24');
+    });
+
+    it('forbids non-subscriber from postponing', function () {
+        [, $todo] = createUserWithTodo();
+        $otherUser = User::factory()->create();
+
+        $this->actingAs($otherUser)
+            ->post(route('todo.postpone', $todo))
+            ->assertForbidden();
+    });
+});
+
 describe('TodoController deletedIndex', function () {
     it('shows deleted todos index page', function () {
         $user = User::factory()->create();

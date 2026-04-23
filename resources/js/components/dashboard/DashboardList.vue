@@ -139,7 +139,9 @@ const isHighlighted = (item: DashboardItem) => {
 };
 
 const hasTodosInGroup = (items: DashboardItem[]) => {
-    return items.some((item) => item.type === 'todo' && !(item.data as Todo).is_finished);
+    return items.some(
+        (item) => item.type === 'todo' && !(item.data as Todo).is_finished,
+    );
 };
 
 const postponingDate = ref<string | null>(null);

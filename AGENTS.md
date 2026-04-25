@@ -35,6 +35,7 @@ This application is a Laravel application and its main Laravel ecosystems packag
 
 ## Verification Scripts
 - Do not create verification scripts or tinker when tests cover that functionality and prove it works. Unit and feature tests are more important.
+- After finishing all code changes, you **must** run `vendor/bin/sail composer check` to verify nothing is broken. This command runs PHPStan, code formatting, Pint, and the full test suite. All checks must pass before considering the task complete.
 
 ## Application Structure & Architecture
 - Stick to existing directory structure - don't create new base folders without approval.

@@ -3,7 +3,7 @@
 **Capylendar** is a modern, shared calendar application built on **Laravel 12** and **Vue 3**, focusing on simplicity,
 speed, and... capybaras. 🦦
 
-The app is designed primarily for sharing events between users (e.g., couples), featuring private notes and color-coded
+The app is designed primarily for sharing events and tasks (todos) between users (e.g., couples), featuring private notes and color-coded
 themes (based on "Capybaras").
 
 ---
@@ -25,9 +25,13 @@ The project utilizes the latest standards in modern PHP and JavaScript developme
 
 ## ✨ Key Features
 
-- **Shared vs. Private Events:**
-    - Users can create events visible to all assigned users (via `event_user` Pivot table).
+- **Shared vs. Private Items:**
+    - Users can create events and todos visible to all assigned users.
     - Option to toggle "Private" mode (visible only to the author).
+- **Todos (Tasks):**
+    - Create tasks with specific deadlines.
+    - **Batch Postpone:** Move all unfinished todos to the next day with a single click.
+    - Intelligent sorting by priority and title.
 - **Capybara Themes:**
     - Events are categorized using the `Capybara` Enum (Blue, Pink, Yellow).
     - Each category has its own color scheme and avatar.
@@ -42,6 +46,8 @@ The project utilizes the latest standards in modern PHP and JavaScript developme
       subtle heart pattern to the event card background.
     - 📝 **Duplication:** Create a copy of an event with pre-filled data in one click.
     - 🕒 **Human Readable Dates:** Creation and update times are formatted as "5 minutes ago".
+    - 🚀 **Animations & UI:** Newly created or updated items are highlighted with a smooth animation.
+    - 🔗 **Native Sharing:** Easily share events and todos via the native share menu on mobile devices.
 
 ---
 

@@ -6,11 +6,11 @@ use Illuminate\Support\Collection;
 
 enum Priority: string
 {
-    case Low = 'low';
+    case High = 'high';
 
     case Medium = 'medium';
 
-    case High = 'high';
+    case Low = 'low';
 
     public function label(): string
     {

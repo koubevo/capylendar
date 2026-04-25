@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import DashboardList from '@/components/dashboard/DashboardList.vue';
 import EventsList from '@/components/events/EventsList.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import GuestLayout from '@/layouts/app/GuestLayout.vue';
+import type { Todo } from '@/types/Todo';
 import { usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 const githubUrl = 'https://github.com/koubevo/capylendar';
 const linkedinUrl = 'https://linkedin.com/in/koubevo';
@@ -59,8 +62,8 @@ const items = [
 
 const features = [
     {
-        name: 'Sdílený kalendář',
-        desc: 'Eventy vidíte oba. Barevně odlišené podle partnera.',
+        name: 'Sdílený kalendář a úkoly',
+        desc: 'Události i úkoly (todos) vidíte oba. Plánujte společně s lehkostí.',
         icon: 'i-lucide-calendar-days',
     },
     {
@@ -69,8 +72,18 @@ const features = [
         icon: 'i-lucide-bell-ring',
     },
     {
+        name: 'Chytrá správa úkolů',
+        desc: 'Hromadné přesouvání nesplněných úkolů na další den a řazení dle priorit.',
+        icon: 'i-lucide-check-square',
+    },
+    {
+        name: 'Plynulé rozhraní',
+        desc: 'Poutavé animace, nativní sdílení na mobilu a chytré upozornění na neuložené změny.',
+        icon: 'i-lucide-sparkles',
+    },
+    {
         name: 'Vlastní tagy',
-        desc: 'Kategorizujte eventy podle typu a důležitosti.',
+        desc: 'Kategorizujte záznamy podle typu a důležitosti.',
         icon: 'i-lucide-tags',
     },
     {
@@ -199,6 +212,53 @@ const upcomingEvents = [
     },
 ];
 
+const upcomingTodos = ref<Todo[]>([
+    {
+        id: 1,
+        title: 'Nezapomenout koupit letenky!',
+        is_finished: false,
+        priority: {
+            value: 'high',
+            label: 'Vysoká',
+            icon: 'i-lucide-arrow-up',
+            border_class: 'border-red-500',
+            icon_color: 'text-red-500',
+            checkbox_color: 'text-red-500',
+        },
+        deadline: {
+            key: new Date().toISOString().split('T')[0],
+            label: 'dnes',
+            start_time: '',
+            is_all_day: true,
+        },
+        capybara: {
+            value: 'blue',
+            label: 'John',
+            classes: 'bg-blue-100 md:bg-blue-50 hover:bg-blue-100',
+            link_classes: 'text-blue-500 hover:text-blue-600',
+            avatar: {
+                src: '/images/capys/blue.jpg',
+                alt: 'Blue',
+            },
+        },
+        is_private: false,
+        has_hearts: false,
+        has_map_meta: false,
+        created_at_human: 'dnes',
+        author: {
+            capybara: 'blue',
+            id: 3,
+            name: 'John',
+        },
+    } as Todo,
+]);
+
+const handleToggled = (id: number) => {
+    upcomingTodos.value = upcomingTodos.value.map((t) =>
+        t.id === id ? { ...t, is_finished: !t.is_finished } : t,
+    );
+};
+
 const historyEvents = [];
 </script>
 
@@ -309,10 +369,12 @@ const historyEvents = [];
                         >
                             <UTabs :items="items">
                                 <template #upcoming>
-                                    <EventsList
+                                    <DashboardList
                                         heading="Nadcházející"
-                                        :events="upcomingEvents"
-                                        :create-event-if-empty="true"
+                                        :events="upcomingEvents as any"
+                                        :todos="upcomingTodos as any"
+                                        :create-if-empty="true"
+                                        @toggled="handleToggled"
                                     />
                                 </template>
 
@@ -344,7 +406,7 @@ const historyEvents = [];
                         </p>
                     </div>
 
-                    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         <div
                             v-for="feature in features"
                             :key="feature.name"

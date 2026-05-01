@@ -3,7 +3,7 @@
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import TagSelectMenu from '@/components/tags/TagSelectMenu.vue';
 import MacroAlert from '@/components/ui/MacroAlert.vue';
-import { hasGoogleMapUrl } from '@/lib/utils';
+import { getTodayDateString, hasGoogleMapUrl } from '@/lib/utils';
 import { Capybara } from '@/types/Capybara';
 import type { EventFormData } from '@/types/EventFormData';
 import { Tag } from '@/types/Tag';
@@ -126,7 +126,18 @@ onUnmounted(() => revokePreview());
                 :error="props.form.errors.start_at"
                 required
             >
-                <UInput v-model="props.form.date" type="date" class="w-full" />
+                <div class="flex items-stretch gap-2">
+                    <UInput v-model="props.form.date" type="date" class="w-full" />
+                    <UButton
+                        type="button"
+                        color="neutral"
+                        variant="outline"
+                        icon="i-lucide-calendar-check"
+                        @click="props.form.date = getTodayDateString()"
+                    >
+                        Dnes
+                    </UButton>
+                </div>
             </UFormField>
 
             <USwitch

@@ -3,7 +3,7 @@
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import TagSelectMenu from '@/components/tags/TagSelectMenu.vue';
 import MacroAlert from '@/components/ui/MacroAlert.vue';
-import { hasGoogleMapUrl } from '@/lib/utils';
+import { getTodayDateString, hasGoogleMapUrl } from '@/lib/utils';
 import { Capybara } from '@/types/Capybara';
 import { Tag } from '@/types/Tag';
 import type { TodoPriority } from '@/types/Todo';
@@ -79,11 +79,22 @@ const emit = defineEmits<{
                 :error="props.form.errors.deadline"
                 required
             >
-                <UInput
-                    v-model="props.form.deadline"
-                    type="date"
-                    class="w-full"
-                />
+                <div class="flex items-stretch gap-2">
+                    <UInput
+                        v-model="props.form.deadline"
+                        type="date"
+                        class="w-full"
+                    />
+                    <UButton
+                        type="button"
+                        color="neutral"
+                        variant="outline"
+                        icon="i-lucide-calendar-check"
+                        @click="props.form.deadline = getTodayDateString()"
+                    >
+                        Dnes
+                    </UButton>
+                </div>
             </UFormField>
 
             <UFormField

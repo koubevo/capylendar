@@ -24,3 +24,12 @@ export function hasGoogleMapUrl(text: string | null | undefined): boolean {
     if (!text) return false;
     return GOOGLE_MAPS_REGEX.test(text);
 }
+
+export function getTodayDateString(): string {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}

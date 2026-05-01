@@ -127,7 +127,11 @@ onUnmounted(() => revokePreview());
                 required
             >
                 <div class="flex items-stretch gap-2">
-                    <UInput v-model="props.form.date" type="date" class="w-full" />
+                    <UInput
+                        v-model="props.form.date"
+                        type="date"
+                        class="w-full"
+                    />
                     <UButton
                         type="button"
                         color="neutral"

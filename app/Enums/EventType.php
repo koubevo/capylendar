@@ -8,6 +8,9 @@ enum EventType: string
 
     case History = 'history';
 
+    /**
+     * @return 'asc'|'desc'
+     */
     public function sortDirection(): string
     {
         return match ($this) {

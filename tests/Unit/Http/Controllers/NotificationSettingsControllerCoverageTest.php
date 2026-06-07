@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Settings\NotificationSettingsController;
 use Illuminate\Http\Request;
+use Illuminate\Session\NullSessionHandler;
+use Illuminate\Session\Store;
 use Illuminate\Support\Facades\Session;
 
 describe('NotificationSettingsController Coverage', function () {
@@ -17,9 +19,9 @@ describe('NotificationSettingsController Coverage', function () {
         app()->instance('request', $request);
 
         // Session is needed for back()->withErrors()
-        $session = new \Illuminate\Session\Store(
+        $session = new Store(
             'test',
-            new \Illuminate\Session\NullSessionHandler
+            new NullSessionHandler
         );
         $request->setLaravelSession($session);
         app()->instance('session.store', $session);

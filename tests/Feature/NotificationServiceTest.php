@@ -2,6 +2,7 @@
 
 use App\Models\Event;
 use App\Models\User;
+use App\Notifications\DailyEventsNotification;
 use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Notification;
@@ -205,7 +206,7 @@ describe('NotificationService', function () {
 
             $this->service->sendEveningNotifications();
 
-            Notification::assertSentTo($user, App\Notifications\DailyEventsNotification::class);
+            Notification::assertSentTo($user, DailyEventsNotification::class);
         });
     });
 
@@ -254,7 +255,7 @@ describe('NotificationService', function () {
 
             $this->service->sendMorningNotifications();
 
-            Notification::assertSentTo($user, App\Notifications\DailyEventsNotification::class);
+            Notification::assertSentTo($user, DailyEventsNotification::class);
         });
     });
 
@@ -273,7 +274,7 @@ describe('NotificationService', function () {
 
             $this->service->sendDailyNotifications();
 
-            Notification::assertSentTo($user, App\Notifications\DailyEventsNotification::class);
+            Notification::assertSentTo($user, DailyEventsNotification::class);
         });
     });
 

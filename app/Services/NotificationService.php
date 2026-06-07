@@ -192,7 +192,14 @@ class NotificationService
         $eventCount = count($events);
         $title = $titlePrefix.$eventCount.' '.trans_choice('event|eventy|eventů', $eventCount);
 
-        $eventTitles = array_map(fn ($event) => $event['title'], array_slice($events, 0, 3));
+        /** @var array<int, array<string, mixed>> $eventItems */
+        $eventItems = array_slice($events, 0, 3);
+
+        $eventTitles = array_map(function (array $event): string {
+            $title = $event['title'];
+
+            return is_string($title) ? $title : '';
+        }, $eventItems);
         $body = implode(', ', $eventTitles);
 
         if ($eventCount > 3) {

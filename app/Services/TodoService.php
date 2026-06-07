@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Concerns\ResolvesOpenGraphMetadata;
-use App\Enums\Priority;
 use App\Http\Requests\Todo\StoreTodoRequest;
 use App\Http\Requests\Todo\UpdateTodoRequest;
 use App\Http\Resources\TodoResource;
@@ -142,17 +141,32 @@ class TodoService
             }
         }
 
-        $priorityOrderRaw = collect(Priority::cases())
-            ->map(fn ($priority) => sprintf("WHEN '%s' THEN %d", $priority->value, $priority->sortWeight()))
-            ->implode(' ');
-
-        $todos = $query
-            ->orderBy('deadline', $finished ? 'desc' : 'asc')
-            ->orderByRaw('CASE priority '.$priorityOrderRaw.' END')
-            ->orderBy('title', 'asc')
-            ->get();
+        $todos = $query->get()
+            ->sort(fn (Todo $first, Todo $second) => $this->compareTodosForList($first, $second, $finished))
+            ->values();
 
         return TodoResource::collection($todos)->resolve();
+    }
+
+    private function compareTodosForList(Todo $first, Todo $second, bool $finished): int
+    {
+        $deadlineComparison = $first->deadline->getTimestamp() <=> $second->deadline->getTimestamp();
+
+        if ($finished) {
+            $deadlineComparison *= -1;
+        }
+
+        if ($deadlineComparison !== 0) {
+            return $deadlineComparison;
+        }
+
+        $priorityComparison = $first->priority->sortWeight() <=> $second->priority->sortWeight();
+
+        if ($priorityComparison !== 0) {
+            return $priorityComparison;
+        }
+
+        return strnatcasecmp($first->title, $second->title);
     }
 
     /**

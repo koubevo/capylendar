@@ -3,7 +3,7 @@ import { finish } from '@/actions/App/Http/Controllers/TodoController';
 import TagsList from '@/components/tags/TagsList.vue';
 import { isOnlyLinks as checkOnlyLinks } from '@/composables/useLinkify';
 import type { Todo } from '@/types/Todo';
-import axios from 'axios';
+import { router } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 interface Props {
@@ -29,7 +29,7 @@ function handleFinish(event: MouseEvent) {
 
     emit('toggled', props.todo.id);
 
-    axios.post(finish(props.todo).url);
+    router.post(finish(props.todo).url, {}, { preserveScroll: true });
 }
 </script>
 

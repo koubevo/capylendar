@@ -14,7 +14,7 @@
         }
     </style>
 
-    <title inertia>{{ config('app.name', 'Capylendar') }}</title>
+    <title data-inertia>{{ config('app.name', 'Capylendar') }}</title>
 
     <link rel="icon" href="/capicon.png" type="image/png">
     <link rel="apple-touch-icon" href="/capicon.png">

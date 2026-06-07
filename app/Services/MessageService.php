@@ -6,13 +6,14 @@ use App\Http\Requests\StoreMessageRequest;
 use App\Models\Message;
 use App\Models\User;
 use App\Notifications\ChatMessageNotification;
+use Illuminate\Support\Collection;
 
 class MessageService
 {
     /**
-     * @return \Illuminate\Support\Collection<int, array{id: int, content: string, created_at_human: string, user: array{id: int, name: string, capybara: array<string, mixed>}}>
+     * @return Collection<int, array{id: int, content: string, created_at_human: string, user: array{id: int, name: string, capybara: array<string, mixed>}}>
      */
-    public function getMessages(): \Illuminate\Support\Collection
+    public function getMessages(): Collection
     {
         return Message::query()
             ->with('user')

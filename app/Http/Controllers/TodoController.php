@@ -9,6 +9,7 @@ use App\Http\Requests\Todo\StoreTodoRequest;
 use App\Http\Requests\Todo\UpdateTodoRequest;
 use App\Http\Resources\TodoResource;
 use App\Models\Todo;
+use App\Models\User;
 use App\Services\TagService;
 use App\Services\TodoService;
 use Carbon\Carbon;
@@ -146,7 +147,7 @@ class TodoController extends Controller
         $date = Carbon::parse($request->string('date'));
         $nextDate = $date->copy()->addDay();
 
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = $request->user();
         $count = $this->todoService->postponeByDate($user, $date);
 

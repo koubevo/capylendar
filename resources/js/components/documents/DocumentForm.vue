@@ -135,6 +135,44 @@ async function insertHeading(): Promise<void> {
     await focusBody(selectionStart, selectionEnd);
 }
 
+async function continueListOnEnter(event: KeyboardEvent): Promise<void> {
+    const textarea =
+        event.target instanceof HTMLTextAreaElement
+            ? event.target
+            : getTextarea();
+
+    if (!textarea || textarea.selectionStart !== textarea.selectionEnd) {
+        return;
+    }
+
+    const start = textarea.selectionStart;
+    const lineStart = form.body.lastIndexOf('\n', start - 1) + 1;
+    const lineEndIndex = form.body.indexOf('\n', start);
+    const lineEnd = lineEndIndex === -1 ? form.body.length : lineEndIndex;
+    const line = form.body.slice(lineStart, lineEnd);
+    const beforeCaret = form.body.slice(lineStart, start);
+    const bullet = beforeCaret.match(/^(\s*[-*]\s+)/);
+
+    if (!bullet) {
+        return;
+    }
+
+    event.preventDefault();
+
+    if (/^\s*[-*]\s*$/.test(line)) {
+        form.body = form.body.slice(0, lineStart) + form.body.slice(lineEnd);
+        await focusBody(lineStart, lineStart);
+        return;
+    }
+
+    const replacement = `\n${bullet[1]}`;
+
+    form.body =
+        form.body.slice(0, start) + replacement + form.body.slice(start);
+
+    await focusBody(start + replacement.length, start + replacement.length);
+}
+
 function openTablePicker(): void {
     if (tablePickerCloseTimeout) {
         clearTimeout(tablePickerCloseTimeout);
@@ -356,6 +394,7 @@ onUnmounted(() => {
                         @keydown.meta.b.prevent="
                             wrapSelection('**', '**', 'tucny text')
                         "
+                        @keydown.enter="continueListOnEnter"
                     />
                 </div>
             </UFormField>

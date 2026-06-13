@@ -50,6 +50,11 @@ This application is a Laravel application and its main Laravel ecosystems packag
 ## Documentation Files
 - You must only create documentation files if explicitly requested by the user.
 
+## Application Behavior Notes
+- Todo completion is intentionally optimistic. When a user checks a todo, the card should become checked in place and remain visible until the next page refresh so accidental taps can be undone on the same page.
+- The completion request must still use Inertia's router. Use a partial reload that excludes todo props such as `unfinishedTodos`, `finishedTodos`, and `todo`; otherwise the redirected response refreshes the list props and immediately removes the completed todo from the current page.
+- Keep rollback handling for failed, cancelled, HTTP-exception, and network-error visits so the local checked state does not drift from the server when the request does not complete.
+
 
 === boost rules ===
 

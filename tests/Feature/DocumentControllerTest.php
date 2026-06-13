@@ -46,7 +46,7 @@ describe('DocumentController store', function () {
                 'title' => 'Vozovy park',
                 'body' => "| Auto | SPZ |\n| --- | --- |\n| Mazda | 1A2 3456 |",
             ])
-            ->assertRedirect(route('document.show', Document::query()->firstOrFail()));
+            ->assertRedirect(route('document.show', Document::query()->latest('id')->firstOrFail()));
 
         $this->assertDatabaseHas('documents', [
             'author_id' => $user->id,
@@ -78,6 +78,50 @@ describe('DocumentController store', function () {
                 'body' => 'Bez nazvu',
             ])
             ->assertSessionHasErrors('title');
+    });
+});
+
+describe('DocumentController authentication', function () {
+    it('redirects guests from the create page', function () {
+        $this->get(route('document.create'))
+            ->assertRedirect(route('login'));
+    });
+
+    it('redirects guests from storing a document', function () {
+        $this->post(route('document.store'), [
+            'title' => 'Vozovy park',
+            'body' => 'Servisni poznamky',
+        ])->assertRedirect(route('login'));
+    });
+
+    it('redirects guests from viewing a document', function () {
+        $document = Document::factory()->create();
+
+        $this->get(route('document.show', $document))
+            ->assertRedirect(route('login'));
+    });
+
+    it('redirects guests from the edit page', function () {
+        $document = Document::factory()->create();
+
+        $this->get(route('document.edit', $document))
+            ->assertRedirect(route('login'));
+    });
+
+    it('redirects guests from updating a document', function () {
+        $document = Document::factory()->create();
+
+        $this->put(route('document.update', $document), [
+            'title' => 'Vozovy park',
+            'body' => 'Servisni poznamky',
+        ])->assertRedirect(route('login'));
+    });
+
+    it('redirects guests from deleting a document', function () {
+        $document = Document::factory()->create();
+
+        $this->delete(route('document.destroy', $document))
+            ->assertRedirect(route('login'));
     });
 });
 

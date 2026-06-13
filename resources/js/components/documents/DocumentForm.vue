@@ -1,27 +1,56 @@
 <script setup lang="ts">
-/* eslint-disable vue/no-mutating-props */
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import type { DocumentFormData } from '@/types/DocumentFormData';
-import type { InertiaForm } from '@inertiajs/vue3';
-import { Form } from '@inertiajs/vue3';
-import { nextTick, ref, type ComponentPublicInstance } from 'vue';
+import { Form, useForm } from '@inertiajs/vue3';
+import { nextTick, onUnmounted, ref, type ComponentPublicInstance } from 'vue';
 
-const props = defineProps<{
-    form: InertiaForm<DocumentFormData>;
-    isEditMode: boolean;
-}>();
+type SubmitMethod = 'post' | 'put';
 
-const emit = defineEmits<{
-    (e: 'submit'): void;
-}>();
+const props = withDefaults(
+    defineProps<{
+        initialTitle?: string;
+        initialBody?: string;
+        isEditMode: boolean;
+        submitUrl: string;
+        submitMethod?: SubmitMethod;
+    }>(),
+    {
+        initialTitle: '',
+        initialBody: '',
+        submitMethod: 'post',
+    },
+);
+
+const form = useForm<DocumentFormData>({
+    title: props.initialTitle,
+    body: props.initialBody,
+});
 
 const bodyTextarea = ref<ComponentPublicInstance | null>(null);
 const isTablePickerOpen = ref(false);
 const selectedTableRows = ref(2);
 const selectedTableColumns = ref(2);
-const tableRows = [1, 2, 3, 4, 5, 6];
-const tableColumns = [1, 2, 3, 4];
+const minTableSize = 2;
+const maxTableRows = 6;
+const maxTableColumns = 4;
+const tableRows = Array.from(
+    { length: maxTableRows - minTableSize + 1 },
+    (_, index) => minTableSize + index,
+);
+const tableColumns = Array.from(
+    { length: maxTableColumns - minTableSize + 1 },
+    (_, index) => minTableSize + index,
+);
 let tablePickerCloseTimeout: ReturnType<typeof setTimeout> | null = null;
+
+function submit(): void {
+    if (props.submitMethod === 'put') {
+        form.put(props.submitUrl);
+        return;
+    }
+
+    form.post(props.submitUrl);
+}
 
 function getTextarea(): HTMLTextAreaElement | null {
     const element = bodyTextarea.value?.$el;
@@ -64,19 +93,16 @@ async function wrapSelection(
     const textarea = getTextarea();
 
     if (!textarea) {
-        props.form.body += `${prefix}${fallback}${suffix}`;
+        form.body += `${prefix}${fallback}${suffix}`;
         return;
     }
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    const selected = props.form.body.slice(start, end);
+    const selected = form.body.slice(start, end);
     const replacement = `${prefix}${selected || fallback}${suffix}`;
 
-    props.form.body =
-        props.form.body.slice(0, start) +
-        replacement +
-        props.form.body.slice(end);
+    form.body = form.body.slice(0, start) + replacement + form.body.slice(end);
 
     await focusBody(
         start + prefix.length,
@@ -88,22 +114,20 @@ async function insertHeading(): Promise<void> {
     const textarea = getTextarea();
 
     if (!textarea) {
-        props.form.body += '\n## Nadpis';
+        form.body += '\n## Nadpis';
         return;
     }
 
     const start = textarea.selectionStart;
-    const lineStart = props.form.body.lastIndexOf('\n', start - 1) + 1;
-    const lineEndIndex = props.form.body.indexOf('\n', start);
-    const lineEnd = lineEndIndex === -1 ? props.form.body.length : lineEndIndex;
-    const line = props.form.body.slice(lineStart, lineEnd);
+    const lineStart = form.body.lastIndexOf('\n', start - 1) + 1;
+    const lineEndIndex = form.body.indexOf('\n', start);
+    const lineEnd = lineEndIndex === -1 ? form.body.length : lineEndIndex;
+    const line = form.body.slice(lineStart, lineEnd);
     const hasHeading = line.startsWith('## ');
     const nextLine = hasHeading ? line.slice(3) : `## ${line || 'Nadpis'}`;
 
-    props.form.body =
-        props.form.body.slice(0, lineStart) +
-        nextLine +
-        props.form.body.slice(lineEnd);
+    form.body =
+        form.body.slice(0, lineStart) + nextLine + form.body.slice(lineEnd);
 
     const selectionStart = hasHeading ? lineStart : lineStart + 3;
     const selectionEnd = lineStart + nextLine.length;
@@ -114,6 +138,7 @@ async function insertHeading(): Promise<void> {
 function openTablePicker(): void {
     if (tablePickerCloseTimeout) {
         clearTimeout(tablePickerCloseTimeout);
+        tablePickerCloseTimeout = null;
     }
 
     isTablePickerOpen.value = true;
@@ -127,43 +152,51 @@ function closeTablePickerSoon(): void {
     tablePickerCloseTimeout = setTimeout(() => {
         isTablePickerOpen.value = false;
         selectTableSize(2, 2);
+        tablePickerCloseTimeout = null;
     }, 180);
 }
 
 function selectTableSize(rows: number, columns: number): void {
-    selectedTableRows.value = Math.max(2, rows);
-    selectedTableColumns.value = Math.max(2, columns);
+    selectedTableRows.value = clampTableRows(rows);
+    selectedTableColumns.value = clampTableColumns(columns);
+}
+
+function clampTableRows(rows: number): number {
+    return Math.min(maxTableRows, Math.max(minTableSize, rows));
+}
+
+function clampTableColumns(columns: number): number {
+    return Math.min(maxTableColumns, Math.max(minTableSize, columns));
 }
 
 async function insertTable(
     rows = selectedTableRows.value,
     columns = selectedTableColumns.value,
 ): Promise<void> {
+    const normalizedRows = clampTableRows(rows);
+    const normalizedColumns = clampTableColumns(columns);
+
     isTablePickerOpen.value = false;
 
     const textarea = getTextarea();
-    const table = buildTable(rows, columns);
+    const table = buildTable(normalizedRows, normalizedColumns);
 
     if (!textarea) {
-        props.form.body += `\n${table}`;
+        form.body += `\n${table}`;
         return;
     }
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const needsLeadingBreak =
-        start > 0 && !props.form.body.slice(0, start).endsWith('\n\n');
+        start > 0 && !form.body.slice(0, start).endsWith('\n\n');
     const needsTrailingBreak =
-        end < props.form.body.length &&
-        !props.form.body.slice(end).startsWith('\n');
+        end < form.body.length && !form.body.slice(end).startsWith('\n');
     const leadingBreak = needsLeadingBreak ? '\n\n' : '';
     const trailingBreak = needsTrailingBreak ? '\n\n' : '';
     const replacement = `${leadingBreak}${table}${trailingBreak}`;
 
-    props.form.body =
-        props.form.body.slice(0, start) +
-        replacement +
-        props.form.body.slice(end);
+    form.body = form.body.slice(0, start) + replacement + form.body.slice(end);
 
     const firstCellStart = start + leadingBreak.length + table.indexOf('Text');
 
@@ -183,25 +216,27 @@ function buildTable(rows: number, columns: number): string {
 
     return tableRows.map((row) => `| ${row.join(' | ')} |`).join('\n');
 }
+
+onUnmounted(() => {
+    if (tablePickerCloseTimeout) {
+        clearTimeout(tablePickerCloseTimeout);
+    }
+});
 </script>
 
 <template>
-    <Form @submit.prevent="emit('submit')">
+    <Form @submit.prevent="submit">
         <div class="flex w-full flex-col gap-y-6 md:gap-y-8">
             <UFormField
                 label="Nazev"
                 name="title"
-                :error="props.form.errors.title"
+                :error="form.errors.title"
                 required
             >
-                <UInput v-model="props.form.title" class="w-full" />
+                <UInput v-model="form.title" class="w-full" />
             </UFormField>
 
-            <UFormField
-                label="Obsah"
-                name="body"
-                :error="props.form.errors.body"
-            >
+            <UFormField label="Obsah" name="body" :error="form.errors.body">
                 <div
                     class="rounded-xl border border-neutral-200 bg-white shadow-sm ring-1 ring-black/5 transition focus-within:border-primary focus-within:ring-primary/20 dark:border-neutral-800 dark:bg-neutral-950 dark:ring-white/10"
                 >
@@ -273,7 +308,7 @@ function buildTable(rows: number, columns: number): string {
                                 </div>
 
                                 <div
-                                    class="grid grid-cols-4 gap-1"
+                                    class="grid grid-cols-3 gap-1"
                                     @mouseleave="selectTableSize(2, 2)"
                                 >
                                     <template
@@ -308,7 +343,7 @@ function buildTable(rows: number, columns: number): string {
 
                     <UTextarea
                         ref="bodyTextarea"
-                        v-model="props.form.body"
+                        v-model="form.body"
                         variant="none"
                         class="w-full font-mono text-sm leading-6"
                         :ui="{
@@ -328,7 +363,7 @@ function buildTable(rows: number, columns: number): string {
             <PrimaryButton
                 class="w-full justify-center"
                 type="submit"
-                :loading="props.form.processing"
+                :loading="form.processing"
             >
                 {{ props.isEditMode ? 'Upravit' : 'Pridat' }}
             </PrimaryButton>

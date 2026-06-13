@@ -3,21 +3,11 @@ import DocumentController from '@/actions/App/Http/Controllers/DocumentControlle
 import DocumentForm from '@/components/documents/DocumentForm.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import type { Document } from '@/types/Document';
-import type { DocumentFormData } from '@/types/DocumentFormData';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 
 const props = defineProps<{
     document: Document;
 }>();
-
-const form = useForm<DocumentFormData>({
-    title: props.document.title,
-    body: props.document.body,
-});
-
-function submit() {
-    form.put(DocumentController.update.url(props.document));
-}
 </script>
 
 <template>
@@ -25,7 +15,13 @@ function submit() {
     <AuthenticatedLayout :display-floating-action-button="false">
         <div class="flex flex-col gap-y-5">
             <h2>Upravit dokument</h2>
-            <DocumentForm :form="form" :is-edit-mode="true" @submit="submit" />
+            <DocumentForm
+                :initial-title="props.document.title"
+                :initial-body="props.document.body"
+                :is-edit-mode="true"
+                :submit-url="DocumentController.update.url(props.document)"
+                submit-method="put"
+            />
         </div>
     </AuthenticatedLayout>
 </template>

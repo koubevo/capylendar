@@ -3,7 +3,6 @@ import { finish } from '@/actions/App/Http/Controllers/TodoController';
 import TagsList from '@/components/tags/TagsList.vue';
 import { isOnlyLinks as checkOnlyLinks } from '@/composables/useLinkify';
 import type { Todo } from '@/types/Todo';
-import { router } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 interface Props {
@@ -23,13 +22,42 @@ const descriptionIsOnlyLinks = computed(() =>
     checkOnlyLinks(props.todo.description_without_meta ?? ''),
 );
 
-function handleFinish(event: MouseEvent) {
+function getXsrfToken(): string | null {
+    const tokenCookie = document.cookie
+        .split('; ')
+        .find((cookie) => cookie.startsWith('XSRF-TOKEN='));
+
+    if (!tokenCookie) {
+        return null;
+    }
+
+    return decodeURIComponent(tokenCookie.slice('XSRF-TOKEN='.length));
+}
+
+async function handleFinish(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
 
     emit('toggled', props.todo.id);
 
-    router.post(finish(props.todo).url, {}, { preserveScroll: true });
+    try {
+        const xsrfToken = getXsrfToken();
+        const response = await fetch(finish(props.todo).url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'text/html, application/xhtml+xml',
+                'X-Requested-With': 'XMLHttpRequest',
+                ...(xsrfToken ? { 'X-XSRF-TOKEN': xsrfToken } : {}),
+            },
+        });
+
+        if (!response.ok) {
+            emit('toggled', props.todo.id);
+        }
+    } catch {
+        emit('toggled', props.todo.id);
+    }
 }
 </script>
 

@@ -15,6 +15,7 @@ use App\Services\TodoService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -113,19 +114,25 @@ class TodoController extends Controller
         return to_route('todo.index')->with('success', 'Todo úspěšně smazáno');
     }
 
-    public function finish(Todo $todo): RedirectResponse
+    public function finish(Todo $todo, Request $request): RedirectResponse|HttpResponse
     {
         Gate::authorize('finish', $todo);
 
         if ($todo->is_finished) {
             $this->todoService->unfinish($todo);
 
-            return back()->with('success', 'Todo označeno jako nesplněné');
+            $message = 'Todo označeno jako nesplněné';
+        } else {
+            $this->todoService->finish($todo);
+
+            $message = 'Todo splněno!';
         }
 
-        $this->todoService->finish($todo);
+        if ($request->ajax()) {
+            return response()->noContent();
+        }
 
-        return back()->with('success', 'Todo splněno!');
+        return back()->with('success', $message);
     }
 
     public function postpone(Todo $todo): RedirectResponse

@@ -326,6 +326,21 @@ describe('TodoController finish', function () {
         expect($todo->is_finished)->toBeFalse();
     });
 
+    it('returns no content for background finish requests', function () {
+        [$user, $todo] = createUserWithTodo();
+
+        $this->actingAs($user)
+            ->withHeaders([
+                'Accept' => 'application/json',
+                'X-Requested-With' => 'XMLHttpRequest',
+            ])
+            ->post(route('todo.finish', $todo))
+            ->assertNoContent();
+
+        $todo->refresh();
+        expect($todo->is_finished)->toBeTrue();
+    });
+
     it('forbids non-subscriber from finishing', function () {
         [, $todo] = createUserWithTodo();
         $otherUser = User::factory()->create();

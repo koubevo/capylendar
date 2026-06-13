@@ -3,10 +3,7 @@ import { finish } from '@/actions/App/Http/Controllers/TodoController';
 import TagsList from '@/components/tags/TagsList.vue';
 import { isOnlyLinks as checkOnlyLinks } from '@/composables/useLinkify';
 import type { Todo } from '@/types/Todo';
-import { router } from '@inertiajs/vue3';
 import { computed } from 'vue';
-
-const todoCompletionStaleProps = ['unfinishedTodos', 'finishedTodos', 'todo'];
 
 interface Props {
     todo: Todo;
@@ -25,6 +22,32 @@ const descriptionIsOnlyLinks = computed(() =>
     checkOnlyLinks(props.todo.description_without_meta ?? ''),
 );
 
+function getCsrfToken(): string {
+    const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+
+    return match ? decodeURIComponent(match[1]) : '';
+}
+
+async function syncCompletion(revertToggle: () => void): Promise<void> {
+    try {
+        const response = await fetch(finish(props.todo).url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-XSRF-TOKEN': getCsrfToken(),
+            },
+        });
+
+        if (!response.ok) {
+            revertToggle();
+        }
+    } catch {
+        revertToggle();
+    }
+}
+
 function handleFinish(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
@@ -33,18 +56,7 @@ function handleFinish(event: MouseEvent) {
 
     emit('toggled', props.todo.id);
 
-    router.post(
-        finish(props.todo).url,
-        {},
-        {
-            except: todoCompletionStaleProps,
-            preserveScroll: true,
-            onCancel: revertToggle,
-            onError: revertToggle,
-            onHttpException: revertToggle,
-            onNetworkError: revertToggle,
-        },
-    );
+    void syncCompletion(revertToggle);
 }
 </script>
 

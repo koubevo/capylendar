@@ -52,8 +52,9 @@ This application is a Laravel application and its main Laravel ecosystems packag
 
 ## Application Behavior Notes
 - Todo completion is intentionally optimistic. When a user checks a todo, the card should become checked in place and remain visible until the next page refresh so accidental taps can be undone on the same page.
-- The completion request must still use Inertia's router. Use a partial reload that excludes todo props such as `unfinishedTodos`, `finishedTodos`, and `todo`; otherwise the redirected response refreshes the list props and immediately removes the completed todo from the current page.
-- Keep rollback handling for failed, cancelled, HTTP-exception, and network-error visits so the local checked state does not drift from the server when the request does not complete.
+- Do not send todo completion through Inertia's router. `TodoController@finish` redirects back, and an Inertia visit can refresh todo props such as `unfinishedTodos`, `finishedTodos`, and `todo`, immediately removing the completed todo from the current page.
+- Use a silent same-origin background request for completion instead. Axios is not a project dependency; use `fetch` with the Laravel `XSRF-TOKEN` cookie unless the dependency policy changes. The request should send `X-Requested-With: XMLHttpRequest` and `Accept: application/json` so `TodoController@finish` can return `204 No Content` instead of a redirect.
+- Keep rollback handling for failed requests so the local checked state does not drift from the server when the request does not complete.
 
 
 === boost rules ===

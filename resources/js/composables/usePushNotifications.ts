@@ -18,6 +18,10 @@ export function usePushNotifications() {
         return page.props.auth.user?.notifications_enabled ?? false;
     });
 
+    const isAuthenticated = computed(() => {
+        return !!page.props.auth.user;
+    });
+
     const checkSupport = () => {
         isSupported.value =
             'serviceWorker' in navigator &&
@@ -236,6 +240,10 @@ export function usePushNotifications() {
         if (isSupported.value) {
             const subscription = await checkSubscription();
 
+            if (!isAuthenticated.value) {
+                return;
+            }
+
             if (
                 serverNotificationsEnabled.value &&
                 permission.value === 'granted'
@@ -244,12 +252,6 @@ export function usePushNotifications() {
                     await subscribe();
                 } catch (e) {
                     console.error('Error during auto-subscribe:', e);
-                }
-            } else if (serverNotificationsEnabled.value && subscription) {
-                try {
-                    await saveSubscription(subscription);
-                } catch (e) {
-                    console.error('Error saving subscription during init:', e);
                 }
             } else if (!serverNotificationsEnabled.value && subscription) {
                 try {
@@ -271,6 +273,7 @@ export function usePushNotifications() {
         unsubscribe,
         checkSubscription,
         serverNotificationsEnabled,
+        isAuthenticated,
         init,
     };
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\Capybara;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -47,7 +48,7 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 /**
-                 * @return array{id: int, name: string, email: string, capybara: mixed, notifications_enabled: bool}|null
+                 * @return array{id: int, name: string, email: string, capybara: Capybara, notifications_enabled: bool}|null
                  */
                 'user' => function () use ($request): ?array {
                     $user = $request->user();

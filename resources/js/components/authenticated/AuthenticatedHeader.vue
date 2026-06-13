@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
+import DocumentController from '@/actions/App/Http/Controllers/DocumentController';
 import EventController from '@/actions/App/Http/Controllers/EventController';
 import MessageController from '@/actions/App/Http/Controllers/MessageController';
 import TagController from '@/actions/App/Http/Controllers/TagController';
@@ -22,6 +23,11 @@ const links = computed(() => [
         label: 'Todos',
         to: TodoController.index(),
         icon: 'i-lucide-list-todo',
+    },
+    {
+        label: 'Dokumenty',
+        to: DocumentController.index(),
+        icon: 'i-lucide-file-text',
         isNew: true,
     },
     {
@@ -43,7 +49,6 @@ const links = computed(() => [
         label: 'Historie',
         to: DashboardController.historyIndex(),
         icon: 'i-lucide-history',
-        isNew: true,
     },
     {
         label: 'Smazané eventy',
@@ -54,7 +59,6 @@ const links = computed(() => [
         label: 'Smazaná todos',
         to: TodoController.deletedIndex(),
         icon: 'i-lucide-list-x',
-        isNew: true,
     },
 ]);
 
@@ -69,6 +73,11 @@ const addMenuItems = [
             label: 'Přidat todo',
             icon: 'i-lucide-list-todo',
             onSelect: () => router.visit(TodoController.create.url()),
+        },
+        {
+            label: 'Přidat dokument',
+            icon: 'i-lucide-file-plus',
+            onSelect: () => router.visit(DocumentController.create.url()),
         },
     ],
 ];

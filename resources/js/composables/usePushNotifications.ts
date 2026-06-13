@@ -1,5 +1,5 @@
 import { usePage } from '@inertiajs/vue3';
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const isSupported = ref(false);
 const isSubscribed = ref(false);
@@ -16,10 +16,6 @@ export function usePushNotifications() {
 
     const serverNotificationsEnabled = computed(() => {
         return page.props.auth.user?.notifications_enabled ?? false;
-    });
-
-    const serverHasPushSubscriptions = computed(() => {
-        return page.props.auth.user?.has_push_subscriptions ?? false;
     });
 
     const checkSupport = () => {
@@ -231,16 +227,20 @@ export function usePushNotifications() {
                 serverNotificationsEnabled.value &&
                 permission.value === 'granted'
             ) {
-                await subscribe(!serverHasPushSubscriptions.value);
+                try {
+                    await subscribe();
+                } catch (e) {
+                    console.error('Error during auto-subscribe:', e);
+                }
             } else if (serverNotificationsEnabled.value && subscription) {
-                await saveSubscription(subscription);
+                try {
+                    await saveSubscription(subscription);
+                } catch (e) {
+                    console.error('Error saving subscription during init:', e);
+                }
             }
         }
     };
-
-    onMounted(() => {
-        init();
-    });
 
     return {
         isSupported,
@@ -252,7 +252,6 @@ export function usePushNotifications() {
         unsubscribe,
         checkSubscription,
         serverNotificationsEnabled,
-        serverHasPushSubscriptions,
         init,
     };
 }

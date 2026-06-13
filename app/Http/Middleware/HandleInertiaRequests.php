@@ -47,7 +47,7 @@ class HandleInertiaRequests extends Middleware
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 /**
-                 * @return array{id: int, name: string, email: string, capybara: mixed, notifications_enabled: bool, has_push_subscriptions: bool}|null
+                 * @return array{id: int, name: string, email: string, capybara: mixed, notifications_enabled: bool}|null
                  */
                 'user' => function () use ($request): ?array {
                     $user = $request->user();
@@ -62,7 +62,6 @@ class HandleInertiaRequests extends Middleware
                         'email' => $user->email,
                         'capybara' => $user->capybara,
                         'notifications_enabled' => $user->notifications_enabled,
-                        'has_push_subscriptions' => $user->pushSubscriptions()->exists(),
                     ];
                 },
             ],

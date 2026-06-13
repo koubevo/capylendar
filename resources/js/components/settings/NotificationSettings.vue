@@ -12,6 +12,7 @@ const {
     error,
     subscribe,
     unsubscribe,
+    init,
 } = usePushNotifications();
 
 const localEnabled = ref(isSubscribed.value);
@@ -64,6 +65,8 @@ async function handleToggle() {
         }
     }
 }
+
+init();
 </script>
 
 <template>

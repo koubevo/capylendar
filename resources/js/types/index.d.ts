@@ -30,7 +30,10 @@ export type AppPageProps<
 export interface User {
     id: number;
     name: string;
+    email: string;
     capybara: string;
+    notifications_enabled: boolean;
+    has_push_subscriptions: boolean;
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;

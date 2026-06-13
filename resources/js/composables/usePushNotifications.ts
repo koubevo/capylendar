@@ -14,6 +14,14 @@ export function usePushNotifications() {
         return (page.props as { vapidPublicKey?: string }).vapidPublicKey || '';
     });
 
+    const serverNotificationsEnabled = computed(() => {
+        return page.props.auth.user?.notifications_enabled ?? false;
+    });
+
+    const serverHasPushSubscriptions = computed(() => {
+        return page.props.auth.user?.has_push_subscriptions ?? false;
+    });
+
     const checkSupport = () => {
         isSupported.value =
             'serviceWorker' in navigator &&
@@ -27,16 +35,18 @@ export function usePushNotifications() {
         }
     };
 
-    const checkSubscription = async () => {
-        if (!isSupported.value) return;
+    const checkSubscription = async (): Promise<PushSubscription | null> => {
+        if (!isSupported.value) return null;
 
         try {
             const registration = await navigator.serviceWorker.ready;
             const subscription =
                 await registration.pushManager.getSubscription();
             isSubscribed.value = !!subscription;
+            return subscription;
         } catch (e) {
             console.error('Error checking subscription:', e);
+            return null;
         }
     };
 
@@ -57,6 +67,10 @@ export function usePushNotifications() {
         if (!isSupported.value) {
             error.value = 'Váš prohlížeč nepodporuje notifikace';
             return false;
+        }
+
+        if (permission.value === 'granted') {
+            return true;
         }
 
         try {
@@ -83,7 +97,26 @@ export function usePushNotifications() {
         return outputArray;
     };
 
-    const subscribe = async (): Promise<boolean> => {
+    const saveSubscription = async (
+        subscription: PushSubscription,
+    ): Promise<void> => {
+        const response = await fetch('/settings/push-subscription', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-XSRF-TOKEN': getCsrfToken(),
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(subscription.toJSON()),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to save subscription');
+        }
+    };
+
+    const subscribe = async (forceNew = false): Promise<boolean> => {
         if (!isSupported.value) {
             error.value = 'Váš prohlížeč nepodporuje notifikace';
             return false;
@@ -111,6 +144,20 @@ export function usePushNotifications() {
             // Wait for service worker to be ready
             await navigator.serviceWorker.ready;
 
+            const currentSubscription =
+                await registration.pushManager.getSubscription();
+
+            if (currentSubscription && !forceNew) {
+                await saveSubscription(currentSubscription);
+                isSubscribed.value = true;
+                isLoading.value = false;
+                return true;
+            }
+
+            if (currentSubscription) {
+                await currentSubscription.unsubscribe();
+            }
+
             // Subscribe to push
             const subscription = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
@@ -119,21 +166,7 @@ export function usePushNotifications() {
                 ),
             });
 
-            // Send subscription to server
-            const response = await fetch('/settings/push-subscription', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-XSRF-TOKEN': getCsrfToken(),
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify(subscription.toJSON()),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to save subscription');
-            }
+            await saveSubscription(subscription);
 
             isSubscribed.value = true;
             isLoading.value = false;
@@ -192,7 +225,16 @@ export function usePushNotifications() {
         checkSupport();
         checkPermission();
         if (isSupported.value) {
-            await checkSubscription();
+            const subscription = await checkSubscription();
+
+            if (
+                serverNotificationsEnabled.value &&
+                permission.value === 'granted'
+            ) {
+                await subscribe(!serverHasPushSubscriptions.value);
+            } else if (serverNotificationsEnabled.value && subscription) {
+                await saveSubscription(subscription);
+            }
         }
     };
 
@@ -209,6 +251,8 @@ export function usePushNotifications() {
         subscribe,
         unsubscribe,
         checkSubscription,
+        serverNotificationsEnabled,
+        serverHasPushSubscriptions,
         init,
     };
 }

@@ -46,7 +46,25 @@ class HandleInertiaRequests extends Middleware
             /** @phpstan-ignore-next-line */
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                /**
+                 * @return array{id: int, name: string, email: string, capybara: mixed, notifications_enabled: bool, has_push_subscriptions: bool}|null
+                 */
+                'user' => function () use ($request): ?array {
+                    $user = $request->user();
+
+                    if (! $user) {
+                        return null;
+                    }
+
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'capybara' => $user->capybara,
+                        'notifications_enabled' => $user->notifications_enabled,
+                        'has_push_subscriptions' => $user->pushSubscriptions()->exists(),
+                    ];
+                },
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [

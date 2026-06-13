@@ -24,13 +24,6 @@ const props = defineProps<{
                     />
                 </div>
 
-                <p
-                    v-if="props.document.excerpt"
-                    class="line-clamp-3 text-sm text-neutral-600 dark:text-neutral-300"
-                >
-                    {{ props.document.excerpt }}
-                </p>
-
                 <div
                     class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-neutral-500 dark:text-neutral-400"
                 >

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventImageController;
 use App\Http\Controllers\MessageController;
@@ -44,6 +45,9 @@ Route::middleware(['auth'])->group(function () {
         ->only(['index', 'create', 'store', 'edit', 'update', 'destroy', 'show']);
 
     Route::resource('/chat', MessageController::class)->only(['index', 'store']);
+
+    Route::resource('/document', DocumentController::class)
+        ->only(['index', 'create', 'store', 'edit', 'update', 'destroy', 'show']);
 });
 
 require __DIR__.'/settings.php';

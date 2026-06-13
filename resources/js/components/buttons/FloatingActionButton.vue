@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DocumentController from '@/actions/App/Http/Controllers/DocumentController';
 import EventController from '@/actions/App/Http/Controllers/EventController';
 import TodoController from '@/actions/App/Http/Controllers/TodoController';
 import { router } from '@inertiajs/vue3';
@@ -14,6 +15,11 @@ const addMenuItems = [
             label: 'Přidat todo',
             icon: 'i-lucide-list-todo',
             onSelect: () => router.visit(TodoController.create.url()),
+        },
+        {
+            label: 'Přidat dokument',
+            icon: 'i-lucide-file-plus',
+            onSelect: () => router.visit(DocumentController.create.url()),
         },
     ],
 ];

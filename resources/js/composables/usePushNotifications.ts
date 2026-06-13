@@ -35,7 +35,13 @@ export function usePushNotifications() {
         if (!isSupported.value) return null;
 
         try {
-            const registration = await navigator.serviceWorker.ready;
+            const registration =
+                await navigator.serviceWorker.getRegistration();
+            if (!registration) {
+                isSubscribed.value = false;
+                return null;
+            }
+
             const subscription =
                 await registration.pushManager.getSubscription();
             isSubscribed.value = !!subscription;
@@ -180,7 +186,14 @@ export function usePushNotifications() {
         error.value = null;
 
         try {
-            const registration = await navigator.serviceWorker.ready;
+            const registration =
+                await navigator.serviceWorker.getRegistration();
+            if (!registration) {
+                isSubscribed.value = false;
+                isLoading.value = false;
+                return true;
+            }
+
             const subscription =
                 await registration.pushManager.getSubscription();
 
@@ -237,6 +250,12 @@ export function usePushNotifications() {
                     await saveSubscription(subscription);
                 } catch (e) {
                     console.error('Error saving subscription during init:', e);
+                }
+            } else if (!serverNotificationsEnabled.value && subscription) {
+                try {
+                    await unsubscribe();
+                } catch (e) {
+                    console.error('Error unsubscribing during init:', e);
                 }
             }
         }

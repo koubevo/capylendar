@@ -10,7 +10,7 @@ beforeEach(function () {
 });
 
 describe('NotificationSettingsController update', function () {
-    it('shares notification repair state with the settings page', function () {
+    it('shares notification enabled state with the settings page', function () {
         $this->user->update(['notifications_enabled' => true]);
 
         $this->actingAs($this->user)

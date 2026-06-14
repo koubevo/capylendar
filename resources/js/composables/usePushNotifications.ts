@@ -246,7 +246,8 @@ export function usePushNotifications() {
 
             if (
                 serverNotificationsEnabled.value &&
-                permission.value === 'granted'
+                permission.value === 'granted' &&
+                !subscription
             ) {
                 try {
                     await subscribe();

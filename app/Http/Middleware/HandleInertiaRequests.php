@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Enums\Capybara;
+use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -53,7 +54,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => function () use ($request): ?array {
                     $user = $request->user();
 
-                    if (! $user) {
+                    if (! $user instanceof User) {
                         return null;
                     }
 

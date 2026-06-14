@@ -15,11 +15,11 @@ export function usePushNotifications() {
     });
 
     const serverNotificationsEnabled = computed(() => {
-        return page.props.auth.user?.notifications_enabled ?? false;
+        return page.props.auth?.user?.notifications_enabled ?? false;
     });
 
     const isAuthenticated = computed(() => {
-        return !!page.props.auth.user;
+        return !!page.props.auth?.user;
     });
 
     const checkSupport = () => {
@@ -241,6 +241,15 @@ export function usePushNotifications() {
             const subscription = await checkSubscription();
 
             if (!isAuthenticated.value) {
+                if (subscription) {
+                    try {
+                        await subscription.unsubscribe();
+                        isSubscribed.value = false;
+                    } catch (e) {
+                        console.error('Error unsubscribing guest locally:', e);
+                    }
+                }
+
                 return;
             }
 

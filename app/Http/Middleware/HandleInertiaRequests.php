@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\Capybara;
+use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -46,7 +48,24 @@ class HandleInertiaRequests extends Middleware
             /** @phpstan-ignore-next-line */
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                /**
+                 * @return array{id: int, name: string, email: string, capybara: Capybara, notifications_enabled: bool}|null
+                 */
+                'user' => function () use ($request): ?array {
+                    $user = $request->user();
+
+                    if (! $user instanceof User) {
+                        return null;
+                    }
+
+                    return [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'capybara' => $user->capybara,
+                        'notifications_enabled' => $user->notifications_enabled,
+                    ];
+                },
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [

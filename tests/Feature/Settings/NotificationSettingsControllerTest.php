@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
     $this->user = User::factory()->create([
@@ -9,6 +10,16 @@ beforeEach(function () {
 });
 
 describe('NotificationSettingsController update', function () {
+    it('shares notification enabled state with the settings page', function () {
+        $this->user->update(['notifications_enabled' => true]);
+
+        $this->actingAs($this->user)
+            ->get(route('profile'))
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('auth.user.notifications_enabled', true)
+            );
+    });
+
     it('enables notifications', function () {
         $this->actingAs($this->user)
             ->put(route('user-notifications.update'), [

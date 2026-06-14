@@ -1,5 +1,10 @@
+import {
+    destroy as destroyPushSubscription,
+    store as storePushSubscription,
+} from '@/actions/App/Http/Controllers/PushSubscriptionController';
+import type { AppPageProps } from '@/types';
 import { usePage } from '@inertiajs/vue3';
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const isSupported = ref(false);
 const isSubscribed = ref(false);
@@ -10,8 +15,18 @@ const error = ref<string | null>(null);
 export function usePushNotifications() {
     const page = usePage();
 
+    const pageProps = computed(() => page.props as AppPageProps);
+
     const vapidPublicKey = computed(() => {
-        return (page.props as { vapidPublicKey?: string }).vapidPublicKey || '';
+        return pageProps.value.vapidPublicKey || '';
+    });
+
+    const serverNotificationsEnabled = computed(() => {
+        return pageProps.value.auth?.user?.notifications_enabled ?? false;
+    });
+
+    const isAuthenticated = computed(() => {
+        return !!pageProps.value.auth?.user;
     });
 
     const checkSupport = () => {
@@ -27,16 +42,24 @@ export function usePushNotifications() {
         }
     };
 
-    const checkSubscription = async () => {
-        if (!isSupported.value) return;
+    const checkSubscription = async (): Promise<PushSubscription | null> => {
+        if (!isSupported.value) return null;
 
         try {
-            const registration = await navigator.serviceWorker.ready;
+            const registration =
+                await navigator.serviceWorker.getRegistration();
+            if (!registration) {
+                isSubscribed.value = false;
+                return null;
+            }
+
             const subscription =
                 await registration.pushManager.getSubscription();
             isSubscribed.value = !!subscription;
+            return subscription;
         } catch (e) {
             console.error('Error checking subscription:', e);
+            return null;
         }
     };
 
@@ -57,6 +80,10 @@ export function usePushNotifications() {
         if (!isSupported.value) {
             error.value = 'Váš prohlížeč nepodporuje notifikace';
             return false;
+        }
+
+        if (permission.value === 'granted') {
+            return true;
         }
 
         try {
@@ -83,7 +110,27 @@ export function usePushNotifications() {
         return outputArray;
     };
 
-    const subscribe = async (): Promise<boolean> => {
+    const saveSubscription = async (
+        subscription: PushSubscription,
+    ): Promise<void> => {
+        const storeRoute = storePushSubscription();
+        const response = await fetch(storeRoute.url, {
+            method: storeRoute.method,
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-XSRF-TOKEN': getCsrfToken(),
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify(subscription.toJSON()),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to save subscription');
+        }
+    };
+
+    const subscribe = async (forceNew = false): Promise<boolean> => {
         if (!isSupported.value) {
             error.value = 'Váš prohlížeč nepodporuje notifikace';
             return false;
@@ -111,6 +158,20 @@ export function usePushNotifications() {
             // Wait for service worker to be ready
             await navigator.serviceWorker.ready;
 
+            const currentSubscription =
+                await registration.pushManager.getSubscription();
+
+            if (currentSubscription && !forceNew) {
+                await saveSubscription(currentSubscription);
+                isSubscribed.value = true;
+                isLoading.value = false;
+                return true;
+            }
+
+            if (currentSubscription) {
+                await currentSubscription.unsubscribe();
+            }
+
             // Subscribe to push
             const subscription = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
@@ -119,21 +180,7 @@ export function usePushNotifications() {
                 ),
             });
 
-            // Send subscription to server
-            const response = await fetch('/settings/push-subscription', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                    'X-XSRF-TOKEN': getCsrfToken(),
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify(subscription.toJSON()),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to save subscription');
-            }
+            await saveSubscription(subscription);
 
             isSubscribed.value = true;
             isLoading.value = false;
@@ -151,14 +198,23 @@ export function usePushNotifications() {
         error.value = null;
 
         try {
-            const registration = await navigator.serviceWorker.ready;
+            const registration =
+                await navigator.serviceWorker.getRegistration();
+            if (!registration) {
+                isSubscribed.value = false;
+                isLoading.value = false;
+                return true;
+            }
+
             const subscription =
                 await registration.pushManager.getSubscription();
 
             if (subscription) {
+                const destroyRoute = destroyPushSubscription();
+
                 // Remove from server first
-                await fetch('/settings/push-subscription', {
-                    method: 'DELETE',
+                await fetch(destroyRoute.url, {
+                    method: destroyRoute.method,
                     headers: {
                         'Content-Type': 'application/json',
                         Accept: 'application/json',
@@ -192,13 +248,48 @@ export function usePushNotifications() {
         checkSupport();
         checkPermission();
         if (isSupported.value) {
-            await checkSubscription();
+            const subscription = await checkSubscription();
+
+            if (!isAuthenticated.value) {
+                if (subscription) {
+                    try {
+                        await subscription.unsubscribe();
+                        isSubscribed.value = false;
+                    } catch (e) {
+                        console.error('Error unsubscribing guest locally:', e);
+                    }
+                }
+
+                return;
+            }
+
+            if (
+                serverNotificationsEnabled.value &&
+                permission.value === 'granted' &&
+                !subscription
+            ) {
+                try {
+                    await subscribe();
+                } catch (e) {
+                    console.error('Error during auto-subscribe:', e);
+                }
+            } else if (!serverNotificationsEnabled.value && subscription) {
+                try {
+                    await unsubscribe();
+                } catch (e) {
+                    console.error('Error unsubscribing during init:', e);
+                }
+            }
         }
     };
 
-    onMounted(() => {
-        init();
-    });
+    watch(
+        [serverNotificationsEnabled, isAuthenticated],
+        () => {
+            void init();
+        },
+        { immediate: true },
+    );
 
     return {
         isSupported,
@@ -209,6 +300,8 @@ export function usePushNotifications() {
         subscribe,
         unsubscribe,
         checkSubscription,
+        serverNotificationsEnabled,
+        isAuthenticated,
         init,
     };
 }

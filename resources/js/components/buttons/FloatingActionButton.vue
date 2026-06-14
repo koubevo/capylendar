@@ -7,6 +7,11 @@ import { router } from '@inertiajs/vue3';
 const addMenuItems = [
     [
         {
+            label: 'Přidat dokument',
+            icon: 'i-lucide-file-plus',
+            onSelect: () => router.visit(DocumentController.create.url()),
+        },
+        {
             label: 'Přidat event',
             icon: 'i-lucide-calendar-plus',
             onSelect: () => router.visit(EventController.create.url()),
@@ -15,11 +20,6 @@ const addMenuItems = [
             label: 'Přidat todo',
             icon: 'i-lucide-list-todo',
             onSelect: () => router.visit(TodoController.create.url()),
-        },
-        {
-            label: 'Přidat dokument',
-            icon: 'i-lucide-file-plus',
-            onSelect: () => router.visit(DocumentController.create.url()),
         },
     ],
 ];

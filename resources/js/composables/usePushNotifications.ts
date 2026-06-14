@@ -1,5 +1,10 @@
+import {
+    destroy as destroyPushSubscription,
+    store as storePushSubscription,
+} from '@/actions/App/Http/Controllers/PushSubscriptionController';
+import type { AppPageProps } from '@/types';
 import { usePage } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const isSupported = ref(false);
 const isSubscribed = ref(false);
@@ -10,16 +15,18 @@ const error = ref<string | null>(null);
 export function usePushNotifications() {
     const page = usePage();
 
+    const pageProps = computed(() => page.props as AppPageProps);
+
     const vapidPublicKey = computed(() => {
-        return (page.props as { vapidPublicKey?: string }).vapidPublicKey || '';
+        return pageProps.value.vapidPublicKey || '';
     });
 
     const serverNotificationsEnabled = computed(() => {
-        return page.props.auth?.user?.notifications_enabled ?? false;
+        return pageProps.value.auth?.user?.notifications_enabled ?? false;
     });
 
     const isAuthenticated = computed(() => {
-        return !!page.props.auth?.user;
+        return !!pageProps.value.auth?.user;
     });
 
     const checkSupport = () => {
@@ -106,8 +113,9 @@ export function usePushNotifications() {
     const saveSubscription = async (
         subscription: PushSubscription,
     ): Promise<void> => {
-        const response = await fetch('/settings/push-subscription', {
-            method: 'POST',
+        const storeRoute = storePushSubscription();
+        const response = await fetch(storeRoute.url, {
+            method: storeRoute.method,
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
@@ -202,9 +210,11 @@ export function usePushNotifications() {
                 await registration.pushManager.getSubscription();
 
             if (subscription) {
+                const destroyRoute = destroyPushSubscription();
+
                 // Remove from server first
-                await fetch('/settings/push-subscription', {
-                    method: 'DELETE',
+                await fetch(destroyRoute.url, {
+                    method: destroyRoute.method,
                     headers: {
                         'Content-Type': 'application/json',
                         Accept: 'application/json',
@@ -272,6 +282,14 @@ export function usePushNotifications() {
             }
         }
     };
+
+    watch(
+        [serverNotificationsEnabled, isAuthenticated],
+        () => {
+            void init();
+        },
+        { immediate: true },
+    );
 
     return {
         isSupported,

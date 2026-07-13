@@ -6,9 +6,8 @@ import MacroAlert from '@/components/ui/MacroAlert.vue';
 import { getTodayDateString, hasGoogleMapUrl } from '@/lib/utils';
 import { Capybara } from '@/types/Capybara';
 import type { EventFormData } from '@/types/EventFormData';
-import { Tag } from '@/types/Tag';
+import type { Tag } from '@/types/Tag';
 import type { InertiaForm } from '@inertiajs/vue3';
-import { Form } from '@inertiajs/vue3';
 import { computed, onUnmounted, ref } from 'vue';
 
 interface Props {
@@ -94,7 +93,7 @@ onUnmounted(() => revokePreview());
 </script>
 
 <template>
-    <Form @submit.prevent="emit('submit')">
+    <form @submit.prevent="emit('submit')">
         <div class="flex w-full flex-col gap-y-6 md:gap-y-8">
             <UFormField
                 label="Název"
@@ -102,7 +101,7 @@ onUnmounted(() => revokePreview());
                 :error="props.form.errors.title"
                 required
             >
-                <UInput v-model="props.form.title" class="w-full" />
+                <UInput v-model="props.form.title" class="w-full" required />
             </UFormField>
 
             <UFormField
@@ -117,6 +116,7 @@ onUnmounted(() => revokePreview());
                     :items="capybaraOptions"
                     placeholder="Vyber kapybaru"
                     :avatar="selectedAvatar"
+                    required
                 />
             </UFormField>
 
@@ -131,6 +131,7 @@ onUnmounted(() => revokePreview());
                         v-model="props.form.date"
                         type="date"
                         class="w-full"
+                        required
                     />
                     <UButton
                         type="button"
@@ -165,6 +166,7 @@ onUnmounted(() => revokePreview());
                         v-model="props.form.start_at"
                         type="time"
                         class="w-full"
+                        required
                     />
                 </UFormField>
 
@@ -285,5 +287,5 @@ onUnmounted(() => revokePreview());
                 {{ props.isEditMode ? 'Upravit' : 'Přidat' }}
             </PrimaryButton>
         </div>
-    </Form>
+    </form>
 </template>

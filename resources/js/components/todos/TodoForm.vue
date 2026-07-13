@@ -9,7 +9,6 @@ import { Tag } from '@/types/Tag';
 import type { TodoPriority } from '@/types/Todo';
 import type { TodoFormData } from '@/types/TodoFormData';
 import type { InertiaForm } from '@inertiajs/vue3';
-import { Form } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 interface Props {
@@ -47,7 +46,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-    <Form @submit.prevent="emit('submit')">
+    <form @submit.prevent="emit('submit')">
         <div class="flex w-full flex-col gap-y-6 md:gap-y-8">
             <UFormField
                 label="Název"
@@ -55,7 +54,7 @@ const emit = defineEmits<{
                 :error="props.form.errors.title"
                 required
             >
-                <UInput v-model="props.form.title" class="w-full" />
+                <UInput v-model="props.form.title" class="w-full" required />
             </UFormField>
 
             <UFormField
@@ -70,6 +69,7 @@ const emit = defineEmits<{
                     :items="capybaraOptions"
                     placeholder="Vyber kapybaru"
                     :avatar="selectedAvatar"
+                    required
                 />
             </UFormField>
 
@@ -84,6 +84,7 @@ const emit = defineEmits<{
                         v-model="props.form.deadline"
                         type="date"
                         class="w-full"
+                        required
                     />
                     <UButton
                         type="button"
@@ -108,6 +109,7 @@ const emit = defineEmits<{
                     class="w-full"
                     :items="priorityOptions"
                     placeholder="Vyber prioritu"
+                    required
                 />
             </UFormField>
 
@@ -148,5 +150,5 @@ const emit = defineEmits<{
                 {{ props.isEditMode ? 'Upravit' : 'Přidat' }}
             </PrimaryButton>
         </div>
-    </Form>
+    </form>
 </template>

@@ -101,7 +101,7 @@ onUnmounted(() => revokePreview());
                 :error="props.form.errors.title"
                 required
             >
-                <UInput v-model="props.form.title" class="w-full" />
+                <UInput v-model="props.form.title" class="w-full" required />
             </UFormField>
 
             <UFormField
@@ -116,6 +116,7 @@ onUnmounted(() => revokePreview());
                     :items="capybaraOptions"
                     placeholder="Vyber kapybaru"
                     :avatar="selectedAvatar"
+                    required
                 />
             </UFormField>
 
@@ -130,6 +131,7 @@ onUnmounted(() => revokePreview());
                         v-model="props.form.date"
                         type="date"
                         class="w-full"
+                        required
                     />
                     <UButton
                         type="button"
@@ -164,6 +166,7 @@ onUnmounted(() => revokePreview());
                         v-model="props.form.start_at"
                         type="time"
                         class="w-full"
+                        required
                     />
                 </UFormField>
 

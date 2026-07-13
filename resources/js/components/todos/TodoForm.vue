@@ -54,7 +54,7 @@ const emit = defineEmits<{
                 :error="props.form.errors.title"
                 required
             >
-                <UInput v-model="props.form.title" class="w-full" />
+                <UInput v-model="props.form.title" class="w-full" required />
             </UFormField>
 
             <UFormField
@@ -69,6 +69,7 @@ const emit = defineEmits<{
                     :items="capybaraOptions"
                     placeholder="Vyber kapybaru"
                     :avatar="selectedAvatar"
+                    required
                 />
             </UFormField>
 
@@ -83,6 +84,7 @@ const emit = defineEmits<{
                         v-model="props.form.deadline"
                         type="date"
                         class="w-full"
+                        required
                     />
                     <UButton
                         type="button"
@@ -107,6 +109,7 @@ const emit = defineEmits<{
                     class="w-full"
                     :items="priorityOptions"
                     placeholder="Vyber prioritu"
+                    required
                 />
             </UFormField>
 

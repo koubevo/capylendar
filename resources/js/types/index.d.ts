@@ -1,3 +1,4 @@
+import type { Capybara } from '@/types/Capybara';
 import { InertiaLinkProps } from '@inertiajs/vue3';
 import type { LucideIcon } from 'lucide-vue-next';
 
@@ -32,7 +33,7 @@ export interface User {
     id: number;
     name: string;
     email: string;
-    capybara: string;
+    capybara: Capybara['value'];
     notifications_enabled: boolean;
 }
 

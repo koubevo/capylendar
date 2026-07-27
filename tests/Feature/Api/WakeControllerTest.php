@@ -1,6 +1,12 @@
 <?php
 
 use App\Models\User;
+use App\Services\NotificationService;
+use Illuminate\Support\Facades\Cache;
+
+beforeEach(function () {
+    Cache::flush();
+});
 
 describe('WakeController', function () {
     it('rejects requests without bearer token', function () {
@@ -60,4 +66,38 @@ describe('WakeController', function () {
         // No notifications sent because no push subscriptions
         $response->assertJson(['users_notified' => 0]);
     });
+
+    it('sends each notification type only once per day', function () {
+        config(['services.notifications.wake_token' => 'valid-token']);
+
+        $service = $this->mock(NotificationService::class);
+        $service->shouldReceive('sendEveningNotifications')
+            ->once()
+            ->andReturn(['users_notified' => 2, 'errors' => 0]);
+
+        $headers = [
+            'Authorization' => 'Bearer valid-token',
+        ];
+
+        $this->postJson('/api/wake', [], $headers)
+            ->assertOk()
+            ->assertJsonPath('already_sent', false);
+
+        $this->postJson('/api/wake', [], $headers)
+            ->assertOk()
+            ->assertJsonPath('already_sent', true);
+    });
+
+    it('rejects an invalid notification type', function () {
+        config(['services.notifications.wake_token' => 'valid-token']);
+
+        $this->postJson('/api/wake', [
+            'type' => 'weekly',
+        ], [
+            'Authorization' => 'Bearer valid-token',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('type');
+    });
+
 });

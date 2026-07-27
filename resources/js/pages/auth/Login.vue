@@ -11,7 +11,7 @@ const form = useForm({
 });
 
 const onSubmit = () => {
-    form.post(store());
+    form.post(store.url());
 };
 </script>
 

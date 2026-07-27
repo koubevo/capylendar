@@ -1,13 +1,19 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
+import { useToast } from '@nuxt/ui/composables';
 import { watch } from 'vue';
 
 const toast = useToast();
+interface FlashMessages {
+    success?: string;
+    error?: string;
+}
+
 const page = usePage();
 
 watch(
-    () => page.props.flash,
-    (flash: { success?: string; error?: string }) => {
+    () => page.props.flash as FlashMessages | undefined,
+    (flash) => {
         if (!flash) return;
 
         if (flash.success) {

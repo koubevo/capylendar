@@ -12,6 +12,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -27,7 +28,7 @@ class EventService
         protected EventTagService $eventTagService,
     ) {}
 
-    private const HISTORY_EVENTS_LIMIT = 20;
+    private const HISTORY_EVENTS_PER_PAGE = 20;
 
     public function store(StoreEventRequest $request): ?Event
     {
@@ -179,10 +180,54 @@ class EventService
         $events = $query->orderBy('start_at', $eventType->sortDirection())
             ->orderBy('is_all_day', 'desc')
             ->orderBy('title', 'asc')
-            ->when($eventType === EventType::History, fn ($q) => $q->limit(self::HISTORY_EVENTS_LIMIT))
+            ->when($eventType === EventType::History, fn ($q) => $q->limit(self::HISTORY_EVENTS_PER_PAGE))
             ->get();
 
         return EventResource::collection($events)->resolve();
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $filters
+     */
+    public function paginateAssignedEvents(
+        User $user,
+        EventType $eventType = EventType::History,
+        ?array $filters = [],
+    ): AnonymousResourceCollection {
+        $query = $user
+            ->assignedEvents()
+            ->with(['tags', 'author'])
+            ->withCount('subscribers')
+            ->where('start_at', $eventType->operator(), Carbon::now()->startOfDay());
+
+        if ($filters) {
+            $search = $filters['search'] ?? null;
+            if (is_string($search) && $search !== '') {
+                $operator = DB::connection()->getDriverName() === 'sqlite' ? 'like' : 'ilike';
+                $query->where(function (Builder $query) use ($search, $operator) {
+                    $query->where('title', $operator, "%{$search}%")
+                        ->orWhere('description', $operator, "%{$search}%");
+                });
+            }
+
+            if (! empty($filters['capybara'])) {
+                $query->where('capybara', $filters['capybara']);
+            }
+
+            if (! empty($filters['tags'])) {
+                $query->whereHas('tags', function (Builder $query) use ($filters) {
+                    $query->whereIn('tags.id', $filters['tags']);
+                });
+            }
+        }
+
+        $events = $query->orderBy('start_at', $eventType->sortDirection())
+            ->orderBy('is_all_day', 'desc')
+            ->orderBy('title', 'asc')
+            ->paginate(self::HISTORY_EVENTS_PER_PAGE)
+            ->withQueryString();
+
+        return EventResource::collection($events);
     }
 
     /**

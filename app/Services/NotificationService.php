@@ -144,6 +144,7 @@ class NotificationService
         $events = $user
             ->assignedEvents()
             ->with(['tags', 'author'])
+            ->withCount('subscribers')
             ->whereDate('start_at', $date->toDateString())
             ->orderBy('start_at')
             ->get();

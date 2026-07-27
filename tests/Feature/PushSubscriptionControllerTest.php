@@ -205,3 +205,43 @@ describe('PushSubscriptionController destroy', function () {
         ])->assertUnauthorized();
     });
 });
+it('rejects unsafe or unsupported push endpoints', function (string $endpoint) {
+    $this->actingAs($this->user)
+        ->postJson(route('push-subscription.store'), [
+            'endpoint' => $endpoint,
+            'keys' => [
+                'p256dh' => 'test-p256dh-key',
+                'auth' => 'test-auth-key',
+            ],
+        ])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('endpoint');
+})->with(
+    [
+        'cleartext provider URL' => 'http://fcm.googleapis.com/fcm/send/test',
+        'private service' => 'https://localhost/push',
+        'unapproved external host' => 'https://example.com/push',
+    ],
+);
+
+it('accepts supported push endpoints', function (string $endpoint) {
+    $this->actingAs($this->user)
+        ->postJson(route('push-subscription.store'), [
+            'endpoint' => $endpoint,
+            'keys' => [
+                'p256dh' => 'test-p256dh-key',
+                'auth' => 'test-auth-key',
+            ],
+        ])
+        ->assertSuccessful()
+        ->assertJsonMissingValidationErrors('endpoint');
+
+    $this->assertDatabaseHas('push_subscriptions', [
+        'subscribable_id' => $this->user->id,
+        'endpoint' => $endpoint,
+    ]);
+})->with([
+    'Mozilla' => 'https://push.services.mozilla.com/wpush/v2/test',
+    'Apple' => 'https://web.push.apple.com/QPush/test',
+    'Windows' => 'https://wns2-am3p.notify.windows.com/w/?token=test',
+]);

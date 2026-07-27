@@ -1,44 +1,77 @@
-name: versioning
+name: Version and release
 
 on:
-  push:
-    branches:
-      - master
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
 
 permissions:
   contents: write
 
+concurrency:
+  group: versioning-master
+  cancel-in-progress: false
+
 jobs:
   version:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'master' &&
+      github.event.workflow_run.actor.login != 'github-actions[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout tested commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
+          ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
 
-      - name: Calculate Next Version
+      - name: Calculate next version
         id: tag_version
-        uses: mathieudutour/github-tag-action@v6.2
+        uses: mathieudutour/github-tag-action@d28fa2ccfbd16e871a4bdf35e11b3ad1bd56c0c1 # v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          commit_sha: ${{ github.event.workflow_run.head_sha }}
+          release_branches: master
+          dry_run: true
 
-      - name: Update VERSION File
-        if: steps.tag_version.outputs.new_tag != steps.tag_version.outputs.old_tag
-        run: echo "${{ steps.tag_version.outputs.new_version }}" > VERSION
+      - name: Commit VERSION, tag the same commit, and create release
+        if: >-
+          steps.tag_version.outputs.new_tag != '' &&
+          steps.tag_version.outputs.new_tag != 'undefined'
+        env:
+          CHANGELOG: ${{ steps.tag_version.outputs.changelog }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NEW_TAG: ${{ steps.tag_version.outputs.new_tag }}
+          NEW_VERSION: ${{ steps.tag_version.outputs.new_version }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
 
-      - name: Commit & Push VERSION File
-        if: steps.tag_version.outputs.new_tag != steps.tag_version.outputs.old_tag
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: 'chore(release): v${{ steps.tag_version.outputs.new_version }} [skip ci]'
-          file_pattern: VERSION
-          branch: master
+          if [[ ! "$NEW_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid generated tag: $NEW_TAG" >&2
+            exit 1
+          fi
 
-      - name: Create Release
-        uses: ncipollo/release-action@v1
-        if: steps.tag_version.outputs.new_tag != steps.tag_version.outputs.old_tag
-        with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: Release ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+          git fetch origin master --tags
+
+          if [[ "$(git rev-parse origin/master)" != "$SOURCE_SHA" ]]; then
+            echo 'master advanced after CI; a newer run will create the release'
+            exit 0
+          fi
+
+          printf '%s\n' "$NEW_VERSION" > VERSION
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add VERSION
+
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(release): $NEW_TAG"
+          fi
+
+          git tag "$NEW_TAG"
+          git push --atomic origin HEAD:master "$NEW_TAG"
+          gh release create "$NEW_TAG" --verify-tag --title "Release $NEW_TAG" --notes "$CHANGELOG"

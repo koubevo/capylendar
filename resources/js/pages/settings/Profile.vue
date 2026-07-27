@@ -21,7 +21,7 @@ const items = [
 </script>
 
 <template>
-    <Head :title="page.props.auth.user.name" />
+    <Head :title="page.props.auth.user?.name ?? 'Profil'" />
 
     <AuthenticatedLayout
         :display-footer="true"

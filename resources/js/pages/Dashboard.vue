@@ -10,12 +10,18 @@ import type { Event } from '@/types/Event';
 import { EventFilters } from '@/types/Filters';
 import { Tag } from '@/types/Tag';
 import type { Todo } from '@/types/Todo';
-import { router } from '@inertiajs/vue3';
+import { InfiniteScroll, router } from '@inertiajs/vue3';
 import { computed, ref, watch } from 'vue';
 
+interface DashboardMonth {
+    key: string;
+    label: string;
+    events: Event[];
+    todos: Todo[];
+}
+
 interface Props {
-    upcomingEvents: Event[];
-    unfinishedTodos: Todo[];
+    dashboardMonths: { data: DashboardMonth[] };
     eventFilters: EventFilters;
     capybaraOptions: Capybara[];
     availableTags: Tag[];
@@ -26,12 +32,21 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const upcomingEvents = computed(() =>
+    props.dashboardMonths.data.flatMap((month) => month.events),
+);
+
+const loadedTodos = computed(() =>
+    props.dashboardMonths.data.flatMap((month) => month.todos),
+);
+
 const handleFilterChange = (newFilters: typeof props.eventFilters) => {
-    router.get(DashboardController(), newFilters as any, {
+    router.get(DashboardController().url, newFilters, {
         preserveState: true,
         preserveScroll: true,
         replace: true,
-        only: ['upcomingEvents', 'unfinishedTodos', 'eventFilters'],
+        only: ['dashboardMonths', 'eventFilters'],
+        reset: ['dashboardMonths'],
     });
 };
 
@@ -76,18 +91,40 @@ const items = [
         slot: 'todos',
     },
 ];
-const localTodos = ref<Todo[]>(props.unfinishedTodos.map((t) => ({ ...t })));
+
+const localTodos = ref<Todo[]>([]);
+const locallyToggledTodoIds = new Set<number>();
 
 watch(
-    () => props.unfinishedTodos,
-    (newVal) => {
-        localTodos.value = newVal.map((t) => ({ ...t }));
+    loadedTodos,
+    (newTodos) => {
+        const localTodosById = new Map(
+            localTodos.value.map((todo) => [todo.id, todo]),
+        );
+        const incomingTodoIds = new Set(newTodos.map((todo) => todo.id));
+
+        localTodos.value = [
+            ...newTodos.map((todo) => {
+                const localTodo = localTodosById.get(todo.id);
+
+                return locallyToggledTodoIds.has(todo.id) && localTodo
+                    ? { ...todo, is_finished: localTodo.is_finished }
+                    : { ...todo };
+            }),
+            ...localTodos.value.filter(
+                (todo) =>
+                    locallyToggledTodoIds.has(todo.id) &&
+                    !incomingTodoIds.has(todo.id),
+            ),
+        ];
     },
+    { immediate: true },
 );
 
 function handleToggled(todoId: number) {
-    localTodos.value = localTodos.value.map((t) =>
-        t.id === todoId ? { ...t, is_finished: !t.is_finished } : t,
+    locallyToggledTodoIds.add(todoId);
+    localTodos.value = localTodos.value.map((todo) =>
+        todo.id === todoId ? { ...todo, is_finished: !todo.is_finished } : todo,
     );
 }
 </script>
@@ -113,47 +150,62 @@ function handleToggled(todoId: number) {
             </template>
         </UCollapsible>
 
-        <UTabs :items="items">
-            <template #all>
-                <DashboardList
-                    heading="Aktuální"
-                    :events="props.upcomingEvents"
-                    :todos="localTodos"
-                    :create-if-empty="true"
-                    :scroll-to-date="props.scrollToDate"
-                    :highlight-event="props.highlightEvent"
-                    :highlight-todo="props.highlightTodo"
-                    :is-scrolled="isScrolled"
-                    @scrolled="handleScrollFinished"
-                    @toggled="handleToggled"
-                />
-            </template>
+        <InfiniteScroll data="dashboardMonths" preserve-url>
+            <UTabs :items="items">
+                <template #all>
+                    <DashboardList
+                        heading="Aktuální"
+                        :events="upcomingEvents"
+                        :todos="localTodos"
+                        :create-if-empty="true"
+                        :scroll-to-date="props.scrollToDate"
+                        :highlight-event="props.highlightEvent"
+                        :highlight-todo="props.highlightTodo"
+                        :is-scrolled="isScrolled"
+                        @scrolled="handleScrollFinished"
+                        @toggled="handleToggled"
+                    />
+                </template>
 
-            <template #events>
-                <EventsList
-                    heading="Eventy"
-                    :events="props.upcomingEvents"
-                    :create-event-if-empty="true"
-                    :scroll-to-date="props.scrollToDate"
-                    :highlight-event="props.highlightEvent"
-                    :is-scrolled="isScrolled"
-                    @scrolled="handleScrollFinished"
-                />
-            </template>
+                <template #events>
+                    <EventsList
+                        heading="Eventy"
+                        :events="upcomingEvents"
+                        :create-event-if-empty="true"
+                        :scroll-to-date="props.scrollToDate"
+                        :highlight-event="props.highlightEvent"
+                        :is-scrolled="isScrolled"
+                        @scrolled="handleScrollFinished"
+                    />
+                </template>
 
-            <template #todos>
-                <TodosList
-                    heading="Todos"
-                    :todos="localTodos"
-                    :create-todo-if-empty="true"
-                    :show-finish-button="true"
-                    :scroll-to-date="props.scrollToDate"
-                    :highlight-todo="props.highlightTodo"
-                    :is-scrolled="isScrolled"
-                    @scrolled="handleScrollFinished"
-                    @toggled="handleToggled"
-                />
+                <template #todos>
+                    <TodosList
+                        heading="Todos"
+                        :todos="localTodos"
+                        :create-todo-if-empty="true"
+                        :show-finish-button="true"
+                        :scroll-to-date="props.scrollToDate"
+                        :highlight-todo="props.highlightTodo"
+                        :is-scrolled="isScrolled"
+                        @scrolled="handleScrollFinished"
+                        @toggled="handleToggled"
+                    />
+                </template>
+            </UTabs>
+
+            <template #loading>
+                <div
+                    class="flex items-center justify-center gap-2 py-8 text-sm text-neutral-500"
+                    role="status"
+                >
+                    <UIcon
+                        name="i-lucide-loader-circle"
+                        class="size-5 animate-spin"
+                    />
+                    <span>Načítám další měsíc</span>
+                </div>
             </template>
-        </UTabs>
+        </InfiniteScroll>
     </AuthenticatedLayout>
 </template>

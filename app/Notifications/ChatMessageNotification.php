@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Str;
 use NotificationChannels\WebPush\WebPushChannel;
 use NotificationChannels\WebPush\WebPushMessage;
 
@@ -10,13 +11,8 @@ class ChatMessageNotification extends Notification
 {
     public function __construct(
         protected string $senderName,
-        protected string $content
-    ) {
-        \Log::info('ChatMessageNotification created', [
-            'sender' => $this->senderName,
-            'content_length' => strlen($this->content),
-        ]);
-    }
+        protected string $content,
+    ) {}
 
     /**
      * @return array<int, string>
@@ -28,18 +24,9 @@ class ChatMessageNotification extends Notification
 
     public function toWebPush(object $notifiable, Notification $notification): WebPushMessage
     {
-        \Log::info('toWebPush called', [
-            'notifiable_id' => $notifiable->id ?? 'unknown',
-            'sender' => $this->senderName,
-        ]);
+        $content = Str::limit($this->content, 100);
 
-        $content = $this->content;
-
-        if (strlen($content) > 100) {
-            $content = substr($content, 0, 97).'...';
-        }
-
-        $message = (new WebPushMessage)
+        return (new WebPushMessage)
             ->title("Nová zpráva od {$this->senderName}")
             ->icon('/capicon.png')
             ->body($content)
@@ -49,16 +36,7 @@ class ChatMessageNotification extends Notification
                 'urgency' => 'normal',
             ])
             ->data([
-                'url' => (function () {
-                    /** @var string $url */
-                    $url = config('app.url');
-
-                    return $url.'/chat';
-                })(),
+                'url' => route('chat.index'),
             ]);
-
-        \Log::info('WebPush message created successfully');
-
-        return $message;
     }
 }

@@ -7,31 +7,34 @@ const page = usePage();
 interface Props {
     size?: 'small' | 'large';
 }
+type AvatarSize = NonNullable<Props['size']>;
+
 
 const props = withDefaults(defineProps<Props>(), {
     size: 'large',
 });
 
-const sizeClasses: Record<Props['size'], string> = {
+const sizeClasses: Record<AvatarSize, string> = {
     small: 'w-26 h-26',
     large: 'w-32 h-32',
 };
 
 const currentSizeClass = computed(() => sizeClasses[props.size]);
+const user = computed(() => page.props.auth.user);
 </script>
 
 <template>
-    <div class="flex flex-col items-center gap-y-4">
+    <div v-if="user" class="flex flex-col items-center gap-y-4">
         <img
-            :src="'/images/capys/' + page.props.auth.user.capybara + '.jpg'"
-            :alt="page.props.auth.user.name"
+            :src="'/images/capys/' + user.capybara + '.jpg'"
+            :alt="user.name"
             class="rounded-lg object-cover"
             :class="currentSizeClass"
         />
 
         <div class="text-center">
-            <h2 class="mb-0">{{ page.props.auth.user.name }}</h2>
-            <p>{{ page.props.auth.user.email }}</p>
+            <h2 class="mb-0">{{ user.name }}</h2>
+            <p>{{ user.email }}</p>
         </div>
     </div>
 </template>

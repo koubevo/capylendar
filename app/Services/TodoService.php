@@ -102,7 +102,7 @@ class TodoService
 
     /**
      * @param  array<string, string>|null  $filters
-     * @return array<TodoResource>
+     * @return array<int, array<string, mixed>>
      */
     public function getAssignedTodos(?User $user, bool $finished = false, ?array $filters = []): array
     {
@@ -170,7 +170,7 @@ class TodoService
     }
 
     /**
-     * @return array<TodoResource>
+     * @return array<int, array<string, mixed>>
      */
     public function getDeletedTodos(?User $user): array
     {

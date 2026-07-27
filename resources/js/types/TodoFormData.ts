@@ -1,6 +1,6 @@
 export interface TodoFormData {
     title: string;
-    capybara: string;
+    capybara: 'blue' | 'pink' | 'yellow';
     deadline: string;
     priority: string;
     is_private: boolean;

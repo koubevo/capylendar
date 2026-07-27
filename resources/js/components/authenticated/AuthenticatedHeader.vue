@@ -3,6 +3,7 @@ import DashboardController from '@/actions/App/Http/Controllers/DashboardControl
 import DocumentController from '@/actions/App/Http/Controllers/DocumentController';
 import EventController from '@/actions/App/Http/Controllers/EventController';
 import MessageController from '@/actions/App/Http/Controllers/MessageController';
+import { index as watchDevicesIndex } from '@/actions/App/Http/Controllers/Settings/WatchDeviceController';
 import TagController from '@/actions/App/Http/Controllers/TagController';
 import TodoController from '@/actions/App/Http/Controllers/TodoController';
 import MenuItem from '@/components/authenticated/MenuItem.vue';
@@ -28,7 +29,6 @@ const links = computed(() => [
         label: 'Dokumenty',
         to: DocumentController.index(),
         icon: 'i-lucide-file-text',
-        isNew: true,
     },
     {
         label: 'Chat',
@@ -39,6 +39,12 @@ const links = computed(() => [
         label: 'Můj Profil',
         to: profile(),
         icon: 'i-lucide-user',
+    },
+    {
+        label: 'Spárovaná zařízení',
+        to: watchDevicesIndex(),
+        icon: 'i-lucide-monitor-smartphone',
+        isNew: true,
     },
     {
         label: 'Správa štítků',

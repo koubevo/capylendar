@@ -39,12 +39,7 @@ class DailyEventsNotification extends Notification
                 'urgency' => 'normal',
             ])
             ->data([
-                'url' => $this->actionUrl ?? (function () {
-                    /** @var string $url */
-                    $url = config('app.url');
-
-                    return $url.'/dashboard';
-                })(),
+                'url' => $this->actionUrl ?? route('dashboard'),
             ]);
     }
 }

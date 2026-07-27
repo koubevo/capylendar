@@ -2,19 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DestroyPushSubscriptionRequest;
+use App\Http\Requests\StorePushSubscriptionRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class PushSubscriptionController extends Controller
 {
-    public function store(Request $request): JsonResponse
+    public function store(StorePushSubscriptionRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'endpoint' => 'required|url',
-            'keys.auth' => 'required|string',
-            'keys.p256dh' => 'required|string',
-        ]);
-
         $user = $request->user();
 
         if (! $user) {
@@ -22,9 +17,9 @@ class PushSubscriptionController extends Controller
         }
 
         $user->updatePushSubscription(
-            $validated['endpoint'],
-            $validated['keys']['p256dh'],
-            $validated['keys']['auth']
+            $request->string('endpoint')->toString(),
+            $request->string('keys.p256dh')->toString(),
+            $request->string('keys.auth')->toString(),
         );
 
         $user->update(['notifications_enabled' => true]);
@@ -32,21 +27,16 @@ class PushSubscriptionController extends Controller
         return response()->json(['message' => 'Subscription saved']);
     }
 
-    public function destroy(Request $request): JsonResponse
+    public function destroy(DestroyPushSubscriptionRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'endpoint' => 'required|url',
-        ]);
-
         $user = $request->user();
 
         if (! $user) {
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
 
-        $user->deletePushSubscription($validated['endpoint']);
+        $user->deletePushSubscription($request->string('endpoint')->toString());
 
-        // If no subscriptions left, disable notifications
         if ($user->pushSubscriptions()->count() === 0) {
             $user->update(['notifications_enabled' => false]);
         }

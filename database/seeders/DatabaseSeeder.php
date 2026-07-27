@@ -2,10 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Event;
-use App\Models\EventUser;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -19,14 +16,6 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->pink()->create();
 
-        Event::factory(5)->create();
-
-        Event::factory(5)->allDay()->create();
-
-        Event::factory(5)->pink()->create();
-
-        Event::factory(5)->pink()->allDay()->create();
-
-        EventUser::factory(10)->create();
+        $this->call(EventAndTodoSeeder::class);
     }
 }

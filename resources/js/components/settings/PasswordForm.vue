@@ -2,6 +2,7 @@
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import { useForm } from '@inertiajs/vue3';
+import { useToast } from '@nuxt/ui/composables';
 
 const toast = useToast();
 const form = useForm({
@@ -11,7 +12,7 @@ const form = useForm({
 });
 
 const onSubmit = () => {
-    form.put(PasswordController.update(), {
+    form.put(PasswordController.update.url(), {
         preserveScroll: true,
 
         onSuccess: () => {

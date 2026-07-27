@@ -9,6 +9,7 @@ use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
+    $this->travelTo(now()->startOfMonth()->addDays(9)->setTime(8, 0));
     $this->user = User::factory()->create();
 });
 
@@ -34,10 +35,10 @@ describe('DashboardController', function () {
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Dashboard')
-                ->has('upcomingEvents', 1)
+                ->has('dashboardMonths.data.0.events', 1)
                 ->has('capybaraOptions')
                 ->has('availableTags')
-                ->where('upcomingEvents.0.title', 'Upcoming Event')
+                ->where('dashboardMonths.data.0.events.0.title', 'Upcoming Event')
             );
     });
 
@@ -82,8 +83,8 @@ describe('DashboardController filters', function () {
             ->get(route('dashboard', ['search' => 'Meeting']))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->has('upcomingEvents', 1)
-                ->where('upcomingEvents.0.title', 'Meeting with Team')
+                ->has('dashboardMonths.data.0.events', 1)
+                ->where('dashboardMonths.data.0.events.0.title', 'Meeting with Team')
             );
     });
 
@@ -107,8 +108,8 @@ describe('DashboardController filters', function () {
             ->get(route('dashboard', ['capybara' => 'blue']))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->has('upcomingEvents', 1)
-                ->where('upcomingEvents.0.title', 'Blue Event')
+                ->has('dashboardMonths.data.0.events', 1)
+                ->where('dashboardMonths.data.0.events.0.title', 'Blue Event')
             );
     });
 
@@ -134,8 +135,8 @@ describe('DashboardController filters', function () {
             ->get(route('dashboard', ['tags' => [$tag->id]]))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->has('upcomingEvents', 1)
-                ->where('upcomingEvents.0.title', 'Tagged Event')
+                ->has('dashboardMonths.data.0.events', 1)
+                ->where('dashboardMonths.data.0.events.0.title', 'Tagged Event')
             );
     });
 
@@ -170,8 +171,8 @@ describe('DashboardController filters', function () {
             ->get(route('dashboard'))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->has('upcomingEvents', 1)
-                ->where('upcomingEvents.0.title', 'My Event')
+                ->has('dashboardMonths.data.0.events', 1)
+                ->where('dashboardMonths.data.0.events.0.title', 'My Event')
             );
     });
 });
@@ -196,9 +197,9 @@ describe('DashboardController sorting', function () {
             ->get(route('dashboard'))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->has('upcomingEvents', 2)
-                ->where('upcomingEvents.0.title', 'Sooner Event')
-                ->where('upcomingEvents.1.title', 'Later Event')
+                ->has('dashboardMonths.data.0.events', 2)
+                ->where('dashboardMonths.data.0.events.0.title', 'Sooner Event')
+                ->where('dashboardMonths.data.0.events.1.title', 'Later Event')
             );
     });
 
@@ -224,9 +225,9 @@ describe('DashboardController sorting', function () {
             ->get(route('dashboard'))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->has('upcomingEvents', 2)
-                ->where('upcomingEvents.0.title', 'All Day Event')
-                ->where('upcomingEvents.1.title', 'Timed Event')
+                ->has('dashboardMonths.data.0.events', 2)
+                ->where('dashboardMonths.data.0.events.0.title', 'All Day Event')
+                ->where('dashboardMonths.data.0.events.1.title', 'Timed Event')
             );
     });
 
@@ -253,9 +254,9 @@ describe('DashboardController sorting', function () {
             ->get(route('dashboard'))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->has('upcomingEvents', 2)
-                ->where('upcomingEvents.0.title', 'Alpha Event')
-                ->where('upcomingEvents.1.title', 'Bravo Event')
+                ->has('dashboardMonths.data.0.events', 2)
+                ->where('dashboardMonths.data.0.events.0.title', 'Alpha Event')
+                ->where('dashboardMonths.data.0.events.1.title', 'Bravo Event')
             );
     });
 
@@ -296,11 +297,84 @@ describe('DashboardController sorting', function () {
             ->get(route('dashboard'))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->has('unfinishedTodos', 4)
-                ->where('unfinishedTodos.0.title', 'Alpha High')
-                ->where('unfinishedTodos.1.title', 'Bravo High')
-                ->where('unfinishedTodos.2.title', 'Medium Todo')
-                ->where('unfinishedTodos.3.title', 'Low Todo')
+                ->has('dashboardMonths.data.0.todos', 4)
+                ->where('dashboardMonths.data.0.todos.0.title', 'Alpha High')
+                ->where('dashboardMonths.data.0.todos.1.title', 'Bravo High')
+                ->where('dashboardMonths.data.0.todos.2.title', 'Medium Todo')
+                ->where('dashboardMonths.data.0.todos.3.title', 'Low Todo')
+            );
+    });
+
+    it('loads one calendar month per dashboard page', function () {
+        $currentEvent = Event::factory()->create([
+            'author_id' => $this->user->id,
+            'title' => 'Current month event',
+            'start_at' => now()->setTime(10, 0),
+        ]);
+        $currentEvent->subscribers()->attach($this->user);
+
+        $nextMonthDate = now()->addMonthNoOverflow()->startOfMonth()->addDay();
+        $nextEvent = Event::factory()->create([
+            'author_id' => $this->user->id,
+            'title' => 'Next month event',
+            'start_at' => $nextMonthDate->copy()->setTime(10, 0),
+        ]);
+        $nextEvent->subscribers()->attach($this->user);
+
+        $overdueTodo = Todo::factory()->create([
+            'author_id' => $this->user->id,
+            'title' => 'Overdue todo',
+            'deadline' => now()->subMonth(),
+        ]);
+        $overdueTodo->subscribers()->attach($this->user);
+
+        $nextTodo = Todo::factory()->create([
+            'author_id' => $this->user->id,
+            'title' => 'Next month todo',
+            'deadline' => $nextMonthDate,
+        ]);
+        $nextTodo->subscribers()->attach($this->user);
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('dashboardMonths.data', 1)
+                ->where(
+                    'dashboardMonths.data.0.key',
+                    now()->format('Y-m'),
+                )
+                ->has('dashboardMonths.data.0.events', 1)
+                ->where(
+                    'dashboardMonths.data.0.events.0.title',
+                    'Current month event',
+                )
+                ->has('dashboardMonths.data.0.todos', 1)
+                ->where(
+                    'dashboardMonths.data.0.todos.0.title',
+                    'Overdue todo',
+                )
+            );
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard', ['dashboard' => 2]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('dashboardMonths.data', 1)
+                ->where(
+                    'dashboardMonths.data.0.key',
+                    $nextMonthDate->format('Y-m'),
+                )
+                ->has('dashboardMonths.data.0.events', 1)
+                ->where(
+                    'dashboardMonths.data.0.events.0.title',
+                    'Next month event',
+                )
+                ->has('dashboardMonths.data.0.todos', 1)
+                ->where(
+                    'dashboardMonths.data.0.todos.0.title',
+                    'Next month todo',
+                )
             );
     });
 
@@ -324,9 +398,29 @@ describe('DashboardController sorting', function () {
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('events/EventHistoryIndex')
-                ->has('historyEvents', 2)
-                ->where('historyEvents.0.title', 'Recent Event')
-                ->where('historyEvents.1.title', 'Older Event')
+                ->has('historyEvents.data', 2)
+                ->where('historyEvents.data.0.title', 'Recent Event')
+                ->where('historyEvents.data.1.title', 'Older Event')
+            );
+    });
+    it('paginates history events beyond the first twenty records', function () {
+        foreach (range(1, 21) as $daysAgo) {
+            $event = Event::factory()->create([
+                'author_id' => $this->user->id,
+                'title' => "History {$daysAgo}",
+                'start_at' => now()->subDays($daysAgo),
+            ]);
+            $event->subscribers()->attach($this->user);
+        }
+
+        $this->actingAs($this->user)
+            ->get(route('event.historyIndex', ['page' => 2]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('historyEvents.data', 1)
+                ->where('historyEvents.data.0.title', 'History 21')
+                ->where('historyEvents.meta.current_page', 2)
+                ->where('historyEvents.meta.last_page', 2)
             );
     });
 });

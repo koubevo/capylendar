@@ -39,7 +39,7 @@ describe('DailyEventsNotification', function () {
 
         $message = $notification->toWebPush($notifiable, $notification);
 
-        $expectedUrl = config('app.url').'/dashboard';
+        $expectedUrl = route('dashboard');
         expect($message->toArray()['data']['url'])->toBe($expectedUrl);
     });
 });

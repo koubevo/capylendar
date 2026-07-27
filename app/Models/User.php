@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\Capybara;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,6 +19,7 @@ use NotificationChannels\WebPush\HasPushSubscriptions;
  * @property string $name
  * @property Capybara $capybara
  * @property bool $notifications_enabled
+ * @property-read Collection<int, WatchDevice> $watchDevices
  */
 class User extends Authenticatable
 {
@@ -94,5 +96,21 @@ class User extends Authenticatable
     public function assignedTodos(): BelongsToMany
     {
         return $this->belongsToMany(Todo::class, 'todo_user');
+    }
+
+    /**
+     * @return HasMany<WatchDevice, $this>
+     */
+    public function watchDevices(): HasMany
+    {
+        return $this->hasMany(WatchDevice::class);
+    }
+
+    /**
+     * @return HasMany<WatchPairing, $this>
+     */
+    public function watchPairings(): HasMany
+    {
+        return $this->hasMany(WatchPairing::class);
     }
 }

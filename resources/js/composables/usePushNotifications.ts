@@ -4,13 +4,20 @@ import {
 } from '@/actions/App/Http/Controllers/PushSubscriptionController';
 import type { AppPageProps } from '@/types';
 import { usePage } from '@inertiajs/vue3';
-import { computed, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
+
+const SUBSCRIPTION_RENEWAL_INTERVAL_MS = 30 * 24 * 60 * 60 * 1000;
+const SUBSCRIPTION_EXPIRY_BUFFER_MS = 7 * 24 * 60 * 60 * 1000;
+const LAST_RENEWED_AT_KEY = 'capylendar:push-subscription-renewed-at';
 
 const isSupported = ref(false);
 const isSubscribed = ref(false);
 const permission = ref<NotificationPermission>('default');
 const isLoading = ref(false);
 const error = ref<string | null>(null);
+
+let stopLifecycle: (() => void) | null = null;
+let reconciliationPromise: Promise<void> | null = null;
 
 export function usePushNotifications() {
     const page = usePage();
@@ -42,12 +49,16 @@ export function usePushNotifications() {
         }
     };
 
+    const getRegistration =
+        async (): Promise<ServiceWorkerRegistration | null> => {
+            return (await navigator.serviceWorker.getRegistration('/')) ?? null;
+        };
+
     const checkSubscription = async (): Promise<PushSubscription | null> => {
         if (!isSupported.value) return null;
 
         try {
-            const registration =
-                await navigator.serviceWorker.getRegistration();
+            const registration = await getRegistration();
             if (!registration) {
                 isSubscribed.value = false;
                 return null;
@@ -57,8 +68,12 @@ export function usePushNotifications() {
                 await registration.pushManager.getSubscription();
             isSubscribed.value = !!subscription;
             return subscription;
-        } catch (e) {
-            console.error('Error checking subscription:', e);
+        } catch (subscriptionError) {
+            console.error(
+                'Error checking push subscription:',
+                subscriptionError,
+            );
+            isSubscribed.value = false;
             return null;
         }
     };
@@ -66,11 +81,13 @@ export function usePushNotifications() {
     const registerServiceWorker =
         async (): Promise<ServiceWorkerRegistration | null> => {
             try {
-                const registration =
-                    await navigator.serviceWorker.register('/sw.js');
-                return registration;
-            } catch (e) {
-                console.error('Service worker registration failed:', e);
+                await navigator.serviceWorker.register('/sw.js');
+                return navigator.serviceWorker.ready;
+            } catch (registrationError) {
+                console.error(
+                    'Service worker registration failed:',
+                    registrationError,
+                );
                 error.value = 'Nepodařilo se registrovat service worker';
                 return null;
             }
@@ -90,24 +107,33 @@ export function usePushNotifications() {
             const result = await Notification.requestPermission();
             permission.value = result;
             return result === 'granted';
-        } catch (e) {
-            console.error('Error requesting permission:', e);
+        } catch (permissionError) {
+            console.error(
+                'Error requesting notification permission:',
+                permissionError,
+            );
             error.value = 'Nepodařilo se získat oprávnění pro notifikace';
             return false;
         }
     };
 
-    const urlBase64ToUint8Array = (base64String: string): Uint8Array => {
+    const urlBase64ToArrayBuffer = (base64String: string): ArrayBuffer => {
         const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
         const base64 = (base64String + padding)
             .replace(/-/g, '+')
             .replace(/_/g, '/');
         const rawData = window.atob(base64);
         const outputArray = new Uint8Array(rawData.length);
-        for (let i = 0; i < rawData.length; ++i) {
-            outputArray[i] = rawData.charCodeAt(i);
+        for (let index = 0; index < rawData.length; index++) {
+            outputArray[index] = rawData.charCodeAt(index);
         }
-        return outputArray;
+
+        return outputArray.buffer;
+    };
+
+    const getCsrfToken = (): string => {
+        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+        return match ? decodeURIComponent(match[1]) : '';
     };
 
     const saveSubscription = async (
@@ -126,8 +152,104 @@ export function usePushNotifications() {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to save subscription');
+            throw new Error('Failed to save push subscription');
         }
+    };
+
+    const removeSubscriptionFromServer = async (
+        endpoint: string,
+    ): Promise<void> => {
+        const destroyRoute = destroyPushSubscription();
+        const response = await fetch(destroyRoute.url, {
+            method: destroyRoute.method,
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-XSRF-TOKEN': getCsrfToken(),
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ endpoint }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to remove push subscription');
+        }
+    };
+
+    const markSubscriptionRenewed = () => {
+        try {
+            window.localStorage.setItem(
+                LAST_RENEWED_AT_KEY,
+                Date.now().toString(),
+            );
+        } catch {
+            // Storage may be unavailable in strict privacy modes.
+        }
+    };
+
+    const isApplicationServerKeyCurrent = (
+        subscription: PushSubscription,
+    ): boolean => {
+        const currentKey = subscription.options.applicationServerKey;
+        if (!currentKey || !vapidPublicKey.value) {
+            return false;
+        }
+
+        const expectedKey = new Uint8Array(
+            urlBase64ToArrayBuffer(vapidPublicKey.value),
+        );
+        const actualKey = new Uint8Array(currentKey);
+
+        return (
+            actualKey.length === expectedKey.length &&
+            actualKey.every((value, index) => value === expectedKey[index])
+        );
+    };
+
+    const shouldRenewSubscription = (
+        subscription: PushSubscription,
+    ): boolean => {
+        if (!isApplicationServerKeyCurrent(subscription)) {
+            return true;
+        }
+
+        if (
+            subscription.expirationTime !== null &&
+            subscription.expirationTime <=
+                Date.now() + SUBSCRIPTION_EXPIRY_BUFFER_MS
+        ) {
+            return true;
+        }
+
+        try {
+            const lastRenewedAt = Number(
+                window.localStorage.getItem(LAST_RENEWED_AT_KEY),
+            );
+
+            if (!Number.isFinite(lastRenewedAt) || lastRenewedAt <= 0) {
+                markSubscriptionRenewed();
+                return false;
+            }
+
+            return (
+                Date.now() - lastRenewedAt >= SUBSCRIPTION_RENEWAL_INTERVAL_MS
+            );
+        } catch {
+            return false;
+        }
+    };
+
+    const createSubscription = async (
+        registration: ServiceWorkerRegistration,
+    ): Promise<PushSubscription> => {
+        if (!vapidPublicKey.value) {
+            throw new Error('VAPID public key is missing');
+        }
+
+        return registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToArrayBuffer(vapidPublicKey.value),
+        });
     };
 
     const subscribe = async (forceNew = false): Promise<boolean> => {
@@ -140,56 +262,61 @@ export function usePushNotifications() {
         error.value = null;
 
         try {
-            // Request permission first
             const permissionGranted = await requestPermission();
             if (!permissionGranted) {
                 error.value = 'Notifikace byly zamítnuty';
-                isLoading.value = false;
                 return false;
             }
 
-            // Register service worker
             const registration = await registerServiceWorker();
             if (!registration) {
-                isLoading.value = false;
                 return false;
             }
-
-            // Wait for service worker to be ready
-            await navigator.serviceWorker.ready;
 
             const currentSubscription =
                 await registration.pushManager.getSubscription();
+            const renewCurrentSubscription =
+                currentSubscription &&
+                (forceNew || shouldRenewSubscription(currentSubscription));
 
-            if (currentSubscription && !forceNew) {
+            if (currentSubscription && !renewCurrentSubscription) {
                 await saveSubscription(currentSubscription);
                 isSubscribed.value = true;
-                isLoading.value = false;
                 return true;
             }
 
+            const previousEndpoint = currentSubscription?.endpoint;
             if (currentSubscription) {
                 await currentSubscription.unsubscribe();
             }
 
-            // Subscribe to push
-            const subscription = await registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(
-                    vapidPublicKey.value,
-                ),
-            });
-
+            const subscription = await createSubscription(registration);
             await saveSubscription(subscription);
+            markSubscriptionRenewed();
+
+            if (
+                previousEndpoint &&
+                previousEndpoint !== subscription.endpoint
+            ) {
+                try {
+                    await removeSubscriptionFromServer(previousEndpoint);
+                } catch (cleanupError) {
+                    console.warn(
+                        'Failed to remove stale push subscription:',
+                        cleanupError,
+                    );
+                }
+            }
 
             isSubscribed.value = true;
-            isLoading.value = false;
             return true;
-        } catch (e) {
-            console.error('Error subscribing:', e);
+        } catch (subscriptionError) {
+            console.error('Error subscribing to push:', subscriptionError);
             error.value = 'Nepodařilo se aktivovat notifikace';
-            isLoading.value = false;
+            isSubscribed.value = false;
             return false;
+        } finally {
+            isLoading.value = false;
         }
     };
 
@@ -198,11 +325,9 @@ export function usePushNotifications() {
         error.value = null;
 
         try {
-            const registration =
-                await navigator.serviceWorker.getRegistration();
+            const registration = await getRegistration();
             if (!registration) {
                 isSubscribed.value = false;
-                isLoading.value = false;
                 return true;
             }
 
@@ -210,86 +335,111 @@ export function usePushNotifications() {
                 await registration.pushManager.getSubscription();
 
             if (subscription) {
-                const destroyRoute = destroyPushSubscription();
-
-                // Remove from server first
-                await fetch(destroyRoute.url, {
-                    method: destroyRoute.method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Accept: 'application/json',
-                        'X-XSRF-TOKEN': getCsrfToken(),
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({ endpoint: subscription.endpoint }),
-                });
-
-                // Unsubscribe locally
+                await removeSubscriptionFromServer(subscription.endpoint);
                 await subscription.unsubscribe();
             }
 
+            try {
+                window.localStorage.removeItem(LAST_RENEWED_AT_KEY);
+            } catch {
+                // Storage may be unavailable in strict privacy modes.
+            }
+
             isSubscribed.value = false;
-            isLoading.value = false;
             return true;
-        } catch (e) {
-            console.error('Error unsubscribing:', e);
+        } catch (unsubscribeError) {
+            console.error('Error unsubscribing from push:', unsubscribeError);
             error.value = 'Nepodařilo se deaktivovat notifikace';
-            isLoading.value = false;
             return false;
+        } finally {
+            isLoading.value = false;
         }
     };
 
-    const getCsrfToken = (): string => {
-        const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-        return match ? decodeURIComponent(match[1]) : '';
-    };
-
-    const init = async () => {
+    const reconcileSubscription = async (): Promise<void> => {
         checkSupport();
         checkPermission();
-        if (isSupported.value) {
-            const subscription = await checkSubscription();
 
-            if (!isAuthenticated.value) {
-                if (subscription) {
-                    try {
-                        await subscription.unsubscribe();
-                        isSubscribed.value = false;
-                    } catch (e) {
-                        console.error('Error unsubscribing guest locally:', e);
-                    }
-                }
+        if (!isSupported.value) {
+            return;
+        }
 
-                return;
+        const subscription = await checkSubscription();
+
+        if (!isAuthenticated.value) {
+            return;
+        }
+
+        if (!serverNotificationsEnabled.value) {
+            if (subscription) {
+                await unsubscribe();
             }
 
-            if (
-                serverNotificationsEnabled.value &&
-                permission.value === 'granted' &&
-                !subscription
-            ) {
-                try {
-                    await subscribe();
-                } catch (e) {
-                    console.error('Error during auto-subscribe:', e);
-                }
-            } else if (!serverNotificationsEnabled.value && subscription) {
-                try {
-                    await unsubscribe();
-                } catch (e) {
-                    console.error('Error unsubscribing during init:', e);
-                }
-            }
+            return;
+        }
+
+        if (permission.value === 'granted') {
+            await subscribe();
         }
     };
 
-    watch(
-        [serverNotificationsEnabled, isAuthenticated],
-        () => {
+    const init = async (): Promise<void> => {
+        if (reconciliationPromise) {
+            return reconciliationPromise;
+        }
+
+        reconciliationPromise = reconcileSubscription().finally(() => {
+            reconciliationPromise = null;
+        });
+
+        return reconciliationPromise;
+    };
+
+    const startLifecycle = () => {
+        if (stopLifecycle) {
+            return;
+        }
+
+        const stopWatch = watch(
+            [serverNotificationsEnabled, isAuthenticated],
+            () => {
+                void init();
+            },
+            { immediate: true },
+        );
+
+        const reconcileWhenVisible = () => {
+            if (document.visibilityState === 'visible') {
+                void init();
+            }
+        };
+        const reconcileWhenOnline = () => {
             void init();
-        },
-        { immediate: true },
-    );
+        };
+
+        document.addEventListener('visibilitychange', reconcileWhenVisible);
+        window.addEventListener('online', reconcileWhenOnline);
+        window.addEventListener('pageshow', reconcileWhenOnline);
+
+        const cleanup = () => {
+            stopWatch();
+            document.removeEventListener(
+                'visibilitychange',
+                reconcileWhenVisible,
+            );
+            window.removeEventListener('online', reconcileWhenOnline);
+            window.removeEventListener('pageshow', reconcileWhenOnline);
+            stopLifecycle = null;
+        };
+
+        stopLifecycle = cleanup;
+
+        onBeforeUnmount(() => {
+            if (stopLifecycle === cleanup) {
+                cleanup();
+            }
+        });
+    };
 
     return {
         isSupported,
@@ -303,5 +453,6 @@ export function usePushNotifications() {
         serverNotificationsEnabled,
         isAuthenticated,
         init,
+        startLifecycle,
     };
 }

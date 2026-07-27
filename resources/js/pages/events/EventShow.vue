@@ -7,10 +7,13 @@ import PreviewCard from '@/components/ui/PreviewCard.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import type { Event } from '@/types/Event';
 import { Head } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 const props = defineProps<{
     event: Event;
 }>();
+
+const mapPreview = computed(() => props.event.meta?.map_preview);
 </script>
 
 <template>
@@ -37,23 +40,23 @@ const props = defineProps<{
                 />
             </UCard>
             <PreviewCard
-                v-if="props.event.has_map_meta"
-                :url="props.event.meta.map_preview.url"
-                :image="props.event.meta.map_preview.image"
-                :title="props.event.meta.map_preview.title"
+                v-if="props.event.has_map_meta && mapPreview"
+                :url="mapPreview.url"
+                :image="mapPreview.image"
+                :title="mapPreview.title"
                 :classes="props.event.capybara.classes"
             />
             <ActionButtons
                 :duplicate-action="{
-                    url: EventController.create({
+                    url: EventController.create.url({
                         query: {
                             duplicate_event_id: props.event.id,
                         },
                     }),
                 }"
-                :edit-action="{ url: EventController.edit(props.event) }"
+                :edit-action="{ url: EventController.edit.url(props.event) }"
                 :delete-action="{
-                    url: EventController.destroy(props.event),
+                    url: EventController.destroy.url(props.event),
                     title: 'Smazat event',
                     titleShort: 'Smazat',
                 }"

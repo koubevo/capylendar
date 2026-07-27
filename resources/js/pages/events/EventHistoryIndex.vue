@@ -7,11 +7,11 @@ import { Capybara } from '@/types/Capybara';
 import type { Event } from '@/types/Event';
 import { EventFilters } from '@/types/Filters';
 import { Tag } from '@/types/Tag';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, InfiniteScroll, router } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 interface Props {
-    historyEvents: Event[];
+    historyEvents: { data: Event[] };
     eventFilters: EventFilters;
     capybaraOptions: Capybara[];
     availableTags: Tag[];
@@ -25,6 +25,7 @@ const handleFilterChange = (newFilters: typeof props.eventFilters) => {
         preserveScroll: true,
         replace: true,
         only: ['historyEvents', 'eventFilters'],
+        reset: ['historyEvents'],
     });
 };
 
@@ -61,6 +62,21 @@ const eventFiltersLabel = computed(() => {
             </template>
         </UCollapsible>
 
-        <EventsList heading="Historické eventy" :events="props.historyEvents" />
+        <InfiniteScroll data="historyEvents" only-next preserve-url>
+            <EventsList
+                heading="Historické eventy"
+                :events="props.historyEvents.data"
+            />
+
+            <template #loading>
+                <div class="flex justify-center py-6" role="status">
+                    <UIcon
+                        name="i-lucide-loader-circle"
+                        class="size-6 animate-spin"
+                    />
+                    <span class="sr-only">Načítám další události</span>
+                </div>
+            </template>
+        </InfiniteScroll>
     </AuthenticatedLayout>
 </template>

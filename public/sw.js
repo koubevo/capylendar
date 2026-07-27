@@ -23,7 +23,11 @@ self.addEventListener('push', function (event) {
 self.addEventListener('notificationclick', function (event) {
     event.notification.close();
 
-    const urlToOpen = event.notification.data?.url || '/';
+    const requestedUrl = new URL(event.notification.data?.url || '/', self.location.origin);
+    const urlToOpen =
+        requestedUrl.origin === self.location.origin
+            ? requestedUrl.href
+            : self.location.origin;
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {

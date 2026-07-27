@@ -1,13 +1,14 @@
 <?php
 
 use App\Http\Controllers\PushSubscriptionController;
-use Illuminate\Http\Request;
+use App\Http\Requests\DestroyPushSubscriptionRequest;
+use App\Http\Requests\StorePushSubscriptionRequest;
 
 describe('PushSubscriptionController Coverage', function () {
     it('returns 401 if user is not found in store', function () {
         $controller = new PushSubscriptionController;
 
-        $request = Request::create('/store', 'POST', [
+        $request = StorePushSubscriptionRequest::create('/store', 'POST', [
             'endpoint' => 'https://example.com',
             'keys' => ['auth' => 'foo', 'p256dh' => 'bar'],
         ]);
@@ -22,7 +23,7 @@ describe('PushSubscriptionController Coverage', function () {
     it('returns 401 if user is not found in destroy', function () {
         $controller = new PushSubscriptionController;
 
-        $request = Request::create('/destroy', 'DELETE', [
+        $request = DestroyPushSubscriptionRequest::create('/destroy', 'DELETE', [
             'endpoint' => 'https://example.com',
         ]);
         $request->setUserResolver(fn () => null);

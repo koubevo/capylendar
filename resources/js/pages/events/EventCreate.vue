@@ -19,7 +19,10 @@ const props = defineProps<{
 
 const form = useForm<EventFormData>({
     title: props.event?.title || '',
-    capybara: props.event?.capybara.value || page.props.auth.user.capybara,
+    capybara:
+        props.event?.capybara.value ??
+        page.props.auth.user?.capybara ??
+        'yellow',
     date: '',
     start_at: props.event?.date.start_time || '',
     end_at: props.event?.date.end_time || '',
@@ -36,7 +39,7 @@ const title = computed(() => {
 });
 
 function submit() {
-    form.post(EventController.store(), {
+    form.post(EventController.store.url(), {
         forceFormData: true,
     });
 }

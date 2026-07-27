@@ -3,6 +3,7 @@ import AuthenticatedFooter from '@/components/authenticated/AuthenticatedFooter.
 import AuthenticatedHeader from '@/components/authenticated/AuthenticatedHeader.vue';
 import FloatingActionButton from '@/components/buttons/FloatingActionButton.vue';
 import Container from '@/components/Container.vue';
+import { usePushNotifications } from '@/composables/usePushNotifications';
 import AppLayout from '@/layouts/AppLayout.vue';
 
 interface Props {
@@ -14,6 +15,9 @@ const props = withDefaults(defineProps<Props>(), {
     displayFooter: false,
     displayFloatingActionButton: true,
 });
+
+const { startLifecycle } = usePushNotifications();
+startLifecycle();
 </script>
 
 <template>

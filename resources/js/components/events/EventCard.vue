@@ -5,7 +5,7 @@ import type { Event, View } from '@/types/Event';
 import { computed } from 'vue';
 interface Props {
     event: Event;
-    view: View;
+    view?: View;
 }
 
 const props = withDefaults(defineProps<Props>(), {

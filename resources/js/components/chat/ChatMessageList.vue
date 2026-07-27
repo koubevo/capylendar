@@ -11,7 +11,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const page = usePage();
-const currentUserId = computed(() => page.props.auth.user.id);
+const currentUserId = computed(() => page.props.auth.user?.id ?? null);
 
 const messagesContainer = ref<HTMLElement | null>(null);
 

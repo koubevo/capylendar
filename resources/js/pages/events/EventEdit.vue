@@ -22,14 +22,14 @@ const form = useForm<EventFormData>({
     end_at: props.event.date.end_time,
     is_all_day: props.event.date.is_all_day,
     is_private: props.event.is_private,
-    description: props.event.description,
+    description: props.event.description ?? '',
     tags: props.event.tags?.map((tag) => tag.id) || [],
     image: null,
     remove_image: false,
 });
 
 function submit() {
-    form.put(EventController.update(props.event), {
+    form.put(EventController.update.url(props.event), {
         forceFormData: true,
     });
 }

@@ -11,7 +11,7 @@ const form = useForm({
 });
 
 const onSubmit = () => {
-    form.put(PasswordController.update(), {
+    form.put(PasswordController.update.url(), {
         preserveScroll: true,
 
         onSuccess: () => {

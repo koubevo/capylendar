@@ -1,114 +1,81 @@
 # 🗓️ Capylendar
 
-**Capylendar** is a modern, shared calendar application built on **Laravel 12** and **Vue 3**, focusing on simplicity,
-speed, and... capybaras. 🦦
+Capylendar is a private application for collaborative planning for two. It is built on Laravel 13, Inertia.js 3, and Vue 3, and alongside the web app, it offers a simple Wear OS client.
 
-The app is designed primarily for sharing events and tasks (todos) between users (e.g., couples), featuring private notes and color-coded
-themes (based on "Capybaras").
+## Technologies
 
----
+- PHP 8.4, Laravel 13, and Fortify
+- Inertia.js 3, Vue 3, and TypeScript
+- Tailwind CSS 4 and Nuxt UI
+- PostgreSQL 18
+- Vite, Wayfinder, Pest, PHPStan/Larastan, Pint, ESLint, and Prettier
+- Laravel Sail for local development and Laravel Cloud for web deployment
+- Native Wear OS app in a separate repository `capylendar-wear`
 
-## 🛠 Tech Stack
+Telescope is not a runtime component of the application. Queue workers are not needed for notifications.
 
-The project utilizes the latest standards in modern PHP and JavaScript development:
+## Features
 
-- **Backend:** [Laravel 12](https://laravel.com) (PHP 8.4+)
-- **Frontend:** [Vue 3](https://vuejs.org) (Composition API, `<script setup>`)
-- **Language:** TypeScript & PHP (Strict types)
-- **Bridge:** [Inertia.js](https://inertiajs.com) (Monolith feel, SPA speed)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com) & [Nuxt UI](https://ui.nuxt.com)
-- **Database:** PostgreSQL 17
-- **Tooling:** Sail (Docker), Vite, ESLint, Prettier, PHPStan (level 9), Pest, Pint, Telescope
-- **PR Reviews** Gemini, Code Rabbit
+- Shared and private events and tasks with priorities, labels, and filtering.
+- Collaborative documents and shared tags.
+- Chat between users with push notifications to the recipient.
+- Morning daily overview and evening preview of tomorrow via Web Push.
+- Event history with Inertia infinite loading of 20 items.
+- Event images, automatic map previews, and native sharing.
+- PWA installation and service worker for push notifications.
+- Wear OS pairing via short-lived code; the watch stores the token encrypted in the Android Keystore.
 
----
+Todo completion is intentionally optimistic: the card stays on the page until the next refresh, so an accidental tap can be undone.
 
-## ✨ Key Features
+## Local Setup
 
-- **Shared vs. Private Items:**
-    - Users can create events and todos visible to all assigned users.
-    - Option to toggle "Private" mode (visible only to the author).
-- **Todos (Tasks):**
-    - Create tasks with specific deadlines.
-    - **Batch Postpone:** Move all unfinished todos to the next day with a single click.
-    - Intelligent sorting by priority and title.
-- **Capybara Themes:**
-    - Events are categorized using the `Capybara` Enum (Blue, Pink, Yellow).
-    - Each category has its own color scheme and avatar.
-- **Dashboard:**
-    - Separated into **Upcoming** and **History** tabs.
-- **Push Notifications:**
-    - Daily PWA push notifications for upcoming events.
-    - Morning reminders (today's events) and evening previews (tomorrow's events).
-    - Configurable via Profile → Notifikace tab.
-- **Smart Features:**
-    - 💖 **Love Detection:** The backend automatically detects keywords in the title (e.g., "date", "love") and adds a
-      subtle heart pattern to the event card background.
-    - 📝 **Duplication:** Create a copy of an event with pre-filled data in one click.
-    - 🕒 **Human Readable Dates:** Creation and update times are formatted as "5 minutes ago".
-    - 🚀 **Animations & UI:** Newly created or updated items are highlighted with a smooth animation.
-    - 🔗 **Native Sharing:** Easily share events and todos via the native share menu on mobile devices.
+```bash
+vendor/bin/sail up -d
+vendor/bin/sail composer install
+vendor/bin/sail npm ci
+vendor/bin/sail artisan key:generate
+vendor/bin/sail npm run dev
+```
 
----
+Run all PHP, Composer, Artisan, and Node commands in this project via Sail.
 
-## 🔔 Push Notifications Setup
+## Push Notifications
 
-1. Generate VAPID keys:
+Generate VAPID keys:
 
-    ```bash
-    php artisan webpush:vapid
-    ```
+```bash
+vendor/bin/sail artisan webpush:vapid
+```
 
-2. Add to `.env`:
+Set them in your environment:
 
-    ```env
-    VAPID_PUBLIC_KEY=<generated-key>
-    VAPID_PRIVATE_KEY=<generated-key>
-    VAPID_SUBJECT=mailto:your@email.com
-    VITE_VAPID_PUBLIC_KEY="${VAPID_PUBLIC_KEY}"
-    NOTIFICATION_WAKE_TOKEN=<generate-secure-token>
-    ```
+```env
+VAPID_PUBLIC_KEY=<public-key>
+VAPID_PRIVATE_KEY=<private-key>
+VAPID_SUBJECT=mailto:your@email.com
+NOTIFICATION_WAKE_TOKEN=<random-long-secret>
+```
 
-3. Configure external cron service to call:
-    - **Evening** (tomorrow's events): `POST /api/wake?type=evening`
-    - **Morning** (today's events): `POST /api/wake?type=morning`
+An external cron can call `POST /api/wake?type=morning` and `POST /api/wake?type=evening` with the header `Authorization: Bearer <NOTIFICATION_WAKE_TOKEN>`. Each type is idempotent on the server for a given calendar day. Sending a chat notification is deferred until after the HTTP response using Laravel `defer`, without a queue worker.
 
-    With header: `Authorization: Bearer <NOTIFICATION_WAKE_TOKEN>`
+## Quality Checks
 
----
+Full local check:
 
-## 🏗 Architecture & Best Practices
+```bash
+vendor/bin/sail composer check
+vendor/bin/sail npm run typecheck
+vendor/bin/sail npm run lint
+vendor/bin/sail npm run format:check
+vendor/bin/sail npm run build:ssr
+```
 
-The project places a strong emphasis on **Clean Code** and maintainability:
-
-### Backend (Laravel)
-
-- **Service Layer:** Data manipulation logic (Create, Update) is isolated in `EventService`. The Controller only manages
-  the data flow.
-- **API Resources:** Data transformation for the frontend is handled exclusively via `EventResource`. No raw Eloquent
-  models are exposed.
-- **Enums:** Native PHP Enums are used for states and types (e.g., `Capybara`, `EventType`) with methods for frontend
-  consumption (colors, labels).
-- **Optimization:**
-    - Usage of DB Transactions when saving M:N relationships.
-
-### Frontend (Vue + TypeScript)
-
-- **Composables:** Form logic is extracted into `EventForm.ts`. Components handle UI only.
-- **Type Safety:** All backend data (Props) have defined TypeScript interfaces (`types/Event.ts`).
-- **Atomic Design:** UI is broken down into small, reusable components (`ActionCard`, `DeleteModal`, `InfoCard`).
-- **Mobile-First UI** Interface elements, including the Floating Action Button (FAB) and input controls, are optimized
-  for touch interaction and bottom-thumb zones.
-
----
+GitHub CI also checks synchronized Wayfinder files and runs `composer audit` and `npm audit`. Weekly dependency audits and Dependabot monitor Composer, npm, and GitHub Actions. A release is created only after a successful CI run; first, the `VERSION` file is committed, then the same commit is tagged and a GitHub Release is created.
 
 ## Deployment
 
-The app is deployed on [Laravel Cloud](https://capylendar.laravel.cloud).
+The web app is deployed on [Laravel Cloud](https://capylendar.laravel.cloud). The production database is used neither during local tests nor audits; the test suite runs on an isolated in-memory SQLite database.
 
----
-
-This README file was generated with assistance from Google's Gemini assistant 3 Pro version and Opus 4.5, based on specifications
-provided by the project author.
+The Wear OS app can be distributed directly as a debug APK via a laptop. Play Store signing or store release automation is not required for this distribution.
 
 Made with ❤️ and 🦦 by Vojtěch Koubek

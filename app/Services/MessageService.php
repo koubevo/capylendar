@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Notifications\ChatMessageNotification;
 use Illuminate\Support\Collection;
 
+use function Illuminate\Support\defer;
+
 class MessageService
 {
     /**
@@ -45,7 +47,10 @@ class MessageService
             'content' => $request->validated('content'),
         ]);
 
-        $this->notifyOtherUsers($message, $user);
+        defer(
+            fn () => $this->notifyOtherUsers($message, $user),
+            "chat-message-notification:{$message->id}",
+        );
 
         return $message;
     }
@@ -57,18 +62,7 @@ class MessageService
             ->where('notifications_enabled', true)
             ->whereHas('pushSubscriptions');
 
-        \Log::info('Chat notification debug', [
-            'message_id' => $message->id,
-            'sender_id' => $sender->id,
-            'recipients_count' => $recipients->count(),
-        ]);
-
         $recipients->cursor()->each(function (User $recipient) use ($message, $sender) {
-            \Log::info('Sending chat notification', [
-                'recipient_id' => $recipient->id,
-                'message_id' => $message->id,
-            ]);
-
             $recipient->notify(new ChatMessageNotification(
                 $sender->name,
                 $message->content

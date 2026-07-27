@@ -2,6 +2,8 @@
 
 use App\Models\Message;
 use App\Models\User;
+use App\Notifications\ChatMessageNotification;
+use Illuminate\Support\Facades\Notification;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
@@ -106,4 +108,28 @@ describe('MessageController store validation', function () {
 
         $this->assertDatabaseCount('messages', 1);
     });
+});
+it('defers a push notification for other subscribed users', function () {
+    $this->withoutDefer();
+    Notification::fake();
+
+    $recipient = User::factory()->create([
+        'notifications_enabled' => true,
+    ]);
+    $recipient->updatePushSubscription(
+        'https://fcm.googleapis.com/fcm/send/recipient',
+        'recipient-public-key',
+        'recipient-auth-token',
+    );
+
+    $this->actingAs($this->user)
+        ->post(route('chat.store'), [
+            'content' => 'Ahoj!',
+        ])
+        ->assertRedirect(route('chat.index'));
+
+    Notification::assertSentTo(
+        $recipient,
+        ChatMessageNotification::class,
+    );
 });

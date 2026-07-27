@@ -76,6 +76,8 @@ describe('watch pairing API', function () {
             'token_hash' => hash('sha256', $plainTextToken),
         ]);
 
+        WatchPairing::query()->sole()->update(['expires_at' => now()->subSecond()]);
+
         $repeatedClaim = $this->postJson(route('watch.pairings.claim'), [
             'device_code' => $pairing->json('device_code'),
         ])

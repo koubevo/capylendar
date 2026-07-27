@@ -79,10 +79,6 @@ class WatchPairingService
                 return ['status' => 'invalid'];
             }
 
-            if ($pairing->expires_at->isPast()) {
-                return ['status' => 'expired'];
-            }
-
             if ($pairing->claimed_at) {
                 $plainTextToken = $pairing->claimed_token;
 
@@ -99,6 +95,10 @@ class WatchPairingService
                 }
 
                 return $this->authorizedResult($plainTextToken, $device);
+            }
+
+            if ($pairing->expires_at->isPast()) {
+                return ['status' => 'expired'];
             }
 
             if (! $pairing->approved_at || ! $pairing->user_id) {

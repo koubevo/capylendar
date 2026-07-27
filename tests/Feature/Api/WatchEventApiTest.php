@@ -22,7 +22,7 @@ describe('watch event API', function () {
         $assignedEvent = Event::factory()->for($user, 'author')->create([
             'title' => 'Večeře',
             'start_at' => now()->addHour(),
-            'end_at' => now()->addHours(2),
+            'end_at' => null,
             'is_all_day' => false,
         ]);
         $ongoingEvent = Event::factory()->for($user, 'author')->create([
@@ -54,6 +54,7 @@ describe('watch event API', function () {
             ->assertJsonPath('data.1.id', $assignedEvent->id)
             ->assertJsonPath('data.1.title', 'Večeře')
             ->assertJsonPath('data.1.date.start_time', $assignedEvent->start_at->format('H:i'))
+            ->assertJsonPath('data.1.date.end_time', '')
             ->assertJsonMissing(['id' => $pastEvent->id])
             ->assertJsonMissing(['id' => $otherEvent->id]);
     });

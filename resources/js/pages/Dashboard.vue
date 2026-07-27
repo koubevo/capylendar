@@ -93,16 +93,36 @@ const items = [
 ];
 
 const localTodos = ref<Todo[]>([]);
+const locallyToggledTodoIds = new Set<number>();
 
 watch(
     loadedTodos,
     (newTodos) => {
-        localTodos.value = newTodos.map((todo) => ({ ...todo }));
+        const localTodosById = new Map(
+            localTodos.value.map((todo) => [todo.id, todo]),
+        );
+        const incomingTodoIds = new Set(newTodos.map((todo) => todo.id));
+
+        localTodos.value = [
+            ...newTodos.map((todo) => {
+                const localTodo = localTodosById.get(todo.id);
+
+                return locallyToggledTodoIds.has(todo.id) && localTodo
+                    ? { ...todo, is_finished: localTodo.is_finished }
+                    : { ...todo };
+            }),
+            ...localTodos.value.filter(
+                (todo) =>
+                    locallyToggledTodoIds.has(todo.id) &&
+                    !incomingTodoIds.has(todo.id),
+            ),
+        ];
     },
     { immediate: true },
 );
 
 function handleToggled(todoId: number) {
+    locallyToggledTodoIds.add(todoId);
     localTodos.value = localTodos.value.map((todo) =>
         todo.id === todoId ? { ...todo, is_finished: !todo.is_finished } : todo,
     );

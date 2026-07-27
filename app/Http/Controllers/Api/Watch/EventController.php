@@ -34,7 +34,7 @@ class EventController extends Controller
                     'key' => $event->start_at->format('Y-m-d'),
                     'label' => $this->dateLabel($event),
                     'start_time' => $event->is_all_day ? '' : $event->start_at->format('H:i'),
-                    'end_time' => $event->is_all_day ? '' : $event->end_at?->format('H:i'),
+                    'end_time' => $event->is_all_day ? '' : ($event->end_at?->format('H:i') ?? ''),
                     'is_all_day' => $event->is_all_day,
                 ],
                 'capybara' => [

@@ -431,12 +431,6 @@ const handleToggled = (id: number) => {
                 </div>
             </section>
 
-            <section class="border-b border-[#18243d] bg-[#18243d] text-white">
-                <div
-                    class="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-white/15 px-6 md:grid-cols-4 lg:px-10"
-                ></div>
-            </section>
-
             <section class="bg-[#fffaf2] py-20 md:py-28">
                 <div class="mx-auto max-w-7xl px-6 lg:px-10">
                     <div

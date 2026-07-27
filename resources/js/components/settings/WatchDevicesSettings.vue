@@ -2,6 +2,7 @@
 import { destroy } from '@/actions/App/Http/Controllers/Settings/WatchDeviceController';
 import { store } from '@/actions/App/Http/Controllers/Settings/WatchPairingController';
 import { router, useForm } from '@inertiajs/vue3';
+import { useToast } from '@nuxt/ui/composables';
 
 export interface WatchDevice {
     id: number;

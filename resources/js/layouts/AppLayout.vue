@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
+import { useToast } from '@nuxt/ui/composables';
 import { watch } from 'vue';
 
 const toast = useToast();

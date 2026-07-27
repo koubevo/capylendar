@@ -6,6 +6,7 @@ import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import { Tag } from '@/types/Tag';
 import { TagFormData } from '@/types/TagFormData';
 import { Head, useForm } from '@inertiajs/vue3';
+import { useToast } from '@nuxt/ui/composables';
 
 interface Props {
     tags: Tag[];

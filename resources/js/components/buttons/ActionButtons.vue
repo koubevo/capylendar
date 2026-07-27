@@ -2,6 +2,7 @@
 import ActionModal from '@/components/modals/ActionModal.vue';
 import type { Action, DuplicateAction, EditAction } from '@/types/Button';
 import { Link } from '@inertiajs/vue3';
+import { useToast } from '@nuxt/ui/composables';
 
 const props = defineProps<{
     duplicateAction?: DuplicateAction;

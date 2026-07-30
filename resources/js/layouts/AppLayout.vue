@@ -1,3 +1,8 @@
+<script lang="ts">
+let lastSuccessMessage: string | undefined;
+let lastErrorMessage: string | undefined;
+</script>
+
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
 import { useToast } from '@nuxt/ui/composables';
@@ -16,7 +21,7 @@ watch(
     (flash) => {
         if (!flash) return;
 
-        if (flash.success) {
+        if (flash.success && flash.success !== lastSuccessMessage) {
             toast.add({
                 title: 'Jupí',
                 description: flash.success,
@@ -25,7 +30,7 @@ watch(
             });
         }
 
-        if (flash.error) {
+        if (flash.error && flash.error !== lastErrorMessage) {
             toast.add({
                 title: 'Chyba',
                 description: flash.error,
@@ -33,6 +38,9 @@ watch(
                 icon: 'i-lucide-alert-circle',
             });
         }
+
+        lastSuccessMessage = flash.success;
+        lastErrorMessage = flash.error;
     },
     { deep: true, immediate: true },
 );

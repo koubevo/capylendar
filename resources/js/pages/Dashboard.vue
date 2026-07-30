@@ -52,6 +52,14 @@ const handleFilterChange = (newFilters: typeof props.eventFilters) => {
 
 const isScrolled = ref(false);
 
+const shouldLoadOnlyNext = computed(
+    () =>
+        !isScrolled.value &&
+        Boolean(
+            props.scrollToDate || props.highlightEvent || props.highlightTodo,
+        ),
+);
+
 const handleScrollFinished = () => {
     isScrolled.value = true;
     if (props.scrollToDate || props.highlightEvent || props.highlightTodo) {
@@ -150,7 +158,11 @@ function handleToggled(todoId: number) {
             </template>
         </UCollapsible>
 
-        <InfiniteScroll data="dashboardMonths" preserve-url>
+        <InfiniteScroll
+            data="dashboardMonths"
+            :only-next="shouldLoadOnlyNext"
+            preserve-url
+        >
             <UTabs :items="items">
                 <template #all>
                     <DashboardList

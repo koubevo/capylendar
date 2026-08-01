@@ -99,6 +99,7 @@ const hasItems = computed(() => mergedItems.value.length > 0);
 
 // Scroll-to-date support
 const dateSectionRefs = ref<Record<string, HTMLElement>>({});
+const itemRefs = ref<Record<string, HTMLElement>>({});
 
 const setDateSectionRef = (
     el: Element | ComponentPublicInstance | null,
@@ -109,15 +110,55 @@ const setDateSectionRef = (
     }
 };
 
+const setItemRef = (
+    el: Element | ComponentPublicInstance | null,
+    itemKey: string,
+) => {
+    const componentElement = (el as ComponentPublicInstance | null)?.$el;
+    const element =
+        el instanceof HTMLElement
+            ? el
+            : componentElement instanceof HTMLElement
+              ? componentElement
+              : null;
+
+    if (element) {
+        itemRefs.value[itemKey] = element;
+    } else if (el === null) {
+        delete itemRefs.value[itemKey];
+    }
+};
+
+const hasScrollTarget = () =>
+    Boolean(
+        props.scrollToDate ||
+        typeof props.highlightEvent === 'number' ||
+        typeof props.highlightTodo === 'number',
+    );
+
 const scrollToDateSection = async () => {
-    if (!props.scrollToDate) return;
+    if (!hasScrollTarget()) return;
 
     await nextTick();
 
-    const targetSection = dateSectionRefs.value[props.scrollToDate];
-    if (targetSection) {
-        const headerOffset = 80;
-        const elementPosition = targetSection.getBoundingClientRect().top;
+    const highlightedItemKey =
+        typeof props.highlightEvent === 'number'
+            ? 'event-' + props.highlightEvent
+            : typeof props.highlightTodo === 'number'
+              ? 'todo-' + props.highlightTodo
+              : null;
+    const targetElement = highlightedItemKey
+        ? itemRefs.value[highlightedItemKey]
+        : undefined;
+    const element =
+        targetElement ??
+        (props.scrollToDate
+            ? dateSectionRefs.value[props.scrollToDate]
+            : undefined);
+
+    if (element) {
+        const headerOffset = targetElement ? 120 : 80;
+        const elementPosition = element.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.scrollY - headerOffset;
 
         window.scrollTo({
@@ -165,9 +206,13 @@ onMounted(() => {
 });
 
 watch(
-    () => props.scrollToDate,
-    (newVal) => {
-        if (newVal) {
+    () => [props.scrollToDate, props.highlightEvent, props.highlightTodo],
+    ([newDate, newEvent, newTodo]) => {
+        if (
+            newDate ||
+            typeof newEvent === 'number' ||
+            typeof newTodo === 'number'
+        ) {
             scrollToDateSection();
         }
     },
@@ -232,6 +277,7 @@ watch(
                         v-if="item.type === 'event'"
                         :href="EventController.show(item.data as Event)"
                         class="block"
+                        :ref="(el) => setItemRef(el, 'event-' + item.data.id)"
                     >
                         <EventCard
                             :event="item.data as Event"
@@ -243,6 +289,7 @@ watch(
                         v-else
                         :href="TodoController.show(item.data as Todo)"
                         class="block"
+                        :ref="(el) => setItemRef(el, 'todo-' + item.data.id)"
                     >
                         <TodoCard
                             :todo="item.data as Todo"

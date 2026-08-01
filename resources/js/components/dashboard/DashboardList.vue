@@ -114,13 +114,30 @@ const setItemRef = (
     el: Element | ComponentPublicInstance | null,
     itemKey: string,
 ) => {
-    if (el instanceof HTMLElement) {
-        itemRefs.value[itemKey] = el;
+    const componentElement = (el as ComponentPublicInstance | null)?.$el;
+    const element =
+        el instanceof HTMLElement
+            ? el
+            : componentElement instanceof HTMLElement
+              ? componentElement
+              : null;
+
+    if (element) {
+        itemRefs.value[itemKey] = element;
+    } else if (el === null) {
+        delete itemRefs.value[itemKey];
     }
 };
 
+const hasScrollTarget = () =>
+    Boolean(
+        props.scrollToDate ||
+        typeof props.highlightEvent === 'number' ||
+        typeof props.highlightTodo === 'number',
+    );
+
 const scrollToDateSection = async () => {
-    if (!props.scrollToDate) return;
+    if (!hasScrollTarget()) return;
 
     await nextTick();
 
@@ -133,7 +150,11 @@ const scrollToDateSection = async () => {
     const targetElement = highlightedItemKey
         ? itemRefs.value[highlightedItemKey]
         : undefined;
-    const element = targetElement ?? dateSectionRefs.value[props.scrollToDate];
+    const element =
+        targetElement ??
+        (props.scrollToDate
+            ? dateSectionRefs.value[props.scrollToDate]
+            : undefined);
 
     if (element) {
         const headerOffset = targetElement ? 120 : 80;
@@ -185,9 +206,13 @@ onMounted(() => {
 });
 
 watch(
-    () => props.scrollToDate,
-    (newVal) => {
-        if (newVal) {
+    () => [props.scrollToDate, props.highlightEvent, props.highlightTodo],
+    ([newDate, newEvent, newTodo]) => {
+        if (
+            newDate ||
+            typeof newEvent === 'number' ||
+            typeof newTodo === 'number'
+        ) {
             scrollToDateSection();
         }
     },

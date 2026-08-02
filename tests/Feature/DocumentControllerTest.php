@@ -163,7 +163,8 @@ describe('DocumentController shared access', function () {
                 'title' => 'New title',
                 'body' => 'Updated body',
             ])
-            ->assertRedirect(route('document.show', $document));
+            ->assertRedirect(route('document.show', $document))
+            ->assertSessionHas('success', 'Dokument upraven');
 
         $this->assertDatabaseHas('documents', [
             'id' => $document->id,

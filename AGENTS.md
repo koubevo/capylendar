@@ -1,3 +1,12 @@
+## Application contract
+
+Before changing application logic, read the entire [APPLICATION.md](APPLICATION.md).
+Agents MUST preserve the intentional behavior documented there, including
+unusual edge cases. When a change alters a product or business rule, update
+`APPLICATION.md` in the same pull request. If the implementation and contract
+are unclear or disagree, stop and ask the user instead of fixing an assumed
+bug.
+
 <laravel-boost-guidelines>
 === foundation rules ===
 

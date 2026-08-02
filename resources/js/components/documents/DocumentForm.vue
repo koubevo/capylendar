@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import type { DocumentFormData } from '@/types/DocumentFormData';
-import { Form, useForm } from '@inertiajs/vue3';
+import { useForm } from '@inertiajs/vue3';
 import { nextTick, onUnmounted, ref, type ComponentPublicInstance } from 'vue';
 
 type SubmitMethod = 'post' | 'put';
+type HeadingLevel = 2 | 3;
 
 const props = withDefaults(
     defineProps<{
@@ -28,10 +29,10 @@ const form = useForm<DocumentFormData>({
 
 const bodyTextarea = ref<ComponentPublicInstance | null>(null);
 const isTablePickerOpen = ref(false);
-const selectedTableRows = ref(2);
-const selectedTableColumns = ref(2);
-const minTableSize = 2;
-const maxTableRows = 6;
+const selectedTableRows = ref(1);
+const selectedTableColumns = ref(1);
+const minTableSize = 1;
+const maxTableRows = 10;
 const maxTableColumns = 4;
 const tableRows = Array.from(
     { length: maxTableRows - minTableSize + 1 },
@@ -110,11 +111,12 @@ async function wrapSelection(
     );
 }
 
-async function insertHeading(): Promise<void> {
+async function insertHeading(level: HeadingLevel): Promise<void> {
+    const headingPrefix = '#'.repeat(level);
     const textarea = getTextarea();
 
     if (!textarea) {
-        form.body += '\n## Nadpis';
+        form.body += '\n' + headingPrefix + ' Nadpis';
         return;
     }
 
@@ -123,16 +125,48 @@ async function insertHeading(): Promise<void> {
     const lineEndIndex = form.body.indexOf('\n', start);
     const lineEnd = lineEndIndex === -1 ? form.body.length : lineEndIndex;
     const line = form.body.slice(lineStart, lineEnd);
-    const hasHeading = line.startsWith('## ');
-    const nextLine = hasHeading ? line.slice(3) : `## ${line || 'Nadpis'}`;
+    const heading = line.match(/^(#{1,6})\s+(.+)$/);
+    const hasHeading = heading?.[1].length === level;
+    const headingText = heading?.[2] ?? line;
+    const nextLine = hasHeading
+        ? headingText
+        : headingPrefix + ' ' + (headingText || 'Nadpis');
 
     form.body =
         form.body.slice(0, lineStart) + nextLine + form.body.slice(lineEnd);
 
-    const selectionStart = hasHeading ? lineStart : lineStart + 3;
+    const selectionStart = hasHeading
+        ? lineStart
+        : lineStart + headingPrefix.length + 1;
     const selectionEnd = lineStart + nextLine.length;
 
     await focusBody(selectionStart, selectionEnd);
+}
+
+async function insertSeparator(): Promise<void> {
+    const separator = '---';
+    const textarea = getTextarea();
+
+    if (!textarea) {
+        form.body += '\n' + separator;
+        return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const needsLeadingBreak =
+        start > 0 && !form.body.slice(0, start).endsWith('\n\n');
+    const needsTrailingBreak =
+        end < form.body.length && !form.body.slice(end).startsWith('\n');
+    const leadingBreak = needsLeadingBreak ? '\n\n' : '';
+    const trailingBreak = needsTrailingBreak ? '\n\n' : '';
+    const replacement = leadingBreak + separator + trailingBreak;
+
+    form.body = form.body.slice(0, start) + replacement + form.body.slice(end);
+
+    const cursorPosition = start + leadingBreak.length + separator.length;
+
+    await focusBody(cursorPosition, cursorPosition);
 }
 
 async function continueListOnEnter(event: KeyboardEvent): Promise<void> {
@@ -189,7 +223,7 @@ function closeTablePickerSoon(): void {
 
     tablePickerCloseTimeout = setTimeout(() => {
         isTablePickerOpen.value = false;
-        selectTableSize(2, 2);
+        selectTableSize(1, 1);
         tablePickerCloseTimeout = null;
     }, 180);
 }
@@ -263,7 +297,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Form @submit.prevent="submit">
+    <form @submit.prevent="submit">
         <div class="flex w-full flex-col gap-y-6 md:gap-y-8">
             <UFormField
                 label="Nazev"
@@ -294,16 +328,42 @@ onUnmounted(() => {
                             />
                         </UTooltip>
 
-                        <UTooltip text="Nadpis">
+                        <UTooltip text="Nadpis 2">
                             <UButton
                                 type="button"
                                 color="neutral"
                                 variant="ghost"
                                 size="sm"
                                 icon="i-lucide-heading-2"
-                                aria-label="Nadpis"
+                                aria-label="Nadpis 2"
                                 class="h-9 w-9 justify-center rounded-md"
-                                @click="insertHeading"
+                                @click="insertHeading(2)"
+                            />
+                        </UTooltip>
+
+                        <UTooltip text="Nadpis 3">
+                            <UButton
+                                type="button"
+                                color="neutral"
+                                variant="ghost"
+                                size="sm"
+                                icon="i-lucide-heading-3"
+                                aria-label="Nadpis 3"
+                                class="h-9 w-9 justify-center rounded-md"
+                                @click="insertHeading(3)"
+                            />
+                        </UTooltip>
+
+                        <UTooltip text="Oddelovac">
+                            <UButton
+                                type="button"
+                                color="neutral"
+                                variant="ghost"
+                                size="sm"
+                                icon="i-lucide-separator-horizontal"
+                                aria-label="Oddelovac"
+                                class="h-9 w-9 justify-center rounded-md"
+                                @click="insertSeparator"
                             />
                         </UTooltip>
 
@@ -346,8 +406,8 @@ onUnmounted(() => {
                                 </div>
 
                                 <div
-                                    class="grid grid-cols-3 gap-1"
-                                    @mouseleave="selectTableSize(2, 2)"
+                                    class="grid grid-cols-4 gap-1"
+                                    @mouseleave="selectTableSize(1, 1)"
                                 >
                                     <template
                                         v-for="row in tableRows"
@@ -407,5 +467,5 @@ onUnmounted(() => {
                 {{ props.isEditMode ? 'Upravit' : 'Pridat' }}
             </PrimaryButton>
         </div>
-    </Form>
+    </form>
 </template>

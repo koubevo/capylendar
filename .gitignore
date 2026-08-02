@@ -29,3 +29,4 @@ yarn-error.log
 appstart.sh
 auto-imports.d.ts
 components.d.ts
+/docs/implementation-plans

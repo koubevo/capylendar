@@ -1,16 +1,13 @@
 <script setup lang="ts">
+import MarkdownInline from '@/components/documents/MarkdownInline.vue';
 import { computed } from 'vue';
 
 type MarkdownBlock =
     | { type: 'heading'; level: number; text: string }
     | { type: 'list'; items: string[] }
     | { type: 'paragraph'; lines: string[] }
+    | { type: 'separator' }
     | { type: 'table'; headers: string[]; rows: string[][] };
-
-type InlineSegment = {
-    text: string;
-    type: 'text' | 'strong';
-};
 
 const props = defineProps<{
     content: string;
@@ -57,6 +54,12 @@ function parseMarkdown(content: string): MarkdownBlock[] {
             continue;
         }
 
+        if (isSeparator(line)) {
+            parsedBlocks.push({ type: 'separator' });
+            index += 1;
+            continue;
+        }
+
         if (/^\s*[-*]\s+/.test(line)) {
             const items: string[] = [];
 
@@ -79,6 +82,7 @@ function parseMarkdown(content: string): MarkdownBlock[] {
             lines[index]?.trim() !== '' &&
             !/^(#{1,3})\s+/.test(lines[index] ?? '') &&
             !/^\s*[-*]\s+/.test(lines[index] ?? '') &&
+            !isSeparator(lines[index] ?? '') &&
             !isTableStart(lines, index)
         ) {
             paragraphLines.push(lines[index] ?? '');
@@ -99,6 +103,10 @@ function isTableStart(lines: string[], index: number): boolean {
         current.includes('|') &&
         /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(next)
     );
+}
+
+function isSeparator(line: string): boolean {
+    return /^\s*(?:-{3,}|\*{3,}|_{3,})\s*$/.test(line);
 }
 
 function normalizeCells(line: string): string[] {
@@ -133,38 +141,6 @@ function headingClass(level: number): string {
 
     return 'text-lg font-semibold';
 }
-
-function parseInline(text: string): InlineSegment[] {
-    const segments: InlineSegment[] = [];
-    const pattern = /\*\*(.+?)\*\*/g;
-    let lastIndex = 0;
-    let match: RegExpExecArray | null;
-
-    while ((match = pattern.exec(text)) !== null) {
-        if (match.index > lastIndex) {
-            segments.push({
-                type: 'text',
-                text: text.slice(lastIndex, match.index),
-            });
-        }
-
-        segments.push({
-            type: 'strong',
-            text: match[1],
-        });
-
-        lastIndex = pattern.lastIndex;
-    }
-
-    if (lastIndex < text.length) {
-        segments.push({
-            type: 'text',
-            text: text.slice(lastIndex),
-        });
-    }
-
-    return segments;
-}
 </script>
 
 <template>
@@ -175,15 +151,7 @@ function parseInline(text: string): InlineSegment[] {
                 v-if="block.type === 'heading'"
                 :class="headingClass(block.level)"
             >
-                <template
-                    v-for="(segment, segmentIndex) in parseInline(block.text)"
-                    :key="segmentIndex"
-                >
-                    <strong v-if="segment.type === 'strong'">
-                        {{ segment.text }}
-                    </strong>
-                    <span v-else>{{ segment.text }}</span>
-                </template>
+                <MarkdownInline :content="block.text" />
             </component>
 
             <p
@@ -195,15 +163,7 @@ function parseInline(text: string): InlineSegment[] {
                     :key="lineIndex"
                 >
                     <br v-if="lineIndex > 0" />
-                    <template
-                        v-for="(segment, segmentIndex) in parseInline(line)"
-                        :key="segmentIndex"
-                    >
-                        <strong v-if="segment.type === 'strong'">
-                            {{ segment.text }}
-                        </strong>
-                        <span v-else>{{ segment.text }}</span>
-                    </template>
+                    <MarkdownInline :content="line" />
                 </template>
             </p>
 
@@ -212,17 +172,14 @@ function parseInline(text: string): InlineSegment[] {
                 class="flex list-disc flex-col gap-y-2 pl-5"
             >
                 <li v-for="(item, itemIndex) in block.items" :key="itemIndex">
-                    <template
-                        v-for="(segment, segmentIndex) in parseInline(item)"
-                        :key="segmentIndex"
-                    >
-                        <strong v-if="segment.type === 'strong'">
-                            {{ segment.text }}
-                        </strong>
-                        <span v-else>{{ segment.text }}</span>
-                    </template>
+                    <MarkdownInline :content="item" />
                 </li>
             </ul>
+
+            <hr
+                v-else-if="block.type === 'separator'"
+                class="border-t border-neutral-200 dark:border-neutral-800"
+            />
 
             <div v-else class="overflow-x-auto">
                 <table class="w-full min-w-120 text-left text-sm">
@@ -235,17 +192,7 @@ function parseInline(text: string): InlineSegment[] {
                                 :key="headerIndex"
                                 class="px-3 py-2 font-semibold"
                             >
-                                <template
-                                    v-for="(
-                                        segment, segmentIndex
-                                    ) in parseInline(header)"
-                                    :key="segmentIndex"
-                                >
-                                    <strong v-if="segment.type === 'strong'">
-                                        {{ segment.text }}
-                                    </strong>
-                                    <span v-else>{{ segment.text }}</span>
-                                </template>
+                                <MarkdownInline :content="header" />
                             </th>
                         </tr>
                     </thead>
@@ -260,17 +207,7 @@ function parseInline(text: string): InlineSegment[] {
                                 :key="cellIndex"
                                 class="px-3 py-2 align-top"
                             >
-                                <template
-                                    v-for="(
-                                        segment, segmentIndex
-                                    ) in parseInline(cell)"
-                                    :key="segmentIndex"
-                                >
-                                    <strong v-if="segment.type === 'strong'">
-                                        {{ segment.text }}
-                                    </strong>
-                                    <span v-else>{{ segment.text }}</span>
-                                </template>
+                                <MarkdownInline :content="cell" />
                             </td>
                         </tr>
                     </tbody>

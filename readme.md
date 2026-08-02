@@ -2,6 +2,8 @@
 
 Capylendar is a private application for collaborative planning for two. It is built on Laravel 13, Inertia.js 3, and Vue 3, and alongside the web app, it offers a simple Wear OS client.
 
+For maintainers and coding agents, [APPLICATION.md](APPLICATION.md) is the internal authoritative behavior contract. It is not user documentation; this README covers the public project overview, setup, and operations.
+
 ## Technologies
 
 - PHP 8.4, Laravel 13, and Fortify
@@ -22,7 +24,7 @@ Telescope is not a runtime component of the application. Queue workers are not n
 - Morning daily overview and evening preview of tomorrow via Web Push.
 - Event history with Inertia infinite loading of 20 items.
 - Event images, automatic map previews, and native sharing.
-- PWA installation and service worker for push notifications.
+- Service-worker based Web Push notifications.
 - Wear OS pairing via short-lived code; the watch stores the token encrypted in the Android Keystore.
 
 Todo completion is intentionally optimistic: the card stays on the page until the next refresh, so an accidental tap can be undone.

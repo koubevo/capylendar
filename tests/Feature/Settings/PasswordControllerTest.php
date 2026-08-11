@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Contracts\Validation\UncompromisedVerifier;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 beforeEach(function () {
     $this->user = User::factory()->create([
@@ -79,6 +81,55 @@ describe('PasswordController update', function () {
             ->assertSessionHasErrors('password');
 
         expect(Hash::check('too-short', $this->user->fresh()->password))->toBeFalse();
+    });
+
+    it('rejects a compromised password in production', function () {
+        $originalEnvironment = app()->environment();
+        app()->detectEnvironment(fn (): string => 'production');
+
+        try {
+            app('validator');
+
+            $verifier = Mockery::mock(UncompromisedVerifier::class);
+            $verifier->shouldReceive('verify')
+                ->once()
+                ->andReturnFalse();
+            $this->instance(UncompromisedVerifier::class, $verifier);
+
+            $validator = validator(
+                ['password' => 'compromised-password'],
+                ['password' => [Password::defaults()]],
+            );
+
+            expect($validator->fails())->toBeTrue()
+                ->and($validator->errors()->has('password'))->toBeTrue();
+        } finally {
+            app()->detectEnvironment(fn (): string => $originalEnvironment);
+        }
+    });
+
+    it('accepts a verified uncompromised password in production', function () {
+        $originalEnvironment = app()->environment();
+        app()->detectEnvironment(fn (): string => 'production');
+
+        try {
+            app('validator');
+
+            $verifier = Mockery::mock(UncompromisedVerifier::class);
+            $verifier->shouldReceive('verify')
+                ->once()
+                ->andReturnTrue();
+            $this->instance(UncompromisedVerifier::class, $verifier);
+
+            $validator = validator(
+                ['password' => 'verified-password'],
+                ['password' => [Password::defaults()]],
+            );
+
+            expect($validator->passes())->toBeTrue();
+        } finally {
+            app()->detectEnvironment(fn (): string => $originalEnvironment);
+        }
     });
 
     it('requires authentication', function () {

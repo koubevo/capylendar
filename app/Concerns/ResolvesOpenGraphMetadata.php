@@ -16,6 +16,8 @@ trait ResolvesOpenGraphMetadata
 
     private const int MAP_PREVIEW_MAX_REDIRECTS = 3;
 
+    private const int MAP_PREVIEW_TIMEOUT_SECONDS = 5;
+
     /** @var list<string> */
     private const array MAP_PREVIEW_ALLOWED_HOSTS = [
         'google.com',
@@ -78,10 +80,12 @@ trait ResolvesOpenGraphMetadata
                 return null;
             }
 
+            $responseDeadline = hrtime(true) + (self::MAP_PREVIEW_TIMEOUT_SECONDS * 1_000_000_000);
+
             $response = Http::accept('text/html')
                 ->withUserAgent('Capylendar map preview')
                 ->connectTimeout(2)
-                ->timeout(5)
+                ->timeout(self::MAP_PREVIEW_TIMEOUT_SECONDS)
                 ->withoutRedirecting()
                 ->withOptions(['stream' => true])
                 ->get($currentUrl);
@@ -110,7 +114,7 @@ trait ResolvesOpenGraphMetadata
                 return null;
             }
 
-            $html = $this->readLimitedResponseBody($response);
+            $html = $this->readLimitedResponseBody($response, $responseDeadline);
             if ($html === null) {
                 return null;
             }
@@ -148,7 +152,7 @@ trait ResolvesOpenGraphMetadata
         return in_array($host, self::MAP_PREVIEW_ALLOWED_HOSTS, true);
     }
 
-    private function readLimitedResponseBody(Response $response): ?string
+    private function readLimitedResponseBody(Response $response, int $deadline): ?string
     {
         $body = $response->toPsrResponse()->getBody();
         $size = $body->getSize();
@@ -164,6 +168,10 @@ trait ResolvesOpenGraphMetadata
         $contents = '';
 
         while (! $body->eof()) {
+            if (hrtime(true) >= $deadline) {
+                return null;
+            }
+
             $chunk = $body->read(8192);
 
             if ($chunk === '') {
@@ -172,7 +180,10 @@ trait ResolvesOpenGraphMetadata
 
             $contents .= $chunk;
 
-            if (strlen($contents) > self::MAP_PREVIEW_MAX_RESPONSE_BYTES) {
+            if (
+                strlen($contents) > self::MAP_PREVIEW_MAX_RESPONSE_BYTES
+                || hrtime(true) >= $deadline
+            ) {
                 return null;
             }
         }
@@ -190,7 +201,10 @@ trait ResolvesOpenGraphMetadata
         try {
             $document = new DOMDocument;
 
-            if (! $document->loadHTML($html, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING)) {
+            if (! $document->loadHTML(
+                '<?xml encoding="UTF-8">'.$html,
+                LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING,
+            )) {
                 return null;
             }
 

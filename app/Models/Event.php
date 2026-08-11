@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon $start_at
  * @property Carbon|null $end_at
  * @property bool $is_all_day
+ * @property bool $countdown_enabled
  * @property Capybara $capybara
  * @property string|null $description
  * @property bool $is_private
@@ -49,6 +50,7 @@ class Event extends Model
         'start_at',
         'end_at',
         'is_all_day',
+        'countdown_enabled',
         'description',
         'icon',
         'meta',
@@ -66,6 +68,7 @@ class Event extends Model
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
             'is_all_day' => 'boolean',
+            'countdown_enabled' => 'boolean',
             'capybara' => Capybara::class,
             'meta' => 'array',
         ];

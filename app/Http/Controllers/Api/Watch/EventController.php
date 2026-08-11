@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Watch;
 use App\Concerns\FormatsHumanDates;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\ValueObjects\EventCountdown;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -33,6 +34,8 @@ class EventController extends Controller
             ->map(fn (Event $event): array => [
                 'id' => $event->id,
                 'title' => $event->title,
+                'countdown_enabled' => $event->countdown_enabled,
+                'countdown' => EventCountdown::forEvent($event)?->toArray(),
                 'date' => [
                     'key' => $event->start_at->format('Y-m-d'),
                     'label' => $this->humanDateLabel($event->start_at),

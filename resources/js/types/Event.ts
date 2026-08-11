@@ -8,6 +8,8 @@ export interface Event {
     date: EventDate;
     capybara: Capybara;
     is_private: boolean;
+    countdown_enabled: boolean;
+    countdown?: EventCountdown;
     description?: string;
     description_without_meta?: string;
     has_hearts: boolean;
@@ -24,6 +26,15 @@ export interface Event {
     has_map_meta: boolean;
     image_url?: string;
     tags?: Tag[];
+}
+
+export interface EventCountdown {
+    active: true;
+    label: string;
+    short_label: string;
+    days: number;
+    target_at: string;
+    next_update_at: string;
 }
 
 export interface EventDate {

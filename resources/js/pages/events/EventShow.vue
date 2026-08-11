@@ -2,6 +2,7 @@
 import EventController from '@/actions/App/Http/Controllers/EventController';
 import ActionButtons from '@/components/buttons/ActionButtons.vue';
 import EventCard from '@/components/events/EventCard.vue';
+import EventCountdown from '@/components/events/EventCountdown.vue';
 import InfoCard from '@/components/ui/InfoCard.vue';
 import PreviewCard from '@/components/ui/PreviewCard.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
@@ -21,6 +22,10 @@ const mapPreview = computed(() => props.event.meta?.map_preview);
     <AuthenticatedLayout>
         <div class="flex flex-col gap-y-4">
             <EventCard :event="props.event" view="detail" />
+            <EventCountdown
+                v-if="props.event.countdown"
+                :countdown="props.event.countdown"
+            />
             <InfoCard
                 :author="props.event.author"
                 :created_at_human="props.event.created_at_human"

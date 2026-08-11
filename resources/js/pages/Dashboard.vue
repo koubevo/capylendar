@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import DashboardController from '@/actions/App/Http/Controllers/DashboardController';
 import DashboardList from '@/components/dashboard/DashboardList.vue';
+import NearestCountdownCard from '@/components/dashboard/NearestCountdownCard.vue';
 import EventFilterForm from '@/components/events/EventFilterForm.vue';
 import EventsList from '@/components/events/EventsList.vue';
 import TodosList from '@/components/todos/TodosList.vue';
@@ -34,6 +35,17 @@ const props = defineProps<Props>();
 
 const upcomingEvents = computed(() =>
     props.dashboardMonths.data.flatMap((month) => month.events),
+);
+
+const nearestCountdownEvent = computed(() =>
+    upcomingEvents.value
+        .filter((event) => event.countdown)
+        .sort(
+            (first, second) =>
+                new Date(first.countdown!.target_at).getTime() -
+                new Date(second.countdown!.target_at).getTime(),
+        )
+        .at(0),
 );
 
 const loadedTodos = computed(() =>
@@ -157,6 +169,11 @@ function handleToggled(todoId: number) {
                 />
             </template>
         </UCollapsible>
+
+        <NearestCountdownCard
+            v-if="nearestCountdownEvent"
+            :event="nearestCountdownEvent"
+        />
 
         <InfiniteScroll
             data="dashboardMonths"

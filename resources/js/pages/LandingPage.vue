@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import DashboardList from '@/components/dashboard/DashboardList.vue';
+import CountdownCard from '@/components/events/CountdownCard.vue';
 import EventsList from '@/components/events/EventsList.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import GuestLayout from '@/layouts/app/GuestLayout.vue';
@@ -27,7 +28,7 @@ const features = [
     {
         name: 'Den na zápěstí',
         description:
-            'Wear OS přehled ukáže nejbližší události a umožní odškrtnout úkol bez telefonu.',
+            'Sdílené odpočty ukážou čas do události na webu i hodinkách; Wear OS navíc umožní odškrtnout úkol bez telefonu.',
         icon: 'i-lucide-watch',
         accent: 'bg-[#d9ecff]',
         span: '',
@@ -99,16 +100,37 @@ const previewTabs = [
 ];
 
 const today = new Date();
-const tomorrow = new Date();
-tomorrow.setDate(today.getDate() + 1);
+
+const dateAfterToday = (days: number) => {
+    const date = new Date(today);
+    date.setDate(date.getDate() + days);
+
+    return date;
+};
+
+const localDateKey = (date: Date) =>
+    [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0'),
+    ].join('-');
+
+const nextCalendarUpdate = new Date(today);
+nextCalendarUpdate.setHours(24, 0, 0, 0);
+
+const demoDates = {
+    anniversary: { date: dateAfterToday(2), label: 'za 2 dny' },
+    appointment: { date: dateAfterToday(4), label: 'za 4 dny' },
+    dinner: { date: dateAfterToday(7), label: 'za 7 dní' },
+};
 
 const upcomingEvents: Event[] = [
     {
         id: 1,
         title: 'Výročí ❤️',
         date: {
-            key: today.toISOString().split('T')[0],
-            label: 'dnes',
+            key: localDateKey(demoDates.anniversary.date),
+            label: demoDates.anniversary.label,
             start_time: '',
             end_time: '',
             is_all_day: true,
@@ -121,6 +143,15 @@ const upcomingEvents: Event[] = [
             avatar: { src: '/images/capys/pink.jpg', alt: 'Pink' },
         },
         is_private: false,
+        countdown_enabled: true,
+        countdown: {
+            active: true,
+            label: demoDates.anniversary.label,
+            short_label: '2 d',
+            days: 2,
+            target_at: demoDates.anniversary.date.toISOString(),
+            next_update_at: nextCalendarUpdate.toISOString(),
+        },
         has_hearts: true,
         created_at_human: 'dnes',
         author: {
@@ -143,8 +174,8 @@ const upcomingEvents: Event[] = [
         id: 2,
         title: 'Oční',
         date: {
-            key: tomorrow.toISOString().split('T')[0],
-            label: 'zítra',
+            key: localDateKey(demoDates.appointment.date),
+            label: demoDates.appointment.label,
             start_time: '12:00',
             end_time: '12:30',
             is_all_day: false,
@@ -179,8 +210,8 @@ const upcomingEvents: Event[] = [
         id: 3,
         title: 'Večeře v osm',
         date: {
-            key: tomorrow.toISOString().split('T')[0],
-            label: 'zítra',
+            key: localDateKey(demoDates.dinner.date),
+            label: demoDates.dinner.label,
             start_time: '20:00',
             end_time: '',
             is_all_day: false,
@@ -220,8 +251,8 @@ const upcomingTodos = ref<Todo[]>([
             checkbox_color: 'text-red-500',
         },
         deadline: {
-            key: today.toISOString().split('T')[0],
-            label: 'dnes',
+            key: localDateKey(demoDates.anniversary.date),
+            label: demoDates.anniversary.label,
         },
         capybara: {
             value: 'blue',
@@ -476,6 +507,19 @@ const handleToggled = (id: number) => {
                             >
                                 <UTabs :items="previewTabs">
                                     <template #upcoming>
+                                        <CountdownCard
+                                            v-if="upcomingEvents[0].countdown"
+                                            :title="upcomingEvents[0].title"
+                                            :label="
+                                                upcomingEvents[0].countdown
+                                                    .label
+                                            "
+                                            :color-classes="
+                                                upcomingEvents[0].capybara
+                                                    .classes
+                                            "
+                                            class="mb-4"
+                                        />
                                         <DashboardList
                                             heading="Nadcházející"
                                             :events="upcomingEvents"

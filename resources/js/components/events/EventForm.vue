@@ -274,6 +274,12 @@ onUnmounted(() => revokePreview());
             </UFormField>
 
             <USwitch
+                label="Zobrazovat odpočet"
+                v-model="props.form.countdown_enabled"
+                :error="props.form.errors.countdown_enabled"
+            />
+
+            <USwitch
                 label="Soukromé (tajný kapybara event)"
                 v-model="props.form.is_private"
                 :error="props.form.errors.is_private"

@@ -35,6 +35,7 @@ abstract class EventFormRequest extends FormRequest
             'end_at' => $dbEndAt,
             'is_all_day' => $isAllDay,
             'is_private' => $this->boolean('is_private'),
+            'countdown_enabled' => $this->boolean('countdown_enabled'),
         ]);
     }
 
@@ -49,6 +50,7 @@ abstract class EventFormRequest extends FormRequest
             'end_at' => ['nullable', 'date', 'after:start_at'],
             'is_all_day' => ['boolean'],
             'is_private' => ['boolean'],
+            'countdown_enabled' => ['boolean'],
             'capybara' => ['required', Rule::enum(Capybara::class)],
             'description' => ['nullable', 'string'],
             'tags' => ['nullable', 'array'],

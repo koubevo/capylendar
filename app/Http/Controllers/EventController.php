@@ -11,7 +11,6 @@ use App\Services\CreatedItemNotificationService;
 use App\Services\EventService;
 use App\Services\EventTagService;
 use App\Services\TagService;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -26,13 +25,6 @@ class EventController extends Controller
         protected TagService $tagService,
         protected CreatedItemNotificationService $createdItemNotificationService,
     ) {}
-
-    public function countdowns(Request $request): JsonResponse
-    {
-        return response()->json([
-            'data' => $this->eventService->getActiveCountdowns($request->user()),
-        ]);
-    }
 
     public function show(Event $event): Response
     {

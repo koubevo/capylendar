@@ -231,26 +231,6 @@ class EventService
     }
 
     /**
-     * @return array<int, array<string, mixed>>
-     */
-    public function getActiveCountdowns(?User $user): array
-    {
-        if (! $user) {
-            return [];
-        }
-
-        $events = $user->assignedEvents()
-            ->with(['tags', 'author'])
-            ->withCount('subscribers')
-            ->where('countdown_enabled', true)
-            ->where('start_at', '>=', now()->startOfDay())
-            ->orderBy('start_at')
-            ->get();
-
-        return EventResource::collection($events)->resolve();
-    }
-
-    /**
      * @return array<EventResource>
      */
     public function getDeletedEvents(?User $user): array

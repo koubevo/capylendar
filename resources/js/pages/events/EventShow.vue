@@ -5,9 +5,10 @@ import EventCard from '@/components/events/EventCard.vue';
 import EventCountdown from '@/components/events/EventCountdown.vue';
 import InfoCard from '@/components/ui/InfoCard.vue';
 import PreviewCard from '@/components/ui/PreviewCard.vue';
+import { useRefreshAt } from '@/composables/useRefreshAt';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import type { Event } from '@/types/Event';
-import { Head } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -15,6 +16,11 @@ const props = defineProps<{
 }>();
 
 const mapPreview = computed(() => props.event.meta?.map_preview);
+
+useRefreshAt(
+    () => props.event.countdown?.next_update_at,
+    () => router.reload({ only: ['event'] }),
+);
 </script>
 
 <template>

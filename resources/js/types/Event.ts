@@ -9,7 +9,7 @@ export interface Event {
     capybara: Capybara;
     is_private: boolean;
     countdown_enabled: boolean;
-    countdown?: EventCountdown;
+    countdown?: EventCountdown | null;
     description?: string;
     description_without_meta?: string;
     has_hearts: boolean;

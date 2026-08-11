@@ -2,6 +2,7 @@
 import DashboardList from '@/components/dashboard/DashboardList.vue';
 import CountdownCard from '@/components/events/CountdownCard.vue';
 import EventsList from '@/components/events/EventsList.vue';
+import { useRefreshAt } from '@/composables/useRefreshAt';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import GuestLayout from '@/layouts/app/GuestLayout.vue';
 import { login } from '@/routes';
@@ -117,6 +118,7 @@ const localDateKey = (date: Date) =>
 
 const nextCalendarUpdate = new Date(today);
 nextCalendarUpdate.setHours(24, 0, 0, 0);
+useRefreshAt(nextCalendarUpdate.toISOString(), () => window.location.reload());
 
 const demoDates = {
     anniversary: { date: dateAfterToday(2), label: 'za 2 dny' },

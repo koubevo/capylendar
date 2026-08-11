@@ -22,8 +22,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('dashboard');
 
     Route::get('/event/history', [DashboardController::class, 'historyIndex'])->name('event.historyIndex');
-    Route::get('/event/countdowns', [EventController::class, 'countdowns'])->name('event.countdowns');
-
     Route::get('/event/deleted', [EventController::class, 'deletedIndex'])->name('event.deletedIndex');
     Route::post('/event/{event}/restore', [EventController::class, 'restore'])
         ->name('event.restore')

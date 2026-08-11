@@ -5,6 +5,7 @@ import NearestCountdownCard from '@/components/dashboard/NearestCountdownCard.vu
 import EventFilterForm from '@/components/events/EventFilterForm.vue';
 import EventsList from '@/components/events/EventsList.vue';
 import TodosList from '@/components/todos/TodosList.vue';
+import { useRefreshAt } from '@/composables/useRefreshAt';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import { Capybara } from '@/types/Capybara';
 import type { Event } from '@/types/Event';
@@ -46,6 +47,10 @@ const nearestCountdownEvent = computed(() =>
                 new Date(second.countdown!.target_at).getTime(),
         )
         .at(0),
+);
+useRefreshAt(
+    () => nearestCountdownEvent.value?.countdown?.next_update_at,
+    () => router.reload({ only: ['dashboardMonths'] }),
 );
 
 const loadedTodos = computed(() =>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import EventController from '@/actions/App/Http/Controllers/EventController';
+import { show } from '@/actions/App/Http/Controllers/EventController';
 import CountdownCard from '@/components/events/CountdownCard.vue';
 import type { Event } from '@/types/Event';
 import { Link } from '@inertiajs/vue3';
@@ -10,7 +10,7 @@ const props = defineProps<{
 </script>
 
 <template>
-    <Link :href="EventController.show(props.event)" class="mb-4 block">
+    <Link :href="show(props.event)" class="mb-4 block">
         <CountdownCard
             v-if="props.event.countdown"
             :title="props.event.title"

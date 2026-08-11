@@ -6,6 +6,7 @@ export interface EventFormData {
     end_at: string;
     is_all_day: boolean;
     is_private: boolean;
+    countdown_enabled: boolean;
     description: string;
     tags: number[];
     image: File | null;

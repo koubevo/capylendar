@@ -22,6 +22,7 @@ const form = useForm<EventFormData>({
     end_at: props.event.date.end_time,
     is_all_day: props.event.date.is_all_day,
     is_private: props.event.is_private,
+    countdown_enabled: props.event.countdown_enabled,
     description: props.event.description ?? '',
     tags: props.event.tags?.map((tag) => tag.id) || [],
     image: null,

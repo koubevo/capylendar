@@ -49,6 +49,18 @@ ordered newest first. The future dashboard and event history are separate
 views. History is loaded in pages of 20 through Inertia infinite loading; it is
 not part of the future dashboard's month stream.
 
+A future event may have countdown_enabled; the default is false. Its countdown
+targets start_at, while an all-day countdown targets the beginning of its
+calendar day in the application timezone. Day labels use calendar-day
+differences (dnes, zítra, then a day count), not elapsed 24-hour periods. Countdown labels never switch to hour or minute precision.
+A countdown remains active through the event's entire calendar day, regardless
+of whether the event is timed or all-day. The stored flag is preserved
+afterward for historical truth, but elapsed events are omitted from active
+countdown surfaces. Remaining time is always derived at read time and is never
+stored. Countdown visibility follows event subscriber authorization on every
+web, phone, and watch surface. A removed or inaccessible manually selected
+event must fall back to an empty configuration state.
+
 Events may have shared color tags. A Google Maps URL in the description can be
 resolved into a map OpenGraph preview when a title and image are available. If
 the remote lookup fails, the event remains valid without a preview. The stored

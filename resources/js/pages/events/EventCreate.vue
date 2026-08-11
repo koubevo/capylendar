@@ -28,6 +28,7 @@ const form = useForm<EventFormData>({
     end_at: props.event?.date.end_time || '',
     is_all_day: props.event?.date.is_all_day || false,
     is_private: props.event?.is_private || false,
+    countdown_enabled: props.event?.countdown_enabled || false,
     description: props.event?.description || '',
     tags: props.event?.tags ? props.event.tags.map((t) => t.id) : [],
     image: null,

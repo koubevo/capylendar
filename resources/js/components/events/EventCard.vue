@@ -75,6 +75,12 @@ const descriptionIsOnlyLinks = computed(() =>
                         </span>
                     </p>
                 </div>
+                <p
+                    v-if="props.event.countdown"
+                    class="mt-1 text-xs font-medium opacity-70"
+                >
+                    Odpočet · {{ props.event.countdown.label }}
+                </p>
                 <TagsList
                     :tags="props.event.tags"
                     class="mt-1"

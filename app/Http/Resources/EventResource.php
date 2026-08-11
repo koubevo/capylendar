@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Concerns\FormatsHumanDates;
 use App\Models\Event;
+use App\ValueObjects\EventCountdown;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -44,6 +45,7 @@ class EventResource extends JsonResource
         $meta = $this->resource->meta;
         $description = $this->resource->description;
         $descriptionWithoutMeta = $this->getDescriptionWithoutMeta($description, $meta);
+        $countdown = EventCountdown::forEvent($this->resource);
 
         return [
             'id' => $this->resource->id,
@@ -51,6 +53,8 @@ class EventResource extends JsonResource
             'description' => $description,
             'description_without_meta' => $descriptionWithoutMeta ?? $description,
             'is_private' => $this->resource->is_private,
+            'countdown_enabled' => $this->resource->countdown_enabled,
+            'countdown' => $countdown?->toArray(),
             'has_hearts' => $hasHearts,
             'author' => [
                 'id' => $this->resource->author->id,

@@ -24,6 +24,7 @@ Telescope is not a runtime component of the application. Queue workers are not n
 - Web Push for newly created shared events, tasks, and documents, plus morning and evening event summaries.
 - Event history with Inertia infinite loading of 20 items.
 - Event images, automatic map previews, and native sharing.
+- Optional event countdowns on cards and event detail; active countdown metadata is also available to paired Wear OS devices.
 - Service-worker based Web Push notifications.
 - Wear OS pairing via short-lived code; the watch stores the token encrypted in the Android Keystore.
 

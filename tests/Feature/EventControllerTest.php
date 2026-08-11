@@ -363,3 +363,35 @@ describe('EventController restore', function () {
         expect($this->event->fresh()->trashed())->toBeFalse();
     });
 });
+
+describe('Event countdown setting', function () {
+    it('stores and updates the countdown flag', function () {
+        $date = now()->addDay()->format('Y-m-d');
+
+        $this->actingAs($this->user)->post(route('event.store'), [
+            'title' => 'Countdown event',
+            'date' => $date,
+            'start_at' => '10:00',
+            'is_all_day' => false,
+            'is_private' => true,
+            'countdown_enabled' => true,
+            'capybara' => 'blue',
+        ])->assertRedirect();
+
+        $event = Event::query()->where('title', 'Countdown event')->firstOrFail();
+
+        expect($event->countdown_enabled)->toBeTrue();
+
+        $this->actingAs($this->user)->put(route('event.update', $event), [
+            'title' => $event->title,
+            'date' => $date,
+            'start_at' => '10:00',
+            'is_all_day' => false,
+            'is_private' => true,
+            'countdown_enabled' => false,
+            'capybara' => 'blue',
+        ])->assertRedirect();
+
+        expect($event->fresh()->countdown_enabled)->toBeFalse();
+    });
+});

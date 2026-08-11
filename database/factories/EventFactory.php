@@ -26,6 +26,7 @@ class EventFactory extends Factory
             'start_at' => $this->faker->dateTimeBetween('2025-01-01', '2025-12-31'),
             'end_at' => $this->faker->dateTimeBetween('2025-01-01', '2025-12-31'),
             'is_all_day' => false,
+            'countdown_enabled' => false,
             'description' => $this->faker->text(),
             'icon' => $this->faker->word(),
         ];

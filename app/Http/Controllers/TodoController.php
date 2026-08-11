@@ -10,6 +10,7 @@ use App\Http\Requests\Todo\UpdateTodoRequest;
 use App\Http\Resources\TodoResource;
 use App\Models\Todo;
 use App\Models\User;
+use App\Services\CreatedItemNotificationService;
 use App\Services\TagService;
 use App\Services\TodoService;
 use Carbon\Carbon;
@@ -22,7 +23,11 @@ use Inertia\Response;
 
 class TodoController extends Controller
 {
-    public function __construct(protected TodoService $todoService, protected TagService $tagService) {}
+    public function __construct(
+        protected TodoService $todoService,
+        protected TagService $tagService,
+        protected CreatedItemNotificationService $createdItemNotificationService,
+    ) {}
 
     public function index(): Response
     {
@@ -70,6 +75,8 @@ class TodoController extends Controller
         if (! $todo) {
             return back()->withErrors(['error' => 'Nepodařilo se vytvořit todo']);
         }
+
+        $this->createdItemNotificationService->deferTodoCreated($todo);
 
         return to_route('dashboard', [
             'scrollToDate' => $todo->deadline->format('Y-m-d'),

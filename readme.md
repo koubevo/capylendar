@@ -21,7 +21,7 @@ Telescope is not a runtime component of the application. Queue workers are not n
 - Shared and private events and tasks with priorities, labels, and filtering.
 - Collaborative documents and shared tags.
 - Chat between users with push notifications to the recipient.
-- Morning daily overview and evening preview of tomorrow via Web Push.
+- Web Push for newly created shared events, tasks, and documents, plus morning and evening event summaries.
 - Event history with Inertia infinite loading of 20 items.
 - Event images, automatic map previews, and native sharing.
 - Service-worker based Web Push notifications.
@@ -58,7 +58,7 @@ VAPID_SUBJECT=mailto:your@email.com
 NOTIFICATION_WAKE_TOKEN=<random-long-secret>
 ```
 
-An external cron can call `POST /api/wake?type=morning` and `POST /api/wake?type=evening` with the header `Authorization: Bearer <NOTIFICATION_WAKE_TOKEN>`. Each type is idempotent on the server for a given calendar day. Sending a chat notification is deferred until after the HTTP response using Laravel `defer`, without a queue worker.
+An external cron can call `POST /api/wake?type=morning` and `POST /api/wake?type=evening` with the header `Authorization: Bearer <NOTIFICATION_WAKE_TOKEN>`. Each type is idempotent on the server for a given calendar day. Chat and newly created shared-item notifications are deferred until after the HTTP response using Laravel `defer`, without a queue worker.
 
 ## Quality Checks
 

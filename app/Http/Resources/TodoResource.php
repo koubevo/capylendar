@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Concerns\FormatsHumanDates;
 use App\Models\Todo;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -13,6 +14,8 @@ use Illuminate\Support\Str;
  */
 class TodoResource extends JsonResource
 {
+    use FormatsHumanDates;
+
     /**
      * @return array<string, mixed>
      */
@@ -54,7 +57,7 @@ class TodoResource extends JsonResource
 
             'deadline' => [
                 'key' => $deadline->format('Y-m-d'),
-                'label' => $this->getHumanDateLabel($deadline),
+                'label' => $this->humanDateLabel($deadline),
             ],
 
             'priority' => [
@@ -82,19 +85,6 @@ class TodoResource extends JsonResource
             'created_at_human' => $this->resource->created_at_human,
             'updated_at_human' => $this->resource->updated_at_human,
         ];
-    }
-
-    private function getHumanDateLabel(Carbon $date): string
-    {
-        if ($date->isToday()) {
-            return 'Dnes';
-        }
-
-        if ($date->isTomorrow()) {
-            return 'Zítra';
-        }
-
-        return ucfirst($date->translatedFormat('l d.m.y'));
     }
 
     /**

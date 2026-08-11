@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Watch;
 
+use App\Concerns\FormatsHumanDates;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Database\Eloquent\Builder;
@@ -10,6 +11,8 @@ use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
+    use FormatsHumanDates;
+
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -32,7 +35,7 @@ class EventController extends Controller
                 'title' => $event->title,
                 'date' => [
                     'key' => $event->start_at->format('Y-m-d'),
-                    'label' => $this->dateLabel($event),
+                    'label' => $this->humanDateLabel($event->start_at),
                     'start_time' => $event->is_all_day ? '' : $event->start_at->format('H:i'),
                     'end_time' => $event->is_all_day ? '' : ($event->end_at?->format('H:i') ?? ''),
                     'is_all_day' => $event->is_all_day,
@@ -45,14 +48,5 @@ class EventController extends Controller
             ->values();
 
         return response()->json(['data' => $events]);
-    }
-
-    private function dateLabel(Event $event): string
-    {
-        return match (true) {
-            $event->start_at->isToday() => 'Dnes',
-            $event->start_at->isTomorrow() => 'Zítra',
-            default => ucfirst($event->start_at->translatedFormat('l d.m.y')),
-        };
     }
 }

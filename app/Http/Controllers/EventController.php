@@ -7,6 +7,7 @@ use App\Http\Requests\Event\StoreEventRequest;
 use App\Http\Requests\Event\UpdateEventRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
+use App\Services\CreatedItemNotificationService;
 use App\Services\EventService;
 use App\Services\EventTagService;
 use App\Services\TagService;
@@ -18,7 +19,12 @@ use Inertia\Response;
 
 class EventController extends Controller
 {
-    public function __construct(protected EventService $eventService, protected EventTagService $eventTagService, protected TagService $tagService) {}
+    public function __construct(
+        protected EventService $eventService,
+        protected EventTagService $eventTagService,
+        protected TagService $tagService,
+        protected CreatedItemNotificationService $createdItemNotificationService,
+    ) {}
 
     public function show(Event $event): Response
     {
@@ -55,6 +61,8 @@ class EventController extends Controller
         if (! $event) {
             return back()->withErrors(['error' => 'Nepodařilo se vytvořit event']);
         }
+
+        $this->createdItemNotificationService->deferEventCreated($event);
 
         return to_route('dashboard', [
             'scrollToDate' => $event->start_at->format('Y-m-d'),

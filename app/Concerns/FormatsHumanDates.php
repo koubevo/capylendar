@@ -17,6 +17,11 @@ trait FormatsHumanDates
             default => $date->translatedFormat($fallbackFormat),
         };
 
-        return $capitalize ? ucfirst($label) : $label;
+        if (! $capitalize) {
+            return $label;
+        }
+
+        return mb_strtoupper(mb_substr($label, 0, 1, 'UTF-8'), 'UTF-8')
+            .mb_substr($label, 1, null, 'UTF-8');
     }
 }

@@ -2,12 +2,14 @@
 
 use App\Enums\Capybara;
 use App\Enums\Priority;
+use App\Http\Resources\EventResource;
 use App\Models\Document;
 use App\Models\Event;
 use App\Models\Todo;
 use App\Models\User;
 use App\Notifications\CreatedItemNotification;
 use App\Services\EventTagService;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 
@@ -302,4 +304,23 @@ it('does not notify pink when blue creates a blue todo', function () {
     ])->assertRedirect();
 
     Notification::assertNothingSent();
+});
+
+it('capitalizes a non-ASCII Czech weekday in shared date labels', function () {
+    $previousLocale = Carbon::getLocale();
+    Carbon::setLocale('cs');
+    Carbon::setTestNow('2026-08-10 12:00:00');
+
+    try {
+        $event = Event::factory()->create([
+            'start_at' => Carbon::parse('2026-08-18 10:00:00'),
+        ]);
+
+        $resource = EventResource::make($event)->resolve();
+
+        expect($resource['date']['label'])->toBe('Úterý 18.08.26');
+    } finally {
+        Carbon::setTestNow();
+        Carbon::setLocale($previousLocale);
+    }
 });

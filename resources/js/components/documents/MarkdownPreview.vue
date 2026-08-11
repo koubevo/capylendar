@@ -182,7 +182,7 @@ function headingClass(level: number): string {
             />
 
             <div v-else class="overflow-x-auto">
-                <table class="w-full min-w-120 text-left text-sm">
+                <table class="w-full min-w-120 table-fixed text-left text-sm">
                     <thead>
                         <tr
                             class="border-b border-neutral-200 dark:border-neutral-800"

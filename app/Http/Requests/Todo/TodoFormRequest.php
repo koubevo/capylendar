@@ -26,7 +26,7 @@ abstract class TodoFormRequest extends FormRequest
             'is_private' => ['boolean'],
             'capybara' => ['required', Rule::enum(Capybara::class)],
             'priority' => ['required', Rule::enum(Priority::class)],
-            'description' => ['nullable', 'string'],
+            'description' => ['nullable', 'string', 'max:20000'],
             'tags' => ['nullable', 'array'],
             'tags.*' => ['exists:tags,id'],
 

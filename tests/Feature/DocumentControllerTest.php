@@ -79,6 +79,19 @@ describe('DocumentController store', function () {
             ])
             ->assertSessionHasErrors('title');
     });
+
+    it('limits body length', function () {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->post(route('document.store'), [
+                'title' => 'Large document',
+                'body' => str_repeat('a', 100001),
+            ])
+            ->assertSessionHasErrors('body');
+
+        $this->assertDatabaseMissing('documents', ['title' => 'Large document']);
+    });
 });
 
 describe('DocumentController authentication', function () {

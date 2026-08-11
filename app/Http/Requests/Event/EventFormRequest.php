@@ -52,10 +52,15 @@ abstract class EventFormRequest extends FormRequest
             'is_private' => ['boolean'],
             'countdown_enabled' => ['boolean'],
             'capybara' => ['required', Rule::enum(Capybara::class)],
-            'description' => ['nullable', 'string'],
+            'description' => ['nullable', 'string', 'max:20000'],
             'tags' => ['nullable', 'array'],
             'tags.*' => ['exists:tags,id'],
-            'image' => ['nullable', 'image', 'max:5120'],
+            'image' => [
+                'nullable',
+                'image',
+                'max:5120',
+                Rule::dimensions()->maxWidth(6000)->maxHeight(6000),
+            ],
             'remove_image' => ['boolean'],
         ];
     }

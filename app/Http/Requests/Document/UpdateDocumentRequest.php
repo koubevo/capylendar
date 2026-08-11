@@ -24,7 +24,7 @@ class UpdateDocumentRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:120'],
-            'body' => ['nullable', 'string'],
+            'body' => ['nullable', 'string', 'max:100000'],
         ];
     }
 }

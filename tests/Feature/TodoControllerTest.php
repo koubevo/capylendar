@@ -195,6 +195,20 @@ describe('TodoController store validation', function () {
             ->assertSessionHasErrors('title');
     });
 
+    it('limits description length', function () {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->post(route('todo.store'), [
+                'title' => 'Test',
+                'capybara' => Capybara::Blue->value,
+                'deadline' => '2026-03-01',
+                'priority' => Priority::Medium->value,
+                'description' => str_repeat('a', 20001),
+            ])
+            ->assertSessionHasErrors('description');
+    });
+
     it('validates tags exist in database', function () {
         $user = User::factory()->create();
 

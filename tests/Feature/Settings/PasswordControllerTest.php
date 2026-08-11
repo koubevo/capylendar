@@ -69,6 +69,18 @@ describe('PasswordController update', function () {
             ->assertSessionHasErrors('password');
     });
 
+    it('requires a password with at least twelve characters', function () {
+        $this->actingAs($this->user)
+            ->put(route('user-password.update'), [
+                'current_password' => 'current-password',
+                'password' => 'too-short',
+                'password_confirmation' => 'too-short',
+            ])
+            ->assertSessionHasErrors('password');
+
+        expect(Hash::check('too-short', $this->user->fresh()->password))->toBeFalse();
+    });
+
     it('requires authentication', function () {
         $this->put(route('user-password.update'), [
             'current_password' => 'password',

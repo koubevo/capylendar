@@ -11,13 +11,11 @@ use App\Services\EventService;
 use App\Services\EventTagService;
 use App\Services\EventUserService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ValidatedInput;
-use shweshi\OpenGraph\OpenGraph;
 
 beforeEach(function () {
-    $this->openGraph = Mockery::mock(OpenGraph::class);
-    app()->instance(OpenGraph::class, $this->openGraph);
-
     $this->eventService = new EventService(
         new EventUserService,
         new EventTagService,
@@ -64,43 +62,92 @@ describe('EventService update', function () {
 describe('EventService resolveMetadata', function () {
     it('resolves map preview from google maps url', function () {
         $url = 'https://maps.app.goo.gl/test';
-        $description = "Location: $url";
 
-        $this->openGraph->shouldReceive('fetch')
-            ->once()
-            // ->with($url) // Argument matching might be strict, let's relax or ensure exact match
-            ->andReturn([
-                'title' => 'Map Location',
-                'image' => 'http://example.com/image.jpg',
-            ]);
+        Http::fake([
+            $url => Http::response(
+                '<meta property="og:title" content="Map Location"><meta property="og:image" content="https://example.com/image.jpg">',
+                200,
+                ['Content-Type' => 'text/html; charset=UTF-8'],
+            ),
+        ]);
 
-        // Reflect to access private method
         $method = new ReflectionMethod(EventService::class, 'resolveMetadata');
         $method->setAccessible(true);
 
-        $result = $method->invoke($this->eventService, $description);
+        $result = $method->invoke($this->eventService, "Location: $url");
 
         expect($result['map_preview']['title'])->toBe('Map Location');
         expect($result['map_preview']['url'])->toBe($url);
     });
 
-    it('returns null when no map url', function () {
+    it('does not make a request when no map url is present', function () {
+        Http::preventStrayRequests();
+
         $method = new ReflectionMethod(EventService::class, 'resolveMetadata');
         $method->setAccessible(true);
 
         $result = $method->invoke($this->eventService, 'Just description');
 
         expect($result)->toBeNull();
+        Http::assertNothingSent();
     });
 
-    it('returns null and logs error when open graph fetch fails', function () {
-        $url = 'https://maps.app.goo.gl/fail';
-        $description = "Location: $url";
+    it('rejects insecure map urls', function () {
+        Http::preventStrayRequests();
 
-        $this->openGraph->shouldReceive('fetch')
-            ->once()
-            ->with($url)
-            ->andThrow(new Exception('Fetch failed'));
+        $method = new ReflectionMethod(EventService::class, 'resolveMetadata');
+        $method->setAccessible(true);
+
+        $result = $method->invoke(
+            $this->eventService,
+            'Location: http://maps.app.goo.gl/insecure',
+        );
+
+        expect($result)->toBeNull();
+        Http::assertNothingSent();
+    });
+
+    it('rejects redirects to untrusted hosts', function () {
+        $url = 'https://maps.app.goo.gl/private';
+
+        Http::fake([
+            $url => Http::response('', 302, [
+                'Location' => 'http://127.0.0.1/private',
+            ]),
+        ]);
+
+        $method = new ReflectionMethod(EventService::class, 'resolveMetadata');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->eventService, "Location: $url");
+
+        expect($result)->toBeNull();
+        Http::assertSentCount(1);
+    });
+
+    it('rejects oversized map responses', function () {
+        $url = 'https://maps.app.goo.gl/large';
+
+        Http::fake([
+            $url => Http::response(
+                str_repeat('a', 1048577),
+                200,
+                ['Content-Type' => 'text/html'],
+            ),
+        ]);
+
+        $method = new ReflectionMethod(EventService::class, 'resolveMetadata');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->eventService, "Location: $url");
+
+        expect($result)->toBeNull();
+    });
+
+    it('returns null and logs error when the map request fails', function () {
+        $url = 'https://maps.app.goo.gl/fail';
+
+        Http::fake(fn () => throw new RuntimeException('Fetch failed'));
 
         Log::shouldReceive('error')
             ->once()
@@ -109,7 +156,7 @@ describe('EventService resolveMetadata', function () {
         $method = new ReflectionMethod(EventService::class, 'resolveMetadata');
         $method->setAccessible(true);
 
-        $result = $method->invoke($this->eventService, $description);
+        $result = $method->invoke($this->eventService, "Location: $url");
 
         expect($result)->toBeNull();
     });

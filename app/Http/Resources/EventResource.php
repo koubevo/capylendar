@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Concerns\FormatsHumanDates;
 use App\Models\Event;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -10,6 +11,8 @@ use Illuminate\Support\Str;
 
 class EventResource extends JsonResource
 {
+    use FormatsHumanDates;
+
     /**
      * @var Event
      */
@@ -61,7 +64,7 @@ class EventResource extends JsonResource
                 'key' => $start->format('Y-m-d'),
                 'is_all_day' => (bool) $this->resource->is_all_day,
 
-                'label' => $this->getHumanDateLabel($start),
+                'label' => $this->humanDateLabel($start),
                 'start_time' => $this->resource->is_all_day ? '' : $start->format('H:i'),
                 'end_time' => $this->resource->end_at?->format('H:i'),
             ],
@@ -81,19 +84,6 @@ class EventResource extends JsonResource
             'created_at_human' => $this->resource->created_at_human,
             'updated_at_human' => $this->resource->updated_at_human,
         ];
-    }
-
-    private function getHumanDateLabel(Carbon $date): string
-    {
-        if ($date->isToday()) {
-            return 'Dnes';
-        }
-
-        if ($date->isTomorrow()) {
-            return 'Zítra';
-        }
-
-        return ucfirst($date->translatedFormat('l d.m.y'));
     }
 
     /**

@@ -7,12 +7,15 @@ use App\Http\Requests\Document\UpdateDocumentRequest;
 use App\Http\Resources\DocumentResource;
 use App\Models\Document;
 use App\Models\User;
+use App\Services\CreatedItemNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class DocumentController extends Controller
 {
+    public function __construct(protected CreatedItemNotificationService $createdItemNotificationService) {}
+
     public function index(): Response
     {
         $documents = Document::query()
@@ -41,6 +44,8 @@ class DocumentController extends Controller
             'body' => $request->string('body')->toString(),
             'author_id' => $user->id,
         ]);
+
+        $this->createdItemNotificationService->deferDocumentCreated($document);
 
         return to_route('document.show', $document)->with('success', 'Dokument ulozen');
     }

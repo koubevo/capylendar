@@ -34,7 +34,8 @@ const features = [
     },
     {
         name: 'Push notifikace',
-        description: 'Ranní a večerní souhrny i chatové zprávy.',
+        description:
+            'Ranní a večerní souhrny, chatové zprávy i upozornění na nové společné položky.',
         icon: 'i-lucide-bell-ring',
         accent: 'bg-[#fff0b8]',
         span: '',

@@ -14,7 +14,8 @@ Pink and Blue identify the two people. Yellow identifies both people together.
 The `capybara` value is a visual and product assignment, not an access-control
 mechanism. A Pink, Blue, or Yellow event/todo can be either private or shared.
 Visibility is determined by subscriber membership and `is_private`, never by
-the capybara color.
+the capybara color. The capybara assignment does select recipients for new event
+and todo notifications; this affects notification targeting, not access.
 
 The authenticated user who creates an event or todo is its stored author. On
 creation, a non-private item is assigned to all users and a private item is
@@ -62,8 +63,12 @@ after a successful replacement/removal.
 
 Creating and editing an event redirect to the dashboard with a target date and
 event highlight. Deleting is a soft delete. Subscribers can view the event
-trash and restore a deleted event. Event creation, editing, deletion, restore,
-and sharing do not currently send push notifications.
+trash and restore a deleted event. Creating a non-private event sends a deferred
+Web Push notification after the creation transaction commits. Pink or Blue
+targets a subscriber with the matching capybara; Yellow targets all other
+subscribers. The author is always excluded, and recipients must have
+notifications enabled and an active push subscription. Editing, deletion, restore, and sharing
+do not send push notifications.
 
 ## Todos
 
@@ -98,8 +103,11 @@ postpone action moves every unfinished todo assigned to the current user on a
 selected date forward by one day; finished todos and other dates are untouched.
 Both actions redirect to the relevant dashboard date, and mutation redirects
 may highlight the affected todo. Todos use the same subscriber-based privacy,
-authorization, soft-delete, trash, and restore rules as events. Todo mutations
-do not currently send push notifications.
+authorization, soft-delete, trash, and restore rules as events. Creating a
+non-private todo sends the same deferred notification after the creation transaction
+commits. Pink and Blue target subscribers with the matching capybara, while Yellow
+targets all other subscribers; the author is always excluded. Update, finish,
+postpone, delete, and restore mutations do not send push notifications.
 
 ## Dashboard
 
@@ -141,8 +149,10 @@ required for current chat notifications.
 Documents are shared pair data. The author is recorded and displayed for
 attribution, but the current authenticated routes do not restrict documents to
 their author: either authenticated user can view, create, edit, or permanently
-delete a document. Documents have no trash/restore lifecycle and do not send
-notifications.
+delete a document. Documents have no trash/restore lifecycle. Creating a
+document sends a deferred Web Push notification to every other user who has
+notifications enabled and an active push subscription. Document updates and
+deletions do not send notifications.
 
 The editor stores Markdown-like plain text. The current renderer intentionally
 supports headings up to level three, unordered lists, separators, tables,
@@ -167,6 +177,15 @@ switch deletes that user's stored push subscriptions. The frontend reconciles
 the browser subscription with the server when authentication, visibility, or
 connectivity changes; permission or unsupported-browser failures do not grant a
 subscription.
+
+Created-item notifications are scheduled only after a successful create operation.
+Event and todo recipients come from the committed subscriber set and always exclude
+the author. Pink and Blue notify only the matching capybara; Yellow notifies all
+other subscribers. Private item details therefore cannot leak. Document
+notifications go to other users because documents are shared pair data. Payloads include the title, author,
+relevant date or deadline, and a same-origin deep link, but never descriptions or
+images. These notifications use post-response deferred work without a queue worker,
+and a push failure does not fail or repeat item creation.
 
 The morning summary covers today's events. The evening summary covers
 tomorrow's events; when tomorrow is empty but a later event exists, it reports

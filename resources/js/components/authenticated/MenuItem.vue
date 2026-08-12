@@ -11,6 +11,7 @@ interface Props {
     label: string;
     icon?: string;
     isNew?: boolean;
+    description?: string;
 }
 
 const props = defineProps<Props>();
@@ -33,11 +34,19 @@ const props = defineProps<Props>();
                 />
             </div>
 
-            <h2
-                class="m-0 flex-1 pt-1 text-left text-xs font-semibold tracking-wide text-gray-700 sm:text-sm md:pt-0 md:text-center md:text-base dark:text-gray-200"
-            >
-                {{ props.label }}
-            </h2>
+            <div class="min-w-0 flex-1 md:text-center">
+                <h2
+                    class="m-0 pt-1 text-left text-xs font-semibold tracking-wide text-gray-700 sm:text-sm md:pt-0 md:text-center md:text-base dark:text-gray-200"
+                >
+                    {{ props.label }}
+                </h2>
+                <p
+                    v-if="props.description"
+                    class="mt-0.5 truncate text-[11px] font-medium text-primary-600 sm:text-xs dark:text-primary-400"
+                >
+                    {{ props.description }}
+                </p>
+            </div>
 
             <UBadge
                 v-if="props.isNew"

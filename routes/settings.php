@@ -3,8 +3,7 @@
 use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\Settings\NotificationSettingsController;
 use App\Http\Controllers\Settings\PasswordController;
-// use App\Http\Controllers\Settings\ProfileController;
-// use App\Http\Controllers\Settings\TwoFactorAuthenticationController;
+use App\Http\Controllers\Settings\RelationshipSettingsController;
 use App\Http\Controllers\Settings\WatchDeviceController;
 use App\Http\Controllers\Settings\WatchPairingController;
 use App\Http\Controllers\TagController;
@@ -13,6 +12,11 @@ use Inertia\Inertia;
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', fn () => Inertia::render('settings/Profile'))->name('profile');
+
+    Route::get('/relationship', [RelationshipSettingsController::class, 'index'])
+        ->name('relationship-settings.index');
+    Route::put('/relationship', [RelationshipSettingsController::class, 'update'])
+        ->name('relationship-settings.update');
 
     Route::get('/paired-devices', [WatchDeviceController::class, 'index'])
         ->name('watch-devices.index');
@@ -38,7 +42,4 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('settings/watch-devices/{watchDevice}', [WatchDeviceController::class, 'destroy'])
         ->name('watch-devices.destroy');
-
-    //    Route::get('settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])
-    //        ->name('two-factor.show');
 });

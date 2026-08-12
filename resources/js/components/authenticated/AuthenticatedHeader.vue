@@ -11,8 +11,19 @@ import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import Logo from '@/components/Logo.vue';
 import AvatarSection from '@/components/ui/AvatarSection.vue';
 import { profile } from '@/routes';
-import { Link, router } from '@inertiajs/vue3';
+import { index as relationshipSettingsIndex } from '@/routes/relationship-settings';
+import type { AppPageProps } from '@/types';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
+
+const page = usePage<AppPageProps>();
+const relationshipDescription = computed(() => {
+    const summary = page.props.relationshipSummary;
+
+    return summary
+        ? `${summary.days_together.toLocaleString('cs-CZ')} dn\u00ed \u00b7 ${summary.human_label}`
+        : undefined;
+});
 
 const links = computed(() => [
     {
@@ -36,6 +47,13 @@ const links = computed(() => [
         icon: 'i-lucide-message-circle',
     },
     {
+        label: 'Vztah',
+        to: relationshipSettingsIndex(),
+        icon: 'i-lucide-heart',
+        isNew: true,
+        description: relationshipDescription.value,
+    },
+    {
         label: 'Můj Profil',
         to: profile(),
         icon: 'i-lucide-user',
@@ -44,7 +62,6 @@ const links = computed(() => [
         label: 'Spárovaná zařízení',
         to: watchDevicesIndex(),
         icon: 'i-lucide-monitor-smartphone',
-        isNew: true,
     },
     {
         label: 'Správa štítků',
@@ -94,7 +111,8 @@ const addMenuItems = [
         :to="DashboardController.url()"
         :ui="{
             toggle: 'visible lg:flex',
-            content: 'lg:block',
+            content: 'lg:block max-h-dvh overflow-y-auto overscroll-contain',
+            body: 'min-h-0 overflow-y-auto',
             header: 'mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full',
         }"
     >
@@ -123,6 +141,7 @@ const addMenuItems = [
                         :label="link.label"
                         :icon="link.icon"
                         :isNew="link.isNew"
+                        :description="link.description"
                     />
                 </div>
             </section>

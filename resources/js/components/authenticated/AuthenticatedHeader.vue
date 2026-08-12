@@ -52,6 +52,7 @@ const links = computed(() => [
         icon: 'i-lucide-heart',
         isNew: true,
         description: relationshipDescription.value,
+        animateDescription: true,
     },
     {
         label: 'Můj Profil',
@@ -142,6 +143,7 @@ const addMenuItems = [
                         :icon="link.icon"
                         :isNew="link.isNew"
                         :description="link.description"
+                        :animateDescription="link.animateDescription"
                     />
                 </div>
             </section>

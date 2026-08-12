@@ -33,6 +33,7 @@
     },
     "dependencies": {
         "@fontsource-variable/instrument-sans": "^5.3.0",
+        "@fontsource/modak": "^5.3.0",
         "@iconify-json/lucide": "^1.2.123",
         "@inertiajs/vue3": "^3.0",
         "@nuxt/ui": "^4.8.2",

@@ -12,6 +12,7 @@ interface Props {
     icon?: string;
     isNew?: boolean;
     description?: string;
+    animateDescription?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -40,12 +41,25 @@ const props = defineProps<Props>();
                 >
                     {{ props.label }}
                 </h2>
-                <p
+                <div
                     v-if="props.description"
-                    class="mt-0.5 truncate text-[11px] font-medium text-primary-600 sm:text-xs dark:text-primary-400"
+                    class="description-marquee mt-0.5 overflow-hidden text-[11px] font-medium text-primary-600 sm:text-xs dark:text-primary-400"
+                    :class="{
+                        'description-marquee--animated':
+                            props.animateDescription,
+                    }"
                 >
-                    {{ props.description }}
-                </p>
+                    <span class="description-marquee__track">
+                        <span>{{ props.description }}</span>
+                        <span
+                            v-if="props.animateDescription"
+                            aria-hidden="true"
+                            class="description-marquee__duplicate"
+                        >
+                            {{ props.description }}
+                        </span>
+                    </span>
+                </div>
             </div>
 
             <UBadge
@@ -60,3 +74,49 @@ const props = defineProps<Props>();
         </div>
     </Link>
 </template>
+
+<style scoped>
+.description-marquee__track {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+    .description-marquee--animated .description-marquee__track {
+        display: flex;
+        width: max-content;
+        overflow: visible;
+        animation: relationship-description-marquee 8s linear infinite;
+    }
+
+    .description-marquee__duplicate {
+        padding-left: 2rem;
+    }
+
+    .group:hover .description-marquee__track,
+    .group:focus-within .description-marquee__track {
+        animation-play-state: paused;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .description-marquee--animated .description-marquee__track {
+        display: block;
+        width: auto;
+        overflow: hidden;
+        animation: none;
+    }
+
+    .description-marquee__duplicate {
+        display: none;
+    }
+}
+
+@keyframes relationship-description-marquee {
+    to {
+        transform: translateX(calc(-50% - 1rem));
+    }
+}
+</style>

@@ -3,8 +3,6 @@
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Modak&display=swap');
-
 .logo {
     font-family: 'Modak', system-ui;
     font-weight: 400;

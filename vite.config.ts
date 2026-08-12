@@ -27,6 +27,11 @@ export default defineConfig(({ mode }) => {
             }),
             ui({
                 inertia: true,
+                icon: {
+                    clientBundle: {
+                        scan: true,
+                    },
+                },
                 ui: {
                     colors: {
                         primary: 'pink',

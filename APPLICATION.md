@@ -164,8 +164,9 @@ required for current chat notifications.
 
 Documents are shared pair data. The author is recorded and displayed for
 attribution, but the current authenticated routes do not restrict documents to
-their author: either authenticated user can view, create, edit, or permanently
-delete a document. Documents have no trash/restore lifecycle. Creating a
+their author: either authenticated user can view, create, edit, or soft-delete
+a document. Soft-deleted documents are excluded from authenticated document
+routes, and documents have no application trash/restore lifecycle. Creating a
 document sends a deferred Web Push notification to every other user who has
 notifications enabled and an active push subscription. Document updates and
 deletions do not send notifications.

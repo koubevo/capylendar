@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\RelationshipSummaryController;
 use App\Http\Controllers\Api\WakeController;
 use App\Http\Controllers\Api\Watch\EventController;
 use App\Http\Controllers\Api\Watch\PairingController;
@@ -22,5 +23,6 @@ Route::prefix('watch')->name('watch.')->group(function () {
         Route::get('/events', [EventController::class, 'index'])->name('events.index');
         Route::get('/todos', [TodoController::class, 'index'])->name('todos.index');
         Route::patch('/todos/{todo}/completion', [TodoController::class, 'updateCompletion'])->name('todos.completion.update');
+        Route::get('/relationship-summary', RelationshipSummaryController::class)->name('relationship.summary');
     });
 });

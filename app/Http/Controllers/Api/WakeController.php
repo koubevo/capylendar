@@ -5,13 +5,17 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SendWakeNotificationRequest;
 use App\Services\NotificationService;
+use App\Services\RelationshipMilestoneNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Throwable;
 
 class WakeController extends Controller
 {
-    public function __construct(protected NotificationService $notificationService) {}
+    public function __construct(
+        protected NotificationService $notificationService,
+        protected RelationshipMilestoneNotificationService $relationshipNotifications,
+    ) {}
 
     public function __invoke(SendWakeNotificationRequest $request): JsonResponse
     {
@@ -37,7 +41,7 @@ class WakeController extends Controller
 
         try {
             $result = match ($type) {
-                'morning' => $this->notificationService->sendMorningNotifications(),
+                'morning' => $this->morningResult(),
                 default => $this->notificationService->sendEveningNotifications(),
             };
         } catch (Throwable $exception) {
@@ -46,7 +50,11 @@ class WakeController extends Controller
             throw $exception;
         }
 
-        Cache::put($cacheKey, true, now()->endOfDay());
+        if ($result['errors'] > 0) {
+            Cache::forget($cacheKey);
+        } else {
+            Cache::put($cacheKey, true, now()->endOfDay());
+        }
 
         return response()->json([
             'message' => 'Notifications sent',
@@ -55,5 +63,17 @@ class WakeController extends Controller
             'errors' => $result['errors'],
             'already_sent' => false,
         ]);
+    }
+
+    /** @return array{users_notified: int, errors: int} */
+    private function morningResult(): array
+    {
+        $events = $this->notificationService->sendMorningNotifications();
+        $relationship = $this->relationshipNotifications->sendMorningNotifications();
+
+        return [
+            'users_notified' => $events['users_notified'] + $relationship['users_notified'],
+            'errors' => $events['errors'] + $relationship['errors'],
+        ];
     }
 }

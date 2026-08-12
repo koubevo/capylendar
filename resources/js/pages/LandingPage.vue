@@ -35,11 +35,19 @@ const features = [
         span: '',
     },
     {
-        name: 'Push notifikace',
+        name: 'Push notifications',
         description:
-            'Ranní a večerní souhrny, chatové zprávy i upozornění na nové společné položky.',
+            'Morning and evening summaries, chat messages, and alerts about new shared items.',
         icon: 'i-lucide-bell-ring',
         accent: 'bg-[#fff0b8]',
+        span: '',
+    },
+    {
+        name: 'Anniversaries that stand out',
+        description:
+            'One shared date, regular anniversaries, and smart milestones such as 1000 days or 100 weeks without filling the calendar.',
+        icon: 'i-lucide-heart',
+        accent: 'bg-[#ffd9e7]',
         span: '',
     },
     {
@@ -392,39 +400,37 @@ const handleToggled = (id: number) => {
 
                             <div class="grid gap-3">
                                 <div
-                                    class="flex items-center gap-4 rounded-2xl bg-[#ffd9e7] p-4"
+                                    class="flex items-center justify-between rounded-xl bg-pink-100 p-4 md:bg-pink-50"
                                 >
-                                    <span
-                                        class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-white/70 text-xl font-black"
-                                        >18</span
-                                    >
                                     <div class="min-w-0 flex-1">
-                                        <p class="font-black">Výročí ❤️</p>
-                                        <p class="text-sm text-[#62697a]">
-                                            celý den · oba
-                                        </p>
+                                        <p class="font-bold">Výročí ❤️</p>
+                                        <p class="text-xs">Oba | Celý den</p>
                                     </div>
-                                    <UIcon
-                                        name="i-lucide-heart"
-                                        class="size-5 text-[#ee4f87]"
+                                    <img
+                                        src="/images/capys/yellow.jpg"
+                                        alt="Obě kapybary"
+                                        class="ml-4 size-14 shrink-0 rounded-md object-cover"
                                     />
                                 </div>
                                 <div
-                                    class="flex items-center gap-4 rounded-2xl bg-[#d9ecff] p-4"
+                                    class="flex items-center justify-between rounded-xl bg-blue-100 p-4 md:bg-blue-50"
                                 >
-                                    <span
-                                        class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-white/70 font-mono text-sm font-black"
-                                        >12:00</span
-                                    >
                                     <div class="min-w-0 flex-1">
-                                        <p class="font-black">Oční</p>
-                                        <p class="text-sm text-[#62697a]">
-                                            soukromý event
+                                        <p class="font-bold">Oční</p>
+                                        <p
+                                            class="flex items-center gap-1 text-xs"
+                                        >
+                                            <UIcon
+                                                name="i-lucide-user-lock"
+                                                class="size-3"
+                                            />
+                                            John | 12:00 - 12:30
                                         </p>
                                     </div>
-                                    <UIcon
-                                        name="i-lucide-lock-keyhole"
-                                        class="size-5"
+                                    <img
+                                        src="/images/capys/blue.jpg"
+                                        alt="Modrá kapybara"
+                                        class="ml-4 size-14 shrink-0 rounded-md object-cover"
                                     />
                                 </div>
                                 <div
@@ -560,7 +566,7 @@ const handleToggled = (id: number) => {
                         </h2>
                     </div>
 
-                    <div class="grid gap-4 md:grid-cols-3">
+                    <div class="grid grid-flow-row-dense gap-4 md:grid-cols-3">
                         <article
                             v-for="feature in features"
                             :key="feature.name"

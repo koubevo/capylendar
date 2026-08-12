@@ -82,3 +82,10 @@ The web app is deployed on [Laravel Cloud](https://capylendar.laravel.cloud). Th
 The Wear OS app can be distributed directly as a debug APK via a laptop. Play Store signing or store release automation is not required for this distribution.
 
 Made with ❤️ and 🦦 by Vojtěch Koubek
+
+
+## Relationship anniversaries
+
+The shared relationship settings page stores the pair's start date and an optional name. It shows day-zero based days together, a human date label, and the next milestones without creating calendar events. One switch enables or disables every milestone notification. The catalog covers monthly anniversaries throughout the relationship, annual anniversaries, round days, round weeks and repeating numbers. Whole-year dates use the annual milestone instead of duplicating the monthly one. Monthly dates fall back to the last day of a shorter month; a 29 February annual anniversary falls on 28 February in a non-leap year. The current day count and human duration are also visible directly in the main menu.
+
+The morning wake endpoint also delivers one merged Web Push notification for matching enabled milestones to subscribed users. Per-recipient delivery records make retries idempotent. The relationship summary is available to the web through authenticated Inertia data and to paired watches at /api/watch/relationship-summary.

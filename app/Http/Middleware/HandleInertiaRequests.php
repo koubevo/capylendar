@@ -3,7 +3,9 @@
 namespace App\Http\Middleware;
 
 use App\Enums\Capybara;
+use App\Models\RelationshipSettings;
 use App\Models\User;
+use App\Services\RelationshipMilestoneService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -67,6 +69,14 @@ class HandleInertiaRequests extends Middleware
                     ];
                 },
             ],
+            'relationshipSummary' => function () use ($request): ?array {
+                if (! $request->user()) {
+                    return null;
+                }
+
+                return app(RelationshipMilestoneService::class)
+                    ->menuSummary(RelationshipSettings::current());
+            },
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),

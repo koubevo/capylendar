@@ -88,6 +88,33 @@ describe('WakeController', function () {
             ->assertJsonPath('already_sent', true);
     });
 
+    it('releases the daily key when a delivery fails so wake can retry', function () {
+        config(['services.notifications.wake_token' => 'valid-token']);
+
+        $service = $this->mock(NotificationService::class);
+        $service->shouldReceive('sendEveningNotifications')
+            ->twice()
+            ->andReturn(
+                ['users_notified' => 1, 'errors' => 1],
+                ['users_notified' => 1, 'errors' => 0],
+            );
+
+        $headers = ['Authorization' => 'Bearer valid-token'];
+
+        $this->postJson('/api/wake', [], $headers)
+            ->assertOk()
+            ->assertJsonPath('errors', 1)
+            ->assertJsonPath('already_sent', false);
+
+        $this->postJson('/api/wake', [], $headers)
+            ->assertOk()
+            ->assertJsonPath('errors', 0)
+            ->assertJsonPath('already_sent', false);
+
+        $this->postJson('/api/wake', [], $headers)
+            ->assertOk()
+            ->assertJsonPath('already_sent', true);
+    });
     it('rejects an invalid notification type', function () {
         config(['services.notifications.wake_token' => 'valid-token']);
 

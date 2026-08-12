@@ -1,5 +1,10 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
+@import '@fontsource-variable/instrument-sans';
+
+@theme {
+    --font-sans: 'Instrument Sans Variable', sans-serif;
+}
 
 @layer base {
     h1 {

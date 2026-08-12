@@ -238,7 +238,7 @@ describe('DocumentController shared access', function () {
             ->and($document->body)->toBe('Original body');
     });
 
-    it('deletes a document created by another user', function () {
+    it('soft deletes a document created by another user', function () {
         $user = User::factory()->create();
         $document = Document::factory()->create();
 
@@ -246,7 +246,7 @@ describe('DocumentController shared access', function () {
             ->delete(route('document.destroy', $document))
             ->assertRedirect(route('document.index'));
 
-        $this->assertDatabaseMissing('documents', [
+        $this->assertSoftDeleted('documents', [
             'id' => $document->id,
         ]);
     });

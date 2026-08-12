@@ -34,6 +34,7 @@ class RelationshipMilestoneNotificationService
 
         $milestoneKey = implode('|', array_column($milestones, 'key'));
         $users = User::query()
+            ->with('pushSubscriptions')
             ->where('notifications_enabled', true)
             ->whereHas('pushSubscriptions')
             ->orderBy('id')

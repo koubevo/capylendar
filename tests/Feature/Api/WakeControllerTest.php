@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Services\NotificationService;
+use App\Services\RelationshipMilestoneNotificationService;
 use Illuminate\Support\Facades\Cache;
 
 beforeEach(function () {
@@ -112,6 +113,44 @@ describe('WakeController', function () {
             ->assertJsonPath('already_sent', false);
 
         $this->postJson('/api/wake', [], $headers)
+            ->assertOk()
+            ->assertJsonPath('already_sent', true);
+    });
+    it('aggregates morning notifications and retries after a partial failure', function () {
+        config(['services.notifications.wake_token' => 'valid-token']);
+
+        $events = $this->mock(NotificationService::class);
+        $events->shouldReceive('sendMorningNotifications')
+            ->twice()
+            ->andReturn(
+                ['users_notified' => 2, 'errors' => 0],
+                ['users_notified' => 0, 'errors' => 0],
+            );
+
+        $relationship = $this->mock(RelationshipMilestoneNotificationService::class);
+        $relationship->shouldReceive('sendMorningNotifications')
+            ->twice()
+            ->andReturn(
+                ['users_notified' => 1, 'errors' => 1],
+                ['users_notified' => 1, 'errors' => 0],
+            );
+
+        $headers = ['Authorization' => 'Bearer valid-token'];
+        $payload = ['type' => 'morning'];
+
+        $this->postJson('/api/wake', $payload, $headers)
+            ->assertOk()
+            ->assertJsonPath('users_notified', 3)
+            ->assertJsonPath('errors', 1)
+            ->assertJsonPath('already_sent', false);
+
+        $this->postJson('/api/wake', $payload, $headers)
+            ->assertOk()
+            ->assertJsonPath('users_notified', 1)
+            ->assertJsonPath('errors', 0)
+            ->assertJsonPath('already_sent', false);
+
+        $this->postJson('/api/wake', $payload, $headers)
             ->assertOk()
             ->assertJsonPath('already_sent', true);
     });

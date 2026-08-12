@@ -19,7 +19,22 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::statement('CREATE UNIQUE INDEX relationship_settings_singleton_unique ON relationship_settings ((1))');
+        if (DB::getDriverName() === 'sqlite') {
+            DB::statement(<<<'SQL'
+                CREATE TRIGGER relationship_settings_singleton_id_check
+                BEFORE INSERT ON relationship_settings
+                WHEN NEW.id <> 1
+                BEGIN
+                    SELECT RAISE(ABORT, 'relationship_settings id must be 1');
+                END
+                SQL);
+
+            return;
+        }
+
+        DB::statement(
+            'ALTER TABLE relationship_settings ADD CONSTRAINT relationship_settings_singleton_id_check CHECK (id = 1)'
+        );
     }
 
     public function down(): void

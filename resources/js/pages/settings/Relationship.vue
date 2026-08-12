@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { update } from '@/actions/App/Http/Controllers/Settings/RelationshipSettingsController';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import type {
     RelationshipSettings,
@@ -18,6 +19,7 @@ const form = useForm({
     name: props.relationship?.name ?? '',
     notifications_enabled: props.relationship?.notifications_enabled ?? true,
     confirm_started_on_change: false,
+    original_started_on: props.relationship?.started_on ?? null,
 });
 
 const startedOnDate = computed<CalendarDate | undefined>({
@@ -43,7 +45,7 @@ function submit(): void {
         return;
     }
 
-    form.put('/relationship', { preserveScroll: true });
+    form.submit(update(), { preserveScroll: true });
 }
 </script>
 

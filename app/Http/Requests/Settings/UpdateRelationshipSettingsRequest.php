@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Settings;
 
-use App\Models\RelationshipSettings;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
@@ -21,17 +20,19 @@ class UpdateRelationshipSettingsRequest extends FormRequest
             'name' => ['nullable', 'string', 'max:120'],
             'notifications_enabled' => ['required', 'boolean'],
             'confirm_started_on_change' => ['nullable', 'boolean'],
+            'original_started_on' => ['present', 'nullable', 'date'],
         ];
     }
 
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {
-            $settings = RelationshipSettings::current();
+            $originalStartedOn = $this->input('original_started_on');
+            $originalStartedOn = is_string($originalStartedOn) ? $originalStartedOn : null;
             $startedOn = $this->string('started_on')->toString();
 
-            if ($settings?->started_on
-                && $settings->started_on->toDateString() !== $startedOn
+            if ($originalStartedOn !== null
+                && $originalStartedOn !== $startedOn
                 && ! $this->boolean('confirm_started_on_change')) {
                 $validator->errors()->add('started_on', "Zm\u{011b}na po\u{010d}\u{00e1}te\u{010d}n\u{00ed}ho data vy\u{017e}aduje potvrzen\u{00ed}.");
             }

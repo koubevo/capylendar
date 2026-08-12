@@ -35,17 +35,17 @@ const features = [
         span: '',
     },
     {
-        name: 'Push notifications',
+        name: 'Push notifikace',
         description:
-            'Morning and evening summaries, chat messages, and alerts about new shared items.',
+            'Ranní a večerní souhrny, zprávy z chatu a upozornění na nové sdílené položky.',
         icon: 'i-lucide-bell-ring',
         accent: 'bg-[#fff0b8]',
         span: '',
     },
     {
-        name: 'Anniversaries that stand out',
+        name: 'Výročí, která nepřehlédnete',
         description:
-            'One shared date, regular anniversaries, and smart milestones such as 1000 days or 100 weeks without filling the calendar.',
+            'Jedno společné datum, pravidelná výročí a chytré milníky jako 1000 dní nebo 100 týdnů bez zaplnění kalendáře.',
         icon: 'i-lucide-heart',
         accent: 'bg-[#ffd9e7]',
         span: '',

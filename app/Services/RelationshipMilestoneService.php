@@ -30,7 +30,7 @@ class RelationshipMilestoneService
     }
 
     /**
-     * @return array{days_together: int, human_label: string, next_milestone: array{date: string, type: string, description: string, days_remaining: int}|null, upcoming_milestones: list<array{date: string, type: string, description: string, days_remaining: int}>}|null
+     * @return array{days_together: int, human_label: string, next_milestone: array{date: string, date_label: string, type: string, description: string, days_remaining: int}|null, upcoming_milestones: list<array{date: string, date_label: string, type: string, description: string, days_remaining: int}>}|null
      */
     public function summary(?RelationshipSettings $settings, ?CarbonInterface $today = null): ?array
     {
@@ -97,7 +97,7 @@ class RelationshipMilestoneService
     }
 
     /**
-     * @return list<array{date: string, type: string, description: string, days_remaining: int}>
+     * @return list<array{date: string, date_label: string, type: string, description: string, days_remaining: int}>
      */
     private function upcomingMilestones(RelationshipSettings $settings, CarbonInterface $today): array
     {

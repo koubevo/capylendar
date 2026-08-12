@@ -4,6 +4,11 @@ export interface RelationshipSettings {
     notifications_enabled: boolean;
 }
 
+export interface RelationshipMenuSummary {
+    days_together: number;
+    human_label: string;
+}
+
 export interface RelationshipMilestone {
     date: string;
     date_label: string;

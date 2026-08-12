@@ -134,14 +134,17 @@ it('allows either authenticated user to update settings', function () {
         'started_on' => '2025-01-01',
         'name' => 'Us',
         'notifications_enabled' => true,
+        'original_started_on' => null,
     ];
 
     $this->actingAs($first)->put(route('relationship-settings.update'), $payload)
         ->assertRedirect(route('relationship-settings.index'))
         ->assertSessionHas('success', "Nastaven\u{00ed} vztahu bylo ulo\u{017e}eno.");
 
-    $this->actingAs($second)->put(route('relationship-settings.update'), $payload)
-        ->assertRedirect();
+    $this->actingAs($second)->put(route('relationship-settings.update'), [
+        ...$payload,
+        'original_started_on' => '2025-01-01',
+    ])->assertRedirect();
 
     expect(RelationshipSettings::query()->sole()->updated_by)->toBe($second->id);
 });
@@ -253,23 +256,24 @@ it('retries only recipients whose relationship notification failed', function ()
         ->toBe(2);
 });
 
-it('enforces a single relationship settings row in the database', function () {
+it('enforces the fixed relationship settings singleton id in an empty table', function () {
     $user = User::factory()->create();
+
+    expect(fn () => RelationshipSettings::query()->create([
+        'id' => 2,
+        'started_on' => '2025-01-01',
+        'notifications_enabled' => true,
+        'created_by' => $user->id,
+        'updated_by' => $user->id,
+    ]))->toThrow(QueryException::class)
+        ->and(RelationshipSettings::query()->count())->toBe(0);
 
     RelationshipSettings::factory()->create([
         'created_by' => $user->id,
         'updated_by' => $user->id,
     ]);
 
-    expect(RelationshipSettings::current())->not->toBeNull()
-        ->and(fn () => RelationshipSettings::query()->create([
-            'id' => 2,
-            'started_on' => '2025-01-01',
-            'notifications_enabled' => true,
-            'created_by' => $user->id,
-            'updated_by' => $user->id,
-        ]))->toThrow(QueryException::class)
-        ->and(RelationshipSettings::query()->count())->toBe(1);
+    expect(RelationshipSettings::current())->not->toBeNull();
 });
 
 it('requires confirmation before changing the relationship start date', function () {
@@ -284,6 +288,7 @@ it('requires confirmation before changing the relationship start date', function
         'started_on' => '2025-02-01',
         'name' => 'My dva',
         'notifications_enabled' => true,
+        'original_started_on' => '2025-01-01',
     ];
 
     $this->actingAs($user)->put(route('relationship-settings.update'), $payload)
@@ -299,6 +304,33 @@ it('requires confirmation before changing the relationship start date', function
     expect(RelationshipSettings::current()?->started_on?->toDateString())->toBe('2025-02-01');
 });
 
+it('rejects a stale relationship settings form after the start date changed', function () {
+    $first = User::factory()->create();
+    $second = User::factory()->create();
+    RelationshipSettings::factory()->create([
+        'started_on' => '2025-01-01',
+        'created_by' => $first->id,
+        'updated_by' => $first->id,
+    ]);
+
+    $this->actingAs($first)->put(route('relationship-settings.update'), [
+        'started_on' => '2025-02-01',
+        'original_started_on' => '2025-01-01',
+        'name' => 'My dva',
+        'notifications_enabled' => true,
+        'confirm_started_on_change' => true,
+    ])->assertRedirect(route('relationship-settings.index'));
+
+    $this->actingAs($second)->put(route('relationship-settings.update'), [
+        'started_on' => '2025-01-01',
+        'original_started_on' => '2025-01-01',
+        'name' => 'Starý formulář',
+        'notifications_enabled' => true,
+    ])->assertConflict();
+
+    expect(RelationshipSettings::current()?->started_on?->toDateString())->toBe('2025-02-01')
+        ->and(RelationshipSettings::current()?->name)->toBe('My dva');
+});
 it('removes the unusable web summary endpoint and keeps the watch endpoint', function () {
     $user = User::factory()->create();
     $plainTextToken = 'capy_watch_relationship_summary_test';

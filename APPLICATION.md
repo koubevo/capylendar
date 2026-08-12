@@ -63,9 +63,13 @@ event must fall back to an empty configuration state.
 
 Events may have shared color tags. A Google Maps URL in the description can be
 resolved into a map OpenGraph preview when a title and image are available. If
-the remote lookup fails, the event remains valid without a preview. The stored
-description remains the source content; the UI can hide the extracted map URL
-when showing the human description.
+the remote lookup fails, the event remains valid without a preview. Preview
+lookups accept HTTPS Google Maps URLs only, validate every redirect against the
+explicit Google Maps host allowlist, follow at most three redirects, use short
+connection and response timeouts, and read at most 1 MiB of HTML. Preview image
+URLs must also be HTTPS; the server does not download the image itself. The
+stored description remains the source content; the UI can hide the extracted
+map URL when showing the human description.
 
 Event images are private media. The image URL is an authenticated route and is
 authorized with the same subscriber policy as the event. Missing media returns
@@ -245,7 +249,21 @@ Guests can see the public landing page only. Application data requires web
 authentication, and event/todo access requires subscriber membership. Private
 event media uses the same authorization boundary; copying a URL must not make
 it public. Web Push endpoints are validated as supported public HTTPS provider
-URLs. Registration is not possible.
+URLs. Registration is not possible. Passwords must contain at least 12
+characters; production additionally rejects passwords found in known breach
+data.
+
+Event and todo descriptions are limited to 20,000 characters. Document bodies
+are limited to 100,000 characters. Event images are limited to 5 MiB and
+6,000 by 6,000 pixels. These server-side limits protect request processing and
+storage even when a client bypasses the UI.
+
+All responses set MIME-sniffing, frame-embedding, referrer, permissions, and
+cross-origin opener security headers. Production responses additionally set a
+Content Security Policy, and secure production responses set HSTS. Production
+session cookies default to secure unless explicitly overridden by deployment
+configuration. Laravel Boost is enabled by default only in the local
+environment and must be explicitly opted into elsewhere.
 
 The deployed/local application uses PostgreSQL through Sail. Tests use
 `RefreshDatabase` with an isolated in-memory SQLite database and MUST NOT use a

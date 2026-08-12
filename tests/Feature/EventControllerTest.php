@@ -3,6 +3,7 @@
 use App\Models\Event;
 use App\Models\Tag;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function () {
@@ -194,6 +195,53 @@ describe('EventController store validation', function () {
             ->assertSessionHasErrors('title');
     });
 
+    it('limits description length', function () {
+        $this->actingAs($this->user)
+            ->post(route('event.store'), [
+                'title' => 'Event',
+                'date' => now()->addDay()->format('Y-m-d'),
+                'start_at' => '10:00',
+                'is_all_day' => false,
+                'capybara' => 'blue',
+                'description' => str_repeat('a', 20001),
+            ])
+            ->assertSessionHasErrors('description');
+    });
+
+    it('limits uploaded image dimensions', function () {
+        $this->actingAs($this->user)
+            ->post(route('event.store'), [
+                'title' => 'Event',
+                'date' => now()->addDay()->format('Y-m-d'),
+                'start_at' => '10:00',
+                'is_all_day' => false,
+                'capybara' => 'blue',
+                'image' => UploadedFile::fake()->image(
+                    'oversized.jpg',
+                    6001,
+                    100,
+                ),
+            ])
+            ->assertSessionHasErrors('image');
+    });
+
+    it('limits uploaded image height', function () {
+        $this->actingAs($this->user)
+            ->post(route('event.store'), [
+                'title' => 'Event',
+                'date' => now()->addDay()->format('Y-m-d'),
+                'start_at' => '10:00',
+                'is_all_day' => false,
+                'capybara' => 'blue',
+                'image' => UploadedFile::fake()->image(
+                    'too-tall.jpg',
+                    100,
+                    6001,
+                ),
+            ])
+            ->assertSessionHasErrors('image');
+    });
+
     it('validates end_at is after start_at', function () {
         $this->actingAs($this->user)
             ->post(route('event.store'), [
@@ -307,6 +355,45 @@ describe('EventController update', function () {
         $this->event->refresh();
         expect($this->event->tags)->toHaveCount(0);
     });
+
+    it('limits description length when updating', function () {
+        $this->actingAs($this->user)
+            ->put(route('event.update', $this->event), [
+                'title' => 'Event',
+                'date' => now()->addDay()->format('Y-m-d'),
+                'start_at' => '10:00',
+                'is_all_day' => false,
+                'capybara' => 'blue',
+                'description' => str_repeat('a', 20001),
+            ])
+            ->assertSessionHasErrors('description');
+
+        expect($this->event->fresh()->description)
+            ->not->toBe(str_repeat('a', 20001));
+    });
+
+    it('limits image dimensions when updating', function (
+        int $width,
+        int $height,
+    ) {
+        $this->actingAs($this->user)
+            ->put(route('event.update', $this->event), [
+                'title' => 'Event',
+                'date' => now()->addDay()->format('Y-m-d'),
+                'start_at' => '10:00',
+                'is_all_day' => false,
+                'capybara' => 'blue',
+                'image' => UploadedFile::fake()->image(
+                    'oversized.jpg',
+                    $width,
+                    $height,
+                ),
+            ])
+            ->assertSessionHasErrors('image');
+    })->with([
+        'width' => [6001, 100],
+        'height' => [100, 6001],
+    ]);
 });
 
 describe('EventController destroy', function () {

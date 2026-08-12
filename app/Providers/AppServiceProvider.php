@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +26,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Password::defaults(function (): Password {
+            $rule = Password::min(12);
+
+            return $this->app->isProduction()
+                ? $rule->uncompromised()
+                : $rule;
+        });
+
         RateLimiter::for('watch-pairing-claim', function (Request $request): array {
             $deviceCode = $request->string('device_code')->toString();
 

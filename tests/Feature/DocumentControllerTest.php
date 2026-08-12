@@ -79,6 +79,36 @@ describe('DocumentController store', function () {
             ])
             ->assertSessionHasErrors('title');
     });
+
+    it('accepts a body at the length limit', function () {
+        $user = User::factory()->create();
+        $body = str_repeat('a', 100000);
+
+        $this->actingAs($user)
+            ->post(route('document.store'), [
+                'title' => 'Boundary document',
+                'body' => $body,
+            ])
+            ->assertRedirect();
+
+        expect(Document::query()
+            ->where('title', 'Boundary document')
+            ->firstOrFail()
+            ->body)->toBe($body);
+    });
+
+    it('limits body length', function () {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->post(route('document.store'), [
+                'title' => 'Large document',
+                'body' => str_repeat('a', 100001),
+            ])
+            ->assertSessionHasErrors('body');
+
+        $this->assertDatabaseMissing('documents', ['title' => 'Large document']);
+    });
 });
 
 describe('DocumentController authentication', function () {
@@ -171,6 +201,41 @@ describe('DocumentController shared access', function () {
             'title' => 'New title',
             'body' => 'Updated body',
         ]);
+    });
+
+    it('accepts an updated body at the length limit', function () {
+        $user = User::factory()->create();
+        $document = Document::factory()->create();
+        $body = str_repeat('a', 100000);
+
+        $this->actingAs($user)
+            ->put(route('document.update', $document), [
+                'title' => 'Boundary document',
+                'body' => $body,
+            ])
+            ->assertRedirect(route('document.show', $document));
+
+        expect($document->fresh()->body)->toBe($body);
+    });
+
+    it('rejects an updated body over the length limit', function () {
+        $user = User::factory()->create();
+        $document = Document::factory()->create([
+            'title' => 'Original title',
+            'body' => 'Original body',
+        ]);
+
+        $this->actingAs($user)
+            ->put(route('document.update', $document), [
+                'title' => 'Oversized update',
+                'body' => str_repeat('a', 100001),
+            ])
+            ->assertSessionHasErrors('body');
+
+        $document->refresh();
+
+        expect($document->title)->toBe('Original title')
+            ->and($document->body)->toBe('Original body');
     });
 
     it('deletes a document created by another user', function () {

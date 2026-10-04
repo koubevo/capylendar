@@ -138,6 +138,11 @@ whose deadline is already overdue. Later content is loaded one calendar month
 at a time. The stream extends far enough to include the latest future event or
 unfinished todo, and always has at least the current month.
 
+The nearest active event countdown is shown on the initial dashboard visit,
+independently of which calendar months have loaded. It follows the current
+dashboard filters and subscriber authorization, and refreshes at the next
+calendar day boundary.
+
 The dashboard has three views: a combined event/todo view, an event-only view,
 and a todo-only view. Search filters title and description. Other filters select
 the capybara assignment and one or more shared tags. Filters apply to both

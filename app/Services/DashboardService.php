@@ -20,6 +20,24 @@ class DashboardService
 
     /**
      * @param  array<string, mixed>  $filters
+     */
+    public function getNearestCountdownEvent(User $user, array $filters): ?EventResource
+    {
+        $event = $this->eventQuery($user, $filters)
+            ->with(['tags', 'author'])
+            ->withCount('subscribers')
+            ->where('countdown_enabled', true)
+            ->where('start_at', '>=', Carbon::today())
+            ->orderBy('start_at')
+            ->orderBy('is_all_day', 'desc')
+            ->orderBy('title')
+            ->first();
+
+        return $event === null ? null : new EventResource($event);
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
      * @return LengthAwarePaginator<int, array{
      *     key: string,
      *     label: string,

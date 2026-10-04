@@ -32,6 +32,7 @@ class DashboardController extends Controller
             : null;
 
         return Inertia::render('Dashboard', [
+            'nearestCountdownEvent' => fn () => $this->dashboardService->getNearestCountdownEvent($user, $filters)?->resolve(),
             'dashboardMonths' => Inertia::scroll(fn () => $this->dashboardService->paginate(
                 user: $user,
                 filters: $filters,

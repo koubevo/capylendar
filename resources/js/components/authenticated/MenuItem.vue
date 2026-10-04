@@ -35,7 +35,7 @@ const props = defineProps<Props>();
                 />
             </div>
 
-            <div class="min-w-0 flex-1 md:text-center">
+            <div class="min-w-0 flex-1 md:w-full md:text-center">
                 <h2
                     class="m-0 pt-1 text-left text-xs font-semibold tracking-wide text-gray-700 sm:text-sm md:pt-0 md:text-center md:text-base dark:text-gray-200"
                 >
@@ -83,6 +83,10 @@ const props = defineProps<Props>();
     white-space: nowrap;
 }
 
+.description-marquee__duplicate {
+    display: none;
+}
+
 @media (max-width: 767px) {
     .description-marquee--animated .description-marquee__track {
         display: flex;
@@ -92,6 +96,7 @@ const props = defineProps<Props>();
     }
 
     .description-marquee__duplicate {
+        display: inline;
         padding-left: 2rem;
     }
 

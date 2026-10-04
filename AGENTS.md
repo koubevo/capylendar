@@ -3,6 +3,11 @@
 For work associated with a Plane task, name branches `CAPY-<task-number>-<feature-name>`, where `<feature-name>` is a concise lowercase kebab-case description of the change (for example, `CAPY-36-preserve-duplicate-event-date`).
 This project-specific naming convention takes precedence over the global branch naming convention.
 
+## Task status
+
+When starting work associated with a Plane task, move its card to WIP using the available integration without asking for additional confirmation.
+If the task cannot be identified reliably or its status cannot be updated, report that limitation instead of claiming the card was moved.
+
 ## Application contract
 
 Before changing application logic, read the entire [APPLICATION.md](APPLICATION.md).

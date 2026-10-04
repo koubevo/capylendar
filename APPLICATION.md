@@ -290,3 +290,13 @@ App is hosted on Laravel Cloud.
 Relationship settings are one shared pair-level record with a stable singleton identity enforced by the database, not deployment configuration. Either authenticated user may view and update the start date, optional name, and one notification switch covering every milestone category; creation and updates record their author. A settings form is rejected as a conflict if the stored start date changed after that form was loaded, so a stale submission cannot restore an older date. The start day is day 0. Monthly anniversaries continue for the lifetime of the relationship and move to the final existing day of a shorter month. Exact whole-year dates are represented by the annual milestone instead of a duplicate monthly milestone. A 29 February annual anniversary occurs on 28 February in non-leap years. The interesting-number catalog includes repeating values and the documented playful values 69, 420, 666, 696, and 6969.
 
 Milestones are derived at read/send time and never become calendar events. When multiple catalog rules match one day, recipients receive one combined Web Push notification. Every 100th day together is a round-day milestone. Morning wake sends these notifications only when the shared milestone switch is enabled and only to users with their general notifications enabled and an active subscription. Each successfully dispatched milestone combination is stored persistently per recipient. Successful recipients are not duplicated by wake retries, while failed recipients remain eligible for retry; recipient-scoped locks prevent concurrent wake requests from sending duplicates. A date change affects only future previews and never recreates delivery history. Authenticated relationship summaries expose days together, a human label, and the nearest milestone to web, menu, and watch clients. The human label combines non-zero years, months, and days, except that the start day is shown as 0 days.
+
+The web relationship summary card can be exported as a PNG containing its current
+rendered summary text and capybara illustration, without controls or other page
+content. Export uses a readable 640-pixel card layout at double resolution,
+independent of the device width, and preserves the card's current colors. Users
+preview the image before explicitly downloading, copying, or sharing it. Image
+clipboard and system file sharing are offered only when supported in a secure
+browser context; PNG download remains available. Failures allow retry or download,
+and cancelling system sharing is not an error. Preparing an image never shares it
+or changes relationship settings or milestone rules.

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { update } from '@/actions/App/Http/Controllers/Settings/RelationshipSettingsController';
+import RelationshipImageExport from '@/components/settings/RelationshipImageExport.vue';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import type {
     RelationshipSettings,
@@ -7,12 +8,14 @@ import type {
 } from '@/types/Relationship';
 import { Head, useForm } from '@inertiajs/vue3';
 import { parseDate, type CalendarDate } from '@internationalized/date';
-import { computed } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 
 const props = defineProps<{
     relationship: RelationshipSettings | null;
     summary: RelationshipSummary | null;
 }>();
+
+const summaryCard = useTemplateRef<{ $el: HTMLElement }>('summaryCard');
 
 const form = useForm({
     started_on: props.relationship?.started_on ?? '',
@@ -65,38 +68,45 @@ function submit(): void {
                 </p>
             </div>
 
-            <UCard v-if="summary">
-                <div
-                    class="relative min-h-28 space-y-3 pr-28 sm:min-h-32 sm:pr-32"
-                >
-                    <p class="text-3xl font-bold">
-                        Spolu {{ summary.days_together }} dní
-                    </p>
-                    <p class="text-neutral-500 dark:text-neutral-400">
-                        {{ summary.human_label }}
-                    </p>
-                    <div v-if="summary.next_milestone">
-                        <p class="font-medium">
-                            Nejbližší milník:
-                            {{ summary.next_milestone.description }}
+            <div v-if="summary" class="flex flex-col gap-3">
+                <UCard ref="summaryCard">
+                    <div
+                        class="relative min-h-28 space-y-3 pr-28 sm:min-h-32 sm:pr-32"
+                    >
+                        <p class="text-3xl font-bold">
+                            Spolu {{ summary.days_together }} dní
                         </p>
-                        <p class="text-sm text-neutral-500">
-                            {{ summary.next_milestone.date_label }}
-                            <span v-if="summary.next_milestone.days_remaining">
-                                (za
-                                {{ summary.next_milestone.days_remaining }}
-                                dní)
-                            </span>
+                        <p class="text-neutral-500 dark:text-neutral-400">
+                            {{ summary.human_label }}
                         </p>
+                        <div v-if="summary.next_milestone">
+                            <p class="font-medium">
+                                Nejbližší milník:
+                                {{ summary.next_milestone.description }}
+                            </p>
+                            <p
+                                class="text-sm text-neutral-500 dark:text-neutral-400"
+                            >
+                                {{ summary.next_milestone.date_label }}
+                                <span
+                                    v-if="summary.next_milestone.days_remaining"
+                                >
+                                    (za
+                                    {{ summary.next_milestone.days_remaining }}
+                                    dní)
+                                </span>
+                            </p>
+                        </div>
+                        <img
+                            src="/images/capys/relationship-loving-v2.png"
+                            alt=""
+                            class="absolute top-1/2 right-0 h-28 w-28 -translate-y-1/2 object-contain sm:h-32 sm:w-32"
+                            aria-hidden="true"
+                        />
                     </div>
-                    <img
-                        src="/images/capys/relationship-loving-v2.png"
-                        alt=""
-                        class="absolute top-1/2 right-0 h-28 w-28 -translate-y-1/2 object-contain sm:h-32 sm:w-32"
-                        aria-hidden="true"
-                    />
-                </div>
-            </UCard>
+                </UCard>
+                <RelationshipImageExport :card="summaryCard?.$el ?? null" />
+            </div>
             <UCard v-if="summary?.upcoming_milestones.length">
                 <template #header>Další milníky</template>
                 <ul class="space-y-2 text-sm">

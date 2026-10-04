@@ -1,3 +1,8 @@
+## Git branches
+
+For work associated with a Plane task, name branches `CAPY-<task-number>-<feature-name>`, where `<feature-name>` is a concise lowercase kebab-case description of the change (for example, `CAPY-36-preserve-duplicate-event-date`).
+This project-specific naming convention takes precedence over the global branch naming convention.
+
 ## Application contract
 
 Before changing application logic, read the entire [APPLICATION.md](APPLICATION.md).

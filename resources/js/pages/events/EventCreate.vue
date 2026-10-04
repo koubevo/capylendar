@@ -23,7 +23,7 @@ const form = useForm<EventFormData>({
         props.event?.capybara.value ??
         page.props.auth.user?.capybara ??
         'yellow',
-    date: '',
+    date: props.event?.date.key || '',
     start_at: props.event?.date.start_time || '',
     end_at: props.event?.date.end_time || '',
     is_all_day: props.event?.date.is_all_day || false,

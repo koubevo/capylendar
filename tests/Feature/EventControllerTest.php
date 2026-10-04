@@ -21,10 +21,18 @@ describe('EventController create', function () {
                 ->component('events/EventCreate')
                 ->has('capybaraOptions')
                 ->has('availableTags')
+                ->where('event', null)
             );
     });
 
-    it('renders event create with duplicate event data', function () {
+    it('renders event create with the original date and times', function (bool $isAllDay) {
+        $this->event->update([
+            'start_at' => '2026-10-15 10:30:00',
+            'end_at' => $isAllDay ? null : '2026-10-15 12:00:00',
+            'is_all_day' => $isAllDay,
+        ]);
+        $originalAttributes = $this->event->refresh()->getAttributes();
+
         $this->actingAs($this->user)
             ->get(route('event.create', ['duplicate_event_id' => $this->event->id]))
             ->assertOk()
@@ -32,7 +40,47 @@ describe('EventController create', function () {
                 ->component('events/EventCreate')
                 ->has('event')
                 ->where('event.title', $this->event->title)
+                ->where('event.date.key', '2026-10-15')
+                ->where('event.date.start_time', $isAllDay ? '' : '10:30')
+                ->where('event.date.end_time', $isAllDay ? null : '12:00')
+                ->where('event.date.is_all_day', $isAllDay)
             );
+
+        expect($this->event->refresh()->getAttributes())->toBe($originalAttributes);
+        $this->assertDatabaseCount('events', 1);
+    })->with(['timed event' => false, 'all-day event' => true]);
+
+    it('saves a duplicate with a changed date without modifying the original', function () {
+        $this->event->update([
+            'start_at' => '2026-10-15 10:30:00',
+            'end_at' => '2026-10-15 12:00:00',
+        ]);
+        $originalAttributes = $this->event->refresh()->getAttributes();
+
+        $this->actingAs($this->user)
+            ->get(route('event.create', ['duplicate_event_id' => $this->event->id]))
+            ->assertOk();
+
+        $this->actingAs($this->user)
+            ->post(route('event.store'), [
+                'title' => $this->event->title,
+                'date' => '2026-10-16',
+                'start_at' => '10:30',
+                'end_at' => '12:00',
+                'is_all_day' => false,
+                'capybara' => $this->event->capybara->value,
+                'is_private' => true,
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect();
+
+        $this->assertDatabaseCount('events', 2);
+        $this->assertDatabaseHas('events', [
+            'id' => 2,
+            'start_at' => '2026-10-16 10:30:00',
+            'end_at' => '2026-10-16 12:00:00',
+        ]);
+        expect($this->event->refresh()->getAttributes())->toBe($originalAttributes);
     });
 
     it('returns 404 when duplicating non-existent event', function () {

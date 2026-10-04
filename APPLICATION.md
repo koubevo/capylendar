@@ -43,6 +43,11 @@ A timed event has a start time and may have
 an end time on the same date; an end time MUST be after the start. An all-day
 event is shown as a whole-day item and has no end time.
 
+Duplicating an event pre-fills the creation form with the original event's
+calendar date, including for all-day events. The copied date remains editable,
+and saving creates a new event without changing the original. Creating an event
+without a duplicate keeps the date empty until the user chooses one.
+
 Upcoming events begin with today and are ordered by start time ascending, then
 all-day status, then title. Historical events are events before today and are
 ordered newest first. The future dashboard and event history are separate

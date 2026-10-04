@@ -14,10 +14,11 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\ImageManager;
 
 class EventService
 {
@@ -128,7 +129,8 @@ class EventService
      */
     private function compressAndStoreImage(UploadedFile $file): string
     {
-        $image = Image::read($file)
+        $manager = new ImageManager(Config::string('image.driver'), ...Config::array('image.options', []));
+        $image = $manager->read($file)
             ->scaleDown(width: self::IMAGE_MAX_WIDTH);
 
         $filename = 'event-images/'.Str::uuid()->toString().'.webp';

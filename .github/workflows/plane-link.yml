@@ -1,4 +1,4 @@
-name: YouTrack Linker
+name: Plane Linker
 on:
   pull_request:
     types: [opened, reopened, edited]
@@ -8,14 +8,14 @@ permissions:
 
 jobs:
   link-ticket:
-    name: Link YouTrack Ticket
+    name: Link Plane Work Item
     runs-on: ubuntu-latest
     steps:
       - name: Add Link to PR Body
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
-            const YOUTRACK_URL = 'https://koubevo.youtrack.cloud/issue/';
+            const PLANE_URL = 'https://app.plane.so/vk-personal/browse/';
             const PROJECT_PREFIX = 'CAPY';
 
             const pr = context.payload.pull_request;
@@ -27,7 +27,7 @@ jobs:
             if (match) {
               const ticketId = match[0].toUpperCase();
               
-              const linkHeader = `# [${ticketId}](${YOUTRACK_URL}${ticketId})`;
+              const linkHeader = `# [${ticketId}](${PLANE_URL}${ticketId})`;
               
               let body = pr.body || "";
 

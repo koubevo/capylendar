@@ -24,6 +24,7 @@ interface DashboardMonth {
 
 interface Props {
     dashboardMonths: { data: DashboardMonth[] };
+    nearestCountdownEvent: Event | null;
     eventFilters: EventFilters;
     capybaraOptions: Capybara[];
     availableTags: Tag[];
@@ -38,19 +39,9 @@ const upcomingEvents = computed(() =>
     props.dashboardMonths.data.flatMap((month) => month.events),
 );
 
-const nearestCountdownEvent = computed(() =>
-    upcomingEvents.value
-        .filter((event) => event.countdown)
-        .sort(
-            (first, second) =>
-                new Date(first.countdown!.target_at).getTime() -
-                new Date(second.countdown!.target_at).getTime(),
-        )
-        .at(0),
-);
 useRefreshAt(
-    () => nearestCountdownEvent.value?.countdown?.next_update_at,
-    () => router.reload({ only: ['dashboardMonths'] }),
+    () => props.nearestCountdownEvent?.countdown?.next_update_at,
+    () => router.reload({ only: ['dashboardMonths', 'nearestCountdownEvent'] }),
 );
 
 const loadedTodos = computed(() =>
@@ -62,7 +53,7 @@ const handleFilterChange = (newFilters: typeof props.eventFilters) => {
         preserveState: true,
         preserveScroll: true,
         replace: true,
-        only: ['dashboardMonths', 'eventFilters'],
+        only: ['dashboardMonths', 'eventFilters', 'nearestCountdownEvent'],
         reset: ['dashboardMonths'],
     });
 };
@@ -176,8 +167,8 @@ function handleToggled(todoId: number) {
         </UCollapsible>
 
         <NearestCountdownCard
-            v-if="nearestCountdownEvent"
-            :event="nearestCountdownEvent"
+            v-if="props.nearestCountdownEvent"
+            :event="props.nearestCountdownEvent"
         />
 
         <InfiniteScroll

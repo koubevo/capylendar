@@ -13,6 +13,151 @@ beforeEach(function () {
     $this->user = User::factory()->create();
 });
 
+describe('Dashboard countdown', function () {
+    it('shows a future countdown before its calendar month is loaded', function (int $monthsAhead, bool $isAllDay) {
+        $event = Event::factory()->create([
+            'author_id' => $this->user->id,
+            'start_at' => now()->startOfMonth()->addMonths($monthsAhead)->setTime($isAllDay ? 0 : 14, 0),
+            'is_all_day' => $isAllDay,
+            'countdown_enabled' => true,
+        ]);
+        $event->subscribers()->attach($this->user);
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('dashboardMonths.data', 1)
+                ->where('dashboardMonths.data.0.key', now()->format('Y-m'))
+                ->has('dashboardMonths.data.0.events', 0)
+                ->where('nearestCountdownEvent.id', $event->id)
+                ->where('nearestCountdownEvent.countdown.active', true)
+                ->where('nearestCountdownEvent.date.is_all_day', $isAllDay)
+            );
+    })->with([
+        'next month timed' => [1, false],
+        'next month all-day' => [1, true],
+        'later month timed' => [4, false],
+        'later month all-day' => [4, true],
+    ]);
+
+    it('keeps todays countdown until the next calendar day', function (bool $isAllDay) {
+        $this->travelTo(now()->setTime(23, 59));
+        $event = Event::factory()->create([
+            'author_id' => $this->user->id,
+            'start_at' => now()->setTime($isAllDay ? 0 : 8, 0),
+            'is_all_day' => $isAllDay,
+            'countdown_enabled' => true,
+        ]);
+        $event->subscribers()->attach($this->user);
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('nearestCountdownEvent.id', $event->id)
+                ->where('nearestCountdownEvent.countdown.label', 'dnes')
+            );
+
+        $this->travelTo(now()->addDay()->startOfDay());
+
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('nearestCountdownEvent', null)
+            );
+    })->with(['timed' => false, 'all-day' => true]);
+
+    it('selects the nearest accessible enabled countdown independently of the requested month', function () {
+        $event = Event::factory()->create([
+            'author_id' => $this->user->id,
+            'start_at' => now()->startOfMonth()->addMonth(),
+            'countdown_enabled' => true,
+        ]);
+        $event->subscribers()->attach($this->user);
+
+        $laterEvent = Event::factory()->create([
+            'author_id' => $this->user->id,
+            'start_at' => now()->startOfMonth()->addMonths(4),
+            'countdown_enabled' => true,
+        ]);
+        $laterEvent->subscribers()->attach($this->user);
+
+        foreach (['past', 'deleted', 'inaccessible', 'disabled'] as $excluded) {
+            $excludedEvent = Event::factory()->create([
+                'author_id' => $this->user->id,
+                'start_at' => $excluded === 'past' ? now()->subDay() : now()->addDay(),
+                'countdown_enabled' => $excluded !== 'disabled',
+            ]);
+            if ($excluded !== 'inaccessible') {
+                $excludedEvent->subscribers()->attach($this->user);
+            }
+            if ($excluded === 'deleted') {
+                $excludedEvent->delete();
+            }
+        }
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard', ['dashboard' => 5]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('dashboardMonths.data.0.events.0.id', $laterEvent->id)
+                ->where('nearestCountdownEvent.id', $event->id)
+            );
+    });
+
+    it('applies dashboard filters to countdowns during partial reloads', function (string $filter) {
+        $tag = Tag::factory()->create();
+        $event = Event::factory()->create([
+            'author_id' => $this->user->id,
+            'title' => 'Matching trip',
+            'description' => 'Matching description',
+            'capybara' => Capybara::Pink,
+            'start_at' => now()->startOfMonth()->addMonths(4),
+            'countdown_enabled' => true,
+        ]);
+        $event->subscribers()->attach($this->user);
+        $event->tags()->attach($tag);
+
+        $excluded = Event::factory()->create([
+            'author_id' => $this->user->id,
+            'title' => 'Other event',
+            'description' => 'Other description',
+            'capybara' => Capybara::Blue,
+            'start_at' => now()->addDay(),
+            'countdown_enabled' => true,
+        ]);
+        $excluded->subscribers()->attach($this->user);
+
+        $filters = match ($filter) {
+            'title' => ['search' => 'Matching trip'],
+            'description' => ['search' => 'Matching description'],
+            'capybara' => ['capybara' => Capybara::Pink->value],
+            'tags' => ['tags' => [$tag->id]],
+            'combined' => ['search' => 'Matching', 'capybara' => Capybara::Pink->value, 'tags' => [$tag->id]],
+        };
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard', $filters))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('nearestCountdownEvent.id', $event->id)
+                ->reloadOnly(['dashboardMonths', 'eventFilters', 'nearestCountdownEvent'], fn (Assert $reload) => $reload
+                    ->where('nearestCountdownEvent.id', $event->id)
+                )
+            );
+
+        $this->get(route('dashboard', ['search' => 'No matching event']))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('nearestCountdownEvent', null)
+                ->reloadOnly('nearestCountdownEvent', fn (Assert $reload) => $reload
+                    ->where('nearestCountdownEvent', null)
+                )
+            );
+    })->with(['title', 'description', 'capybara', 'tags', 'combined']);
+});
+
 describe('DashboardController', function () {
     it('shows upcoming events on dashboard', function () {
         $upcomingEvent = Event::factory()->create([

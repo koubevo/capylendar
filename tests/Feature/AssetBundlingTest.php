@@ -21,3 +21,11 @@ it('includes an accessible mobile animation for the relationship description', f
     expect($menuItem)->toContain('relationship-description-marquee')
         ->toContain('prefers-reduced-motion: reduce');
 });
+
+it('constrains menu descriptions and hides the animation duplicate on desktop', function () {
+    $menuItem = file_get_contents(resource_path('js/components/authenticated/MenuItem.vue'));
+
+    expect($menuItem)->toContain('min-w-0 flex-1 md:w-full')
+        ->toMatch('/\.description-marquee__duplicate\s*\{\s*display: none;/')
+        ->toMatch('/@media \(max-width: 767px\)[\s\S]*\.description-marquee__duplicate\s*\{\s*display: inline;/');
+});

@@ -82,9 +82,44 @@ not found. Creating or updating an event must not leave a newly uploaded image
 behind when its database transaction fails, and an old image is removed only
 after a successful replacement/removal.
 
+Every event has a kind. `standard` is the default and `birthday` is the only
+other kind in the current implementation; the kind list is expected to grow, so
+kind-specific behavior is driven by the kind's capabilities rather than by
+assuming two values. An update that omits the kind keeps the stored one. Kind
+does not change privacy, subscribers, countdowns, or ordering. Cards mark
+birthday events with a cake icon.
+
+Creating a birthday event sends no created-item notification to anyone. This
+is the only notification difference: birthday events are counted and listed in
+the morning and evening summaries like any other event.
+
+A birthday event may carry one surprise image in addition to the ordinary event
+image. It is stored together with a required password and an optional hint of
+up to 255 characters, and has the same file limits as the event image. Any
+other kind rejects a surprise upload, and changing a birthday event to another
+kind deletes its surprise image, password, and hint.
+
+The surprise image is locked for every subscriber, including its author; the
+author simply knows the password. The password is stored only as a hash and is
+never returned to a client. Matching ignores letter case and surrounding or
+repeated whitespace. A correct password unlocks that image for the current web
+session only; other events, other sessions, and other devices stay locked.
+Event payloads expose the hint and lock state to subscribers, and expose the
+surprise image URL only after an unlock. The image route requires both the
+subscriber policy and the session unlock, and is served without caching.
+Unlock attempts are rate-limited to 10 per minute.
+
+The password can be set only together with a newly uploaded surprise image, so
+a subscriber who can edit the event cannot swap the password to reveal the
+existing image. Replacing the image locks it again for everyone. The hint can
+be edited on its own, and a subscriber can remove the surprise without knowing
+the password. The edit form never previews a stored surprise image. Duplicating
+an event copies the kind but not the surprise. Surprise images are not sent to
+Wear OS and are never part of a notification.
+
 Creating and editing an event redirect to the dashboard with a target date and
 event highlight. Deleting is a soft delete. Subscribers can view the event
-trash and restore a deleted event. Creating a non-private event sends a deferred
+trash and restore a deleted event. Creating a non-private, non-birthday event sends a deferred
 Web Push notification after the creation transaction commits. Pink or Blue
 targets a subscriber with the matching capybara; Yellow targets all other
 subscribers. The author is always excluded, and recipients must have

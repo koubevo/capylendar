@@ -34,6 +34,16 @@ const descriptionIsOnlyLinks = computed(() =>
                         class="size-3"
                     />
                     <UIcon
+                        name="i-lucide-cake"
+                        v-if="props.event.kind?.value === 'birthday'"
+                        class="size-3"
+                    />
+                    <UIcon
+                        name="i-lucide-gift"
+                        v-if="props.event.surprise && showListItems"
+                        class="size-3"
+                    />
+                    <UIcon
                         name="i-lucide-notepad-text"
                         v-if="
                             props.event.description_without_meta &&

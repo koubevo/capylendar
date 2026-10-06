@@ -22,6 +22,10 @@ class CreatedItemNotificationService
 
     public function deferEventCreated(Event $event): void
     {
+        if (! $event->kind->notifiesOnCreation()) {
+            return;
+        }
+
         defer(function () use ($event): void {
             $event->loadMissing('author');
 

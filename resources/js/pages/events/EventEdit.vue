@@ -5,11 +5,13 @@ import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import { Capybara } from '@/types/Capybara';
 import type { Event } from '@/types/Event';
 import { EventFormData } from '@/types/EventFormData';
+import type { EventKind } from '@/types/EventKind';
 import { Tag } from '@/types/Tag';
 import { Head, useForm } from '@inertiajs/vue3';
 
 const props = defineProps<{
     capybaraOptions: Capybara[];
+    kindOptions: EventKind[];
     event: Event;
     availableTags: Tag[];
 }>();
@@ -27,6 +29,11 @@ const form = useForm<EventFormData>({
     tags: props.event.tags?.map((tag) => tag.id) || [],
     image: null,
     remove_image: false,
+    kind: props.event.kind?.value ?? 'standard',
+    surprise_image: null,
+    surprise_password: '',
+    surprise_hint: props.event.surprise?.hint ?? '',
+    remove_surprise_image: false,
 });
 
 function submit() {
@@ -47,10 +54,12 @@ function submit() {
             :form="form"
             :is-edit-mode="true"
             :capybara-options="props.capybaraOptions"
+            :kind-options="props.kindOptions"
             @submit="submit"
             :available-tags="props.availableTags"
             :event-id="props.event.id"
             :image-url="props.event.image_url"
+            :has-surprise-image="Boolean(props.event.surprise)"
         />
     </AuthenticatedLayout>
 </template>

@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\Tag;
 use App\Models\User;
 use App\Services\EventService;
+use App\Services\EventSurpriseService;
 use App\Services\EventTagService;
 use App\Services\EventUserService;
 use Carbon\Carbon;
@@ -23,6 +24,7 @@ beforeEach(function () {
     $this->eventService = new EventService(
         new EventUserService,
         new EventTagService,
+        new EventSurpriseService,
     );
     $this->user = User::factory()->create();
 });

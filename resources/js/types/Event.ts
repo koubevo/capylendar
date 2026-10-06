@@ -1,4 +1,5 @@
 import { Capybara } from '@/types/Capybara';
+import type { EventKind, EventSurprise } from '@/types/EventKind';
 import { User } from '@/types/index';
 import { Tag } from '@/types/Tag';
 
@@ -25,6 +26,8 @@ export interface Event {
     };
     has_map_meta: boolean;
     image_url?: string;
+    kind?: EventKind;
+    surprise?: EventSurprise | null;
     tags?: Tag[];
 }
 

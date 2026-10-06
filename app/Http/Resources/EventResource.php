@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Concerns\FormatsHumanDates;
 use App\Models\Event;
+use App\Services\EventSurpriseService;
 use App\ValueObjects\EventCountdown;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -85,8 +86,34 @@ class EventResource extends JsonResource
 
             'image_url' => $this->resource->image_url,
 
+            'kind' => $this->resource->kind->info(),
+            'surprise' => $this->surprise($request),
+
             'created_at_human' => $this->resource->created_at_human,
             'updated_at_human' => $this->resource->updated_at_human,
+        ];
+    }
+
+    /**
+     * The surprise image URL is exposed only after the password was entered in this session.
+     *
+     * @return array{hint: string|null, is_unlocked: bool, image_url: string|null}|null
+     */
+    private function surprise(Request $request): ?array
+    {
+        if (! $this->resource->kind->allowsSurprise() || ! $this->resource->surprise_image_path) {
+            return null;
+        }
+
+        $isUnlocked = app(EventSurpriseService::class)->isUnlocked(
+            $this->resource,
+            $request->hasSession() ? $request->session() : null,
+        );
+
+        return [
+            'hint' => $this->resource->surprise_hint,
+            'is_unlocked' => $isUnlocked,
+            'image_url' => $isUnlocked ? $this->resource->surprise_image_url : null,
         ];
     }
 

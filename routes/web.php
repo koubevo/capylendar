@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventImageController;
+use App\Http\Controllers\EventSurpriseController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TodoController;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +29,11 @@ Route::middleware(['auth'])->group(function () {
         ->withTrashed();
 
     Route::get('/event/{event}/image', [EventImageController::class, 'show'])->name('event.image.show');
+
+    Route::get('/event/{event}/surprise', [EventSurpriseController::class, 'show'])->name('event.surprise.show');
+    Route::post('/event/{event}/surprise/unlock', [EventSurpriseController::class, 'unlock'])
+        ->middleware('throttle:10,1')
+        ->name('event.surprise.unlock');
 
     Route::resource('/event', EventController::class)
         ->only(['create', 'store', 'edit', 'update', 'destroy', 'show']);

@@ -22,6 +22,7 @@ const accessibleLabel = computed(
 <template>
     <span
         class="inline-flex items-center gap-1.5 rounded-full bg-white/70 py-1 pr-2 pl-1 shadow-sm ring-1 ring-black/5 dark:bg-white/10 dark:ring-white/10"
+        role="img"
         :aria-label="accessibleLabel"
         :title="accessibleLabel"
         data-reaction-user

@@ -3,6 +3,7 @@ import EventController from '@/actions/App/Http/Controllers/EventController';
 import ActionButtons from '@/components/buttons/ActionButtons.vue';
 import EventCard from '@/components/events/EventCard.vue';
 import EventCountdown from '@/components/events/EventCountdown.vue';
+import EventSurpriseCard from '@/components/events/EventSurpriseCard.vue';
 import InfoCard from '@/components/ui/InfoCard.vue';
 import PreviewCard from '@/components/ui/PreviewCard.vue';
 import { useRefreshAt } from '@/composables/useRefreshAt';
@@ -50,6 +51,12 @@ useRefreshAt(
                     class="w-full rounded-md object-cover"
                 />
             </UCard>
+            <EventSurpriseCard
+                v-if="props.event.surprise"
+                :event-id="props.event.id"
+                :surprise="props.event.surprise"
+                :classes="props.event.capybara.classes"
+            />
             <PreviewCard
                 v-if="props.event.has_map_meta && mapPreview"
                 :url="mapPreview.url"

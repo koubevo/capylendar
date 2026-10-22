@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\Capybara;
+use App\Enums\EventKind;
 use App\Models\Model;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -37,6 +38,13 @@ class EventFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'is_all_day' => true,
             'end_at' => null,
+        ]);
+    }
+
+    public function birthday(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'kind' => EventKind::Birthday,
         ]);
     }
 

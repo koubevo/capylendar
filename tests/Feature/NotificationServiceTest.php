@@ -294,4 +294,22 @@ describe('NotificationService', function () {
         expect($result['errors'])->toBe(1);
         expect($result['users_notified'])->toBe(0);
     });
+
+    describe('birthday events', function () {
+        it('are included in the daily summaries', function () {
+            $user = User::factory()->create();
+            $tomorrow = Carbon::tomorrow()->startOfDay();
+            $birthday = Event::factory()->birthday()->create([
+                'author_id' => $user->id,
+                'title' => 'Narozeniny',
+                'start_at' => $tomorrow->copy()->setHour(9),
+            ]);
+            $user->assignedEvents()->attach($birthday->id);
+
+            $content = $this->service->getEveningNotificationContent($user);
+
+            expect($content['title'])->toBe('Zítra: 1 event');
+            expect($content['body'])->toBe('Narozeniny');
+        });
+    });
 });

@@ -6,17 +6,20 @@ import MacroAlert from '@/components/ui/MacroAlert.vue';
 import { getTodayDateString, hasGoogleMapUrl } from '@/lib/utils';
 import { Capybara } from '@/types/Capybara';
 import type { EventFormData } from '@/types/EventFormData';
+import type { EventKind } from '@/types/EventKind';
 import type { Tag } from '@/types/Tag';
 import type { InertiaForm } from '@inertiajs/vue3';
-import { computed, onUnmounted, ref } from 'vue';
+import { computed, onUnmounted, ref, watch } from 'vue';
 
 interface Props {
     form: InertiaForm<EventFormData>;
     isEditMode: boolean;
     capybaraOptions: Capybara[];
+    kindOptions: EventKind[];
     availableTags?: Tag[];
     eventId?: number;
     imageUrl?: string;
+    hasSurpriseImage?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -89,7 +92,69 @@ function clearImage() {
     }
 }
 
-onUnmounted(() => revokePreview());
+const selectedKind = computed(() =>
+    props.kindOptions.find((option) => option.value === props.form.kind),
+);
+
+const allowsSurprise = computed(
+    () => selectedKind.value?.allows_surprise ?? false,
+);
+
+const surprisePreview = ref<string | null>(null);
+
+const hasStoredSurprise = computed(
+    () =>
+        Boolean(props.hasSurpriseImage) &&
+        !props.form.remove_surprise_image &&
+        !props.form.surprise_image,
+);
+
+function revokeSurprisePreview() {
+    if (surprisePreview.value) {
+        URL.revokeObjectURL(surprisePreview.value);
+        surprisePreview.value = null;
+    }
+}
+
+function onSurpriseImageSelected(event: globalThis.Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+
+    revokeSurprisePreview();
+
+    if (!file) {
+        props.form.surprise_image = null;
+        return;
+    }
+
+    props.form.surprise_image = file;
+    props.form.remove_surprise_image = false;
+    surprisePreview.value = URL.createObjectURL(file);
+}
+
+function clearSurpriseImage() {
+    props.form.surprise_image = null;
+    props.form.surprise_password = '';
+    revokeSurprisePreview();
+
+    if (props.hasSurpriseImage) {
+        props.form.remove_surprise_image = true;
+    }
+}
+
+watch(allowsSurprise, (allowed) => {
+    if (!allowed) {
+        props.form.surprise_image = null;
+        props.form.surprise_password = '';
+        revokeSurprisePreview();
+    }
+});
+
+onUnmounted(() => {
+    revokePreview();
+    revokeSurprisePreview();
+});
 </script>
 
 <template>
@@ -102,6 +167,21 @@ onUnmounted(() => revokePreview());
                 required
             >
                 <UInput v-model="props.form.title" class="w-full" required />
+            </UFormField>
+
+            <UFormField
+                label="Typ"
+                name="kind"
+                :error="props.form.errors.kind"
+                required
+            >
+                <USelect
+                    v-model="props.form.kind"
+                    class="w-full"
+                    :items="kindOptions"
+                    :icon="selectedKind?.icon"
+                    required
+                />
             </UFormField>
 
             <UFormField
@@ -263,6 +343,130 @@ onUnmounted(() => revokePreview());
                     </label>
                 </div>
             </UFormField>
+
+            <!-- Surprise Section -->
+            <div
+                v-if="allowsSurprise"
+                class="flex flex-col gap-y-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700"
+            >
+                <div>
+                    <div class="flex items-center gap-x-2">
+                        <UIcon name="i-lucide-gift" class="size-5" />
+                        <h3 class="font-bold">Tajný obrázek</h3>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Obrázek se v detailu eventu zobrazí až po zadání hesla.
+                        Heslo znáš jen ty, druhé kapybaře pomůže nápověda.
+                    </p>
+                </div>
+
+                <UFormField
+                    label="Obrázek za heslem"
+                    name="surprise_image"
+                    :error="props.form.errors.surprise_image"
+                >
+                    <div class="flex flex-col gap-3">
+                        <div
+                            v-if="surprisePreview"
+                            class="relative overflow-hidden rounded-xl border border-gray-200 shadow-sm dark:border-gray-700"
+                        >
+                            <img
+                                :src="surprisePreview"
+                                alt="Tajný obrázek"
+                                class="h-48 w-full object-cover"
+                            />
+                            <button
+                                type="button"
+                                class="absolute top-2 right-2 flex items-center gap-1 rounded-md bg-red-500/90 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:bg-red-600 focus:ring-2 focus:ring-red-500 focus:outline-none"
+                                @click="clearSurpriseImage()"
+                            >
+                                <UIcon name="i-lucide-trash-2" class="size-4" />
+                                Odebrat
+                            </button>
+                        </div>
+
+                        <div
+                            v-else-if="hasStoredSurprise"
+                            class="flex items-center justify-between gap-3 rounded-xl border border-gray-200 p-3 text-sm dark:border-gray-700"
+                        >
+                            <span class="flex items-center gap-2">
+                                <UIcon name="i-lucide-lock" class="size-4" />
+                                Tajný obrázek je nahraný a zamčený
+                            </span>
+                            <UButton
+                                type="button"
+                                color="error"
+                                variant="soft"
+                                size="xs"
+                                icon="i-lucide-trash-2"
+                                @click="clearSurpriseImage()"
+                            >
+                                Odebrat
+                            </UButton>
+                        </div>
+
+                        <label
+                            class="flex h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50/50 px-3 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50 dark:hover:bg-gray-800"
+                        >
+                            <div
+                                class="rounded-full bg-primary-50 p-2 text-primary-500 dark:bg-primary-900/30"
+                            >
+                                <UIcon name="i-lucide-gift" class="size-6" />
+                            </div>
+                            <div class="text-center">
+                                <span
+                                    class="text-sm font-medium text-primary-600 dark:text-primary-400"
+                                >
+                                    {{
+                                        surprisePreview || hasStoredSurprise
+                                            ? 'Nahrát jiný tajný obrázek'
+                                            : 'Nahrát tajný obrázek (klikněte)'
+                                    }}
+                                </span>
+                                <p class="mt-1 text-xs text-gray-500">
+                                    PNG, JPG, GIF do 5MB
+                                </p>
+                            </div>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                class="hidden"
+                                @change="onSurpriseImageSelected"
+                            />
+                        </label>
+                    </div>
+                </UFormField>
+
+                <UFormField
+                    v-if="props.form.surprise_image"
+                    label="Heslo"
+                    name="surprise_password"
+                    help="Na velikosti písmen nezáleží."
+                    :error="props.form.errors.surprise_password"
+                    required
+                >
+                    <UInput
+                        v-model="props.form.surprise_password"
+                        class="w-full"
+                        autocomplete="off"
+                        required
+                    />
+                </UFormField>
+
+                <UFormField
+                    v-if="props.form.surprise_image || hasStoredSurprise"
+                    label="Nápověda k heslu"
+                    name="surprise_hint"
+                    :error="props.form.errors.surprise_hint"
+                >
+                    <UInput
+                        v-model="props.form.surprise_hint"
+                        class="w-full"
+                        maxlength="255"
+                        placeholder="Třeba: kam jsme jeli na první výlet?"
+                    />
+                </UFormField>
+            </div>
 
             <UFormField label="Štítky" name="tags">
                 <TagSelectMenu

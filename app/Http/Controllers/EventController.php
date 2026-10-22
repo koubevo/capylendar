@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\Capybara;
+use App\Enums\EventKind;
 use App\Http\Requests\Event\StoreEventRequest;
 use App\Http\Requests\Event\UpdateEventRequest;
 use App\Http\Resources\EventResource;
@@ -51,6 +52,7 @@ class EventController extends Controller
 
         return Inertia::render('events/EventCreate', [
             'capybaraOptions' => Capybara::options(),
+            'kindOptions' => EventKind::options(),
             'event' => $event?->resolve(),
             'availableTags' => $this->tagService->getAvailableTags(),
         ]);
@@ -78,6 +80,7 @@ class EventController extends Controller
 
         return Inertia::render('events/EventEdit', [
             'capybaraOptions' => Capybara::options(),
+            'kindOptions' => EventKind::options(),
             'event' => EventResource::make($event)->resolve(),
             'availableTags' => $this->tagService->getAvailableTags(),
         ]);

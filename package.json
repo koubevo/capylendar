@@ -55,6 +55,7 @@
         "lightningcss-win32-x64-msvc": "^1.29.1"
     },
     "overrides": {
-        "esbuild": "^0.28.1"
+        "esbuild": "^0.28.1",
+        "shell-quote": "^1.11.0"
     }
 }

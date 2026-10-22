@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Capybara;
+use App\Enums\EventKind;
 use App\Enums\Priority;
 use App\Http\Resources\EventResource;
 use App\Models\Document;
@@ -324,3 +325,27 @@ it('capitalizes a non-ASCII Czech weekday in shared date labels', function () {
         Carbon::setLocale($previousLocale);
     }
 });
+
+it('does not notify anyone when a birthday event is created', function (Capybara $capybara) {
+    $this->withoutDefer();
+    Notification::fake();
+
+    $author = User::factory()->pink()->create();
+    notificationRecipient();
+
+    $this->actingAs($author)->post(route('event.store'), [
+        'title' => 'Narozeniny',
+        'date' => now()->addDay()->format('Y-m-d'),
+        'start_at' => '10:00',
+        'is_all_day' => false,
+        'capybara' => $capybara->value,
+        'is_private' => false,
+        'kind' => EventKind::Birthday->value,
+    ])->assertRedirect();
+
+    expect(Event::query()->where('title', 'Narozeniny')->firstOrFail()->kind)->toBe(EventKind::Birthday);
+    Notification::assertNothingSent();
+})->with([
+    'matching capybara' => Capybara::Blue,
+    'both capybaras' => Capybara::Yellow,
+]);

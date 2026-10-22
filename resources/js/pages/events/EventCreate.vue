@@ -5,6 +5,7 @@ import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import { Capybara } from '@/types/Capybara';
 import type { Event } from '@/types/Event';
 import { EventFormData } from '@/types/EventFormData';
+import type { EventKind } from '@/types/EventKind';
 import { Tag } from '@/types/Tag';
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
@@ -13,6 +14,7 @@ const page = usePage();
 
 const props = defineProps<{
     capybaraOptions: Capybara[];
+    kindOptions: EventKind[];
     event?: Event;
     availableTags: Tag[];
 }>();
@@ -33,6 +35,11 @@ const form = useForm<EventFormData>({
     tags: props.event?.tags ? props.event.tags.map((t) => t.id) : [],
     image: null,
     remove_image: false,
+    kind: props.event?.kind?.value ?? 'standard',
+    surprise_image: null,
+    surprise_password: '',
+    surprise_hint: '',
+    remove_surprise_image: false,
 });
 
 const title = computed(() => {
@@ -54,6 +61,7 @@ function submit() {
             :form="form"
             :is-edit-mode="false"
             :capybara-options="props.capybaraOptions"
+            :kind-options="props.kindOptions"
             @submit="submit"
             :available-tags="props.availableTags"
         />

@@ -24,7 +24,7 @@ class DashboardService
     public function getNearestCountdownEvent(User $user, array $filters): ?EventResource
     {
         $event = $this->eventQuery($user, $filters)
-            ->with(['tags', 'author'])
+            ->with(['tags', 'author', 'reactions.user:id,name,capybara'])
             ->withCount('subscribers')
             ->where('countdown_enabled', true)
             ->where('start_at', '>=', Carbon::today())
@@ -162,7 +162,7 @@ class DashboardService
         Carbon $periodEnd,
     ): array {
         $events = $this->eventQuery($user, $filters)
-            ->with(['tags', 'author'])
+            ->with(['tags', 'author', 'reactions.user:id,name,capybara'])
             ->withCount('subscribers')
             ->whereBetween('start_at', [$periodStart, $periodEnd])
             ->orderBy('start_at')
@@ -184,7 +184,7 @@ class DashboardService
         Carbon $periodEnd,
     ): array {
         $query = $this->todoQuery($user, $filters)
-            ->with(['tags', 'author'])
+            ->with(['tags', 'author', 'reactions.user:id,name,capybara'])
             ->withCount('subscribers')
             ->whereNull('finished_at')
             ->where('deadline', '<=', $periodEnd);

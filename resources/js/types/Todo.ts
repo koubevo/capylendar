@@ -1,5 +1,6 @@
 import { Capybara } from '@/types/Capybara';
 import { User } from '@/types/index';
+import type { ReactionGroup } from '@/types/Reaction';
 import { Tag } from '@/types/Tag';
 
 export interface TodoPriority {
@@ -40,4 +41,5 @@ export interface Todo {
     };
     has_map_meta: boolean;
     tags?: Tag[];
+    reactions?: ReactionGroup[];
 }

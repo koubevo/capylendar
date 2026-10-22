@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Enums\Capybara;
+use App\Enums\ReactionType;
 use App\Models\RelationshipSettings;
 use App\Models\User;
 use App\Services\RelationshipMilestoneService;
@@ -46,6 +47,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            'reactionOptions' => fn (): array => ReactionType::options(),
             'version' => config('app.version'),
             /** @phpstan-ignore-next-line */
             'quote' => ['message' => trim($message), 'author' => trim($author)],

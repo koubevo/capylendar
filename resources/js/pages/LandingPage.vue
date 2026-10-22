@@ -67,6 +67,14 @@ const features = [
         span: '',
     },
     {
+        name: 'Reakce na společné plány',
+        description:
+            'Dejte jedním klepnutím vědět, že plán berete, viděli jste ho nebo se těšíte. U eventů i todo uvidíte, kdo reagoval.',
+        icon: 'i-lucide-smile-plus',
+        accent: 'bg-[#fff0b8]',
+        span: '',
+    },
+    {
         name: 'Obrázky, mapy a chat',
         description:
             'Fotky u eventů, chytré náhledy mapových odkazů a jednoduchá konverzace ve dvou.',
@@ -533,6 +541,7 @@ const handleToggled = (id: number) => {
                                             :events="upcomingEvents"
                                             :todos="upcomingTodos"
                                             :create-if-empty="true"
+                                            :interactive="false"
                                             @toggled="handleToggled"
                                         />
                                     </template>
@@ -542,6 +551,7 @@ const handleToggled = (id: number) => {
                                             heading="Historické"
                                             :events="historyEvents"
                                             :create-event-if-empty="true"
+                                            :interactive="false"
                                         />
                                     </template>
                                 </UTabs>

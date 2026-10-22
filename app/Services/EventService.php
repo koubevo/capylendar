@@ -155,7 +155,7 @@ class EventService
 
         $query = $user
             ->assignedEvents()
-            ->with(['tags', 'author'])
+            ->with(['tags', 'author', 'reactions.user:id,name,capybara'])
             ->withCount('subscribers')
             ->where('start_at', $eventType->operator(), Carbon::now()->startOfDay());
 
@@ -198,7 +198,7 @@ class EventService
     ): AnonymousResourceCollection {
         $query = $user
             ->assignedEvents()
-            ->with(['tags', 'author'])
+            ->with(['tags', 'author', 'reactions.user:id,name,capybara'])
             ->withCount('subscribers')
             ->where('start_at', $eventType->operator(), Carbon::now()->startOfDay());
 

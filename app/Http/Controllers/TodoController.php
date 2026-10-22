@@ -43,7 +43,7 @@ class TodoController extends Controller
     {
         Gate::authorize('view', $todo);
 
-        $todo->loadMissing(['author', 'tags'])->loadCount('subscribers');
+        $todo->loadMissing(['author', 'tags', 'reactions.user:id,name,capybara'])->loadCount('subscribers');
 
         return Inertia::render('todos/TodoShow', [
             'todo' => TodoResource::make($todo)->resolve(),

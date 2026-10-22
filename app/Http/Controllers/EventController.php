@@ -30,6 +30,8 @@ class EventController extends Controller
     {
         Gate::authorize('view', $event);
 
+        $event->loadMissing(['reactions.user:id,name,capybara']);
+
         return Inertia::render('events/EventShow', [
             'event' => EventResource::make($event)->resolve(),
         ]);

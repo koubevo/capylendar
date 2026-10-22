@@ -19,6 +19,7 @@ Telescope is not a runtime component of the application. Queue workers are not n
 ## Features
 
 - Shared and private events and tasks with priorities, labels, and filtering.
+- Five quick reactions on event and task cards, with names and capybara avatars.
 - Collaborative documents and shared tags.
 - Chat between users with push notifications to the recipient.
 - Web Push for newly created shared events, tasks, and documents, plus morning and evening event summaries.
@@ -29,6 +30,8 @@ Telescope is not a runtime component of the application. Queue workers are not n
 - Wear OS pairing via short-lived code; the watch stores the token encrypted in the Android Keystore.
 
 Todo completion is intentionally optimistic: the card stays on the page until the next refresh, so an accidental tap can be undone.
+
+Reactions update immediately without navigation. Each user can add several different reactions and remove their own; only subscribers to the item can see or use them. Reactions do not send push notifications or change an item's status.
 
 ## Local Setup
 

@@ -1,5 +1,6 @@
 import { Capybara } from '@/types/Capybara';
 import { User } from '@/types/index';
+import type { ReactionGroup } from '@/types/Reaction';
 import { Tag } from '@/types/Tag';
 
 export interface Event {
@@ -26,6 +27,7 @@ export interface Event {
     has_map_meta: boolean;
     image_url?: string;
     tags?: Tag[];
+    reactions?: ReactionGroup[];
 }
 
 export interface EventCountdown {

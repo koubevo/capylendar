@@ -1,17 +1,24 @@
 <script setup lang="ts">
 import { finish } from '@/actions/App/Http/Controllers/TodoController';
+import ItemReactions from '@/components/reactions/ItemReactions.vue';
 import TagsList from '@/components/tags/TagsList.vue';
 import { isOnlyLinks as checkOnlyLinks } from '@/composables/useLinkify';
 import type { Todo } from '@/types/Todo';
+import { Link, type InertiaLinkProps } from '@inertiajs/vue3';
 import { computed } from 'vue';
+
+type CardHref = NonNullable<InertiaLinkProps['href']>;
 
 interface Props {
     todo: Todo;
     showFinishButton?: boolean;
+    href?: CardHref;
+    interactive?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     showFinishButton: false,
+    interactive: true,
 });
 
 const emit = defineEmits<{
@@ -21,6 +28,7 @@ const emit = defineEmits<{
 const descriptionIsOnlyLinks = computed(() =>
     checkOnlyLinks(props.todo.description_without_meta ?? ''),
 );
+const contentComponent = computed(() => (props.href ? Link : 'div'));
 
 function getCsrfToken(): string {
     const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
@@ -111,86 +119,102 @@ function handleFinish(event: MouseEvent) {
             </button>
 
             <!-- Main Content Area -->
-            <div
-                class="flex flex-1 items-center justify-between p-4"
-                :class="todo.has_hearts ? 'bg-hearts' : ''"
+            <component
+                :is="contentComponent"
+                :href="props.href"
+                class="min-w-0 flex-1"
             >
-                <div class="min-w-0 flex-1 pr-4">
-                    <h3
-                        class="font-bold transition-all duration-300"
-                        :class="
-                            props.todo.is_finished
-                                ? 'line-through decoration-2 opacity-60'
-                                : ''
-                        "
-                        :title="props.todo.title"
-                    >
-                        {{ props.todo.title }}
-                    </h3>
-                    <div class="mt-0.5 flex items-center gap-x-1">
-                        <UIcon
-                            name="i-lucide-user-lock"
-                            v-if="props.todo.is_private"
-                            class="size-3 text-gray-500"
-                            title="Soukromé"
-                        />
-                        <UIcon
-                            :name="props.todo.priority.icon"
-                            :class="props.todo.priority.icon_color"
-                            class="size-3"
-                            :title="'Priorita: ' + props.todo.priority.label"
-                        />
-                        <UIcon
-                            name="i-lucide-notepad-text"
-                            v-if="
-                                props.todo.description_without_meta &&
-                                !descriptionIsOnlyLinks
+                <div
+                    class="flex h-full items-center justify-between p-4"
+                    :class="props.todo.has_hearts ? 'bg-hearts' : ''"
+                >
+                    <div class="min-w-0 flex-1 pr-4">
+                        <h3
+                            class="font-bold transition-all duration-300"
+                            :class="
+                                props.todo.is_finished
+                                    ? 'line-through decoration-2 opacity-60'
+                                    : ''
                             "
-                            class="size-3 text-gray-500"
-                            title="Obsahuje popis"
-                        />
-                        <UIcon
-                            name="i-lucide-map-pinned"
-                            v-if="props.todo.has_map_meta"
-                            class="size-3 text-gray-500"
-                            title="Obsahuje lokaci"
-                        />
-                        <UIcon
-                            name="i-lucide-link"
-                            v-if="descriptionIsOnlyLinks"
-                            class="size-3 text-gray-500"
-                            title="Obsahuje odkaz"
-                        />
-                        <p
-                            class="truncate pl-0.5 text-xs text-gray-600 dark:text-gray-300"
+                            :title="props.todo.title"
                         >
-                            {{ props.todo.capybara.label }} |
-                            {{ props.todo.deadline.label }}
-                        </p>
+                            {{ props.todo.title }}
+                        </h3>
+                        <div class="mt-0.5 flex items-center gap-x-1">
+                            <UIcon
+                                name="i-lucide-user-lock"
+                                v-if="props.todo.is_private"
+                                class="size-3 text-gray-500"
+                                title="Soukromé"
+                            />
+                            <UIcon
+                                :name="props.todo.priority.icon"
+                                :class="props.todo.priority.icon_color"
+                                class="size-3"
+                                :title="
+                                    'Priorita: ' + props.todo.priority.label
+                                "
+                            />
+                            <UIcon
+                                name="i-lucide-notepad-text"
+                                v-if="
+                                    props.todo.description_without_meta &&
+                                    !descriptionIsOnlyLinks
+                                "
+                                class="size-3 text-gray-500"
+                                title="Obsahuje popis"
+                            />
+                            <UIcon
+                                name="i-lucide-map-pinned"
+                                v-if="props.todo.has_map_meta"
+                                class="size-3 text-gray-500"
+                                title="Obsahuje lokaci"
+                            />
+                            <UIcon
+                                name="i-lucide-link"
+                                v-if="descriptionIsOnlyLinks"
+                                class="size-3 text-gray-500"
+                                title="Obsahuje odkaz"
+                            />
+                            <p
+                                class="truncate pl-0.5 text-xs text-gray-600 dark:text-gray-300"
+                            >
+                                {{ props.todo.capybara.label }} |
+                                {{ props.todo.deadline.label }}
+                            </p>
+                        </div>
+                        <TagsList
+                            :tags="props.todo.tags"
+                            :can-delete="false"
+                            class="mt-1"
+                            v-if="props.todo.tags && props.todo.tags.length > 0"
+                        />
                     </div>
-                    <TagsList
-                        :tags="props.todo.tags"
-                        :can-delete="false"
-                        class="mt-1"
-                        v-if="props.todo.tags && props.todo.tags.length > 0"
-                    />
-                </div>
 
-                <!-- Avatar Column -->
-                <div class="shrink-0 pl-2">
-                    <img
-                        class="h-14 w-14 rounded-md object-cover ring-1 ring-black/5 transition-all duration-300 dark:ring-white/10"
-                        :class="
-                            props.todo.is_finished
-                                ? 'opacity-50 grayscale'
-                                : 'opacity-100 shadow-sm'
-                        "
-                        :src="props.todo.capybara.avatar.src"
-                        :alt="props.todo.capybara.avatar.alt"
-                    />
+                    <!-- Avatar Column -->
+                    <div class="shrink-0 pl-2">
+                        <img
+                            class="h-14 w-14 rounded-md object-cover ring-1 ring-black/5 transition-all duration-300 dark:ring-white/10"
+                            :class="
+                                props.todo.is_finished
+                                    ? 'opacity-50 grayscale'
+                                    : 'opacity-100 shadow-sm'
+                            "
+                            :src="props.todo.capybara.avatar.src"
+                            :alt="props.todo.capybara.avatar.alt"
+                        />
+                    </div>
                 </div>
-            </div>
+            </component>
         </div>
+
+        <ItemReactions
+            :key="props.todo.id"
+            item-type="todo"
+            :item-id="props.todo.id"
+            :reactions="props.todo.reactions"
+            :interactive="props.interactive"
+        />
     </UCard>
 </template>
 

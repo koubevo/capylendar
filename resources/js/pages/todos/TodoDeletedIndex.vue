@@ -97,6 +97,7 @@ const columns: TableColumn<Todo>[] = [
                             body: () =>
                                 h(TodoCard, {
                                     todo: row.original,
+                                    interactive: false,
                                 }),
                         },
                     ),

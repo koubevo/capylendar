@@ -1,19 +1,28 @@
 <script setup lang="ts">
+import ItemReactions from '@/components/reactions/ItemReactions.vue';
 import TagsList from '@/components/tags/TagsList.vue';
 import { isOnlyLinks as checkOnlyLinks } from '@/composables/useLinkify';
 import type { Event, View } from '@/types/Event';
+import { Link, type InertiaLinkProps } from '@inertiajs/vue3';
 import { computed } from 'vue';
+
+type CardHref = NonNullable<InertiaLinkProps['href']>;
+
 interface Props {
     event: Event;
     view?: View;
+    href?: CardHref;
+    interactive?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     view: 'list',
+    interactive: true,
 });
 
 const showListItems = computed(() => props.view === 'list');
 const showDetailItems = computed(() => props.view === 'detail');
+const contentComponent = computed(() => (props.href ? Link : 'div'));
 const descriptionIsOnlyLinks = computed(() =>
     checkOnlyLinks(props.event.description_without_meta ?? ''),
 );
@@ -21,89 +30,99 @@ const descriptionIsOnlyLinks = computed(() =>
 
 <template>
     <UCard :class="props.event.capybara.classes" class="event-card">
-        <div
-            class="flex items-center justify-between p-4"
-            :class="event.has_hearts ? 'bg-hearts' : ''"
-        >
-            <div class="min-w-0 flex-1">
-                <h3 class="font-bold">{{ props.event.title }}</h3>
-                <div class="flex items-center gap-x-1">
-                    <UIcon
-                        name="i-lucide-user-lock"
-                        v-if="props.event.is_private"
-                        class="size-3"
-                    />
-                    <UIcon
-                        name="i-lucide-cake"
-                        v-if="props.event.kind?.value === 'birthday'"
-                        class="size-3"
-                    />
-                    <UIcon
-                        name="i-lucide-gift"
-                        v-if="props.event.surprise && showListItems"
-                        class="size-3"
-                    />
-                    <UIcon
-                        name="i-lucide-notepad-text"
-                        v-if="
-                            props.event.description_without_meta &&
-                            !descriptionIsOnlyLinks &&
-                            showListItems
-                        "
-                        class="size-3"
-                    />
-                    <UIcon
-                        name="i-lucide-map-pinned"
-                        v-if="props.event.has_map_meta && showListItems"
-                        class="size-3"
-                    />
-                    <UIcon
-                        name="i-lucide-link"
-                        v-if="descriptionIsOnlyLinks && showListItems"
-                        class="size-3"
-                    />
-                    <UIcon
-                        name="i-lucide-image"
-                        v-if="props.event.image_url && showListItems"
-                        class="size-3"
-                    />
-                    <p class="text-xs">
-                        {{ props.event.capybara.label }} |
-                        <span v-if="showDetailItems">
-                            {{ props.event.date.label }} |
-                        </span>
-                        <span v-if="props.event.date.is_all_day">
-                            Celý den
-                        </span>
-                        <span v-else>
-                            <span>
-                                {{ props.event.date.start_time }}
+        <component :is="contentComponent" :href="props.href" class="block">
+            <div
+                class="flex items-center justify-between p-4"
+                :class="props.event.has_hearts ? 'bg-hearts' : ''"
+            >
+                <div class="min-w-0 flex-1">
+                    <h3 class="font-bold">{{ props.event.title }}</h3>
+                    <div class="flex items-center gap-x-1">
+                        <UIcon
+                            name="i-lucide-user-lock"
+                            v-if="props.event.is_private"
+                            class="size-3"
+                        />
+                        <UIcon
+                            name="i-lucide-cake"
+                            v-if="props.event.kind?.value === 'birthday'"
+                            class="size-3"
+                        />
+                        <UIcon
+                            name="i-lucide-gift"
+                            v-if="props.event.surprise && showListItems"
+                            class="size-3"
+                        />
+                        <UIcon
+                            name="i-lucide-notepad-text"
+                            v-if="
+                                props.event.description_without_meta &&
+                                !descriptionIsOnlyLinks &&
+                                showListItems
+                            "
+                            class="size-3"
+                        />
+                        <UIcon
+                            name="i-lucide-map-pinned"
+                            v-if="props.event.has_map_meta && showListItems"
+                            class="size-3"
+                        />
+                        <UIcon
+                            name="i-lucide-link"
+                            v-if="descriptionIsOnlyLinks && showListItems"
+                            class="size-3"
+                        />
+                        <UIcon
+                            name="i-lucide-image"
+                            v-if="props.event.image_url && showListItems"
+                            class="size-3"
+                        />
+                        <p class="text-xs">
+                            {{ props.event.capybara.label }} |
+                            <span v-if="showDetailItems">
+                                {{ props.event.date.label }} |
                             </span>
-                            <span v-if="props.event.date.end_time">
-                                - {{ props.event.date.end_time }}
+                            <span v-if="props.event.date.is_all_day">
+                                Celý den
                             </span>
-                        </span>
+                            <span v-else>
+                                <span>
+                                    {{ props.event.date.start_time }}
+                                </span>
+                                <span v-if="props.event.date.end_time">
+                                    - {{ props.event.date.end_time }}
+                                </span>
+                            </span>
+                        </p>
+                    </div>
+                    <p
+                        v-if="props.event.countdown"
+                        class="mt-1 text-xs font-medium opacity-70"
+                    >
+                        Odpočet · {{ props.event.countdown.label }}
                     </p>
+                    <TagsList
+                        :tags="props.event.tags"
+                        class="mt-1"
+                        v-if="props.event.tags"
+                    />
                 </div>
-                <p
-                    v-if="props.event.countdown"
-                    class="mt-1 text-xs font-medium opacity-70"
-                >
-                    Odpočet · {{ props.event.countdown.label }}
-                </p>
-                <TagsList
-                    :tags="props.event.tags"
-                    class="mt-1"
-                    v-if="props.event.tags"
-                />
+                <div class="ml-4 shrink-0">
+                    <img
+                        class="h-14 w-14 rounded-md"
+                        :src="props.event.capybara.avatar.src"
+                        :alt="props.event.capybara.avatar.alt"
+                    />
+                </div>
             </div>
-            <div class="ml-4 shrink-0">
-                <img
-                    class="h-14 w-14 rounded-md"
-                    :src="props.event.capybara.avatar.src"
-                    :alt="props.event.capybara.avatar.alt"
-                />
-            </div>
-        </div>
+        </component>
+
+        <ItemReactions
+            :key="props.event.id"
+            item-type="event"
+            :item-id="props.event.id"
+            :reactions="props.event.reactions"
+            :interactive="props.interactive"
+        />
     </UCard>
 </template>

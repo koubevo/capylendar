@@ -102,6 +102,7 @@ const columns: TableColumn<Event>[] = [
                                 h(EventCard, {
                                     event: row.original,
                                     view: 'detail',
+                                    interactive: false,
                                 }),
                         },
                     ),

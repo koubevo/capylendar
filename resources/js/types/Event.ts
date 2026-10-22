@@ -1,6 +1,7 @@
 import { Capybara } from '@/types/Capybara';
 import type { EventKind, EventSurprise } from '@/types/EventKind';
 import { User } from '@/types/index';
+import type { ReactionGroup } from '@/types/Reaction';
 import { Tag } from '@/types/Tag';
 
 export interface Event {
@@ -29,6 +30,7 @@ export interface Event {
     kind?: EventKind;
     surprise?: EventSurprise | null;
     tags?: Tag[];
+    reactions?: ReactionGroup[];
 }
 
 export interface EventCountdown {

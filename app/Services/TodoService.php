@@ -112,7 +112,7 @@ class TodoService
 
         $query = $user
             ->assignedTodos()
-            ->with(['tags', 'author'])
+            ->with(['tags', 'author', 'reactions.user:id,name,capybara'])
             ->withCount('subscribers');
 
         if ($finished) {

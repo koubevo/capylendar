@@ -1,6 +1,12 @@
 <script setup lang="ts">
-import EventController from '@/actions/App/Http/Controllers/EventController';
-import TodoController from '@/actions/App/Http/Controllers/TodoController';
+import {
+    create as createEvent,
+    show as showEvent,
+} from '@/actions/App/Http/Controllers/EventController';
+import {
+    postponeByDate,
+    show as showTodo,
+} from '@/actions/App/Http/Controllers/TodoController';
 import NeutralButton from '@/components/buttons/NeutralButton.vue';
 import PrimaryButton from '@/components/buttons/PrimaryButton.vue';
 import EventCard from '@/components/events/EventCard.vue';
@@ -8,7 +14,7 @@ import Nothing from '@/components/Nothing.vue';
 import TodoCard from '@/components/todos/TodoCard.vue';
 import type { Event } from '@/types/Event';
 import type { Todo } from '@/types/Todo';
-import { Link, router } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import {
     type ComponentPublicInstance,
     computed,
@@ -27,11 +33,13 @@ interface Props {
     highlightEvent?: number;
     highlightTodo?: number;
     isScrolled?: boolean;
+    interactive?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     createIfEmpty: false,
     scrollToDate: undefined,
+    interactive: true,
 });
 
 const emit = defineEmits<{
@@ -40,7 +48,7 @@ const emit = defineEmits<{
 }>();
 
 const button = props.createIfEmpty
-    ? { to: EventController.create(), label: 'Přidat event' }
+    ? { to: createEvent(), label: 'Přidat event' }
     : undefined;
 
 interface DashboardItem {
@@ -190,7 +198,7 @@ const postponingDate = ref<string | null>(null);
 const handlePostponeByDate = (dateKey: string, close: () => void) => {
     postponingDate.value = dateKey;
     router.post(
-        TodoController.postponeByDate.url(),
+        postponeByDate.url(),
         { date: dateKey },
         {
             onSuccess: () => close(),
@@ -220,88 +228,93 @@ watch(
 </script>
 
 <template>
-    <h2 class="mt-4">{{ props.heading }}</h2>
+    <div>
+        <h2 class="mt-4">{{ props.heading }}</h2>
 
-    <div v-if="hasItems" class="space-y-4">
-        <section
-            v-for="(items, dateKey) in groupedItems"
-            :key="dateKey"
-            :ref="(el) => setDateSectionRef(el, dateKey as string)"
-        >
-            <div class="flex items-center justify-between">
-                <h3 class="lowercase">
-                    {{ items[0].dateLabel }}
-                </h3>
-                <UModal
-                    v-if="hasTodosInGroup(items)"
-                    title="Přesunout todos"
-                    :ui="{ footer: 'justify-end', title: 'm-0' }"
-                >
-                    <button
-                        type="button"
-                        aria-label="Přesunout todos na další den"
-                        class="flex cursor-pointer items-center gap-1 rounded-md px-1.5 py-0.5 text-xs text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+        <div v-if="hasItems" class="space-y-4">
+            <section
+                v-for="(items, dateKey) in groupedItems"
+                :key="dateKey"
+                :ref="(el) => setDateSectionRef(el, dateKey as string)"
+            >
+                <div class="flex items-center justify-between">
+                    <h3 class="lowercase">
+                        {{ items[0].dateLabel }}
+                    </h3>
+                    <UModal
+                        v-if="hasTodosInGroup(items)"
+                        title="Přesunout todos"
+                        :ui="{ footer: 'justify-end', title: 'm-0' }"
                     >
-                        <UIcon name="i-lucide-arrow-right" class="size-3" />
-                    </button>
+                        <button
+                            type="button"
+                            aria-label="Přesunout todos na další den"
+                            class="flex cursor-pointer items-center gap-1 rounded-md px-1.5 py-0.5 text-xs text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                        >
+                            <UIcon name="i-lucide-arrow-right" class="size-3" />
+                        </button>
 
-                    <template #body>
-                        <p>
-                            Opravdu chceš přesunout všechna todos z
-                            <strong class="lowercase">{{
-                                items[0].dateLabel
-                            }}</strong>
-                            na další den?
-                        </p>
-                    </template>
+                        <template #body>
+                            <p>
+                                Opravdu chceš přesunout všechna todos z
+                                <strong class="lowercase">{{
+                                    items[0].dateLabel
+                                }}</strong>
+                                na další den?
+                            </p>
+                        </template>
 
-                    <template #footer="{ close }">
-                        <NeutralButton label="Zrušit" @click="close" />
-                        <PrimaryButton
-                            label="Přesunout"
-                            :loading="postponingDate === (dateKey as string)"
-                            @click="
-                                handlePostponeByDate(dateKey as string, close)
-                            "
-                        />
-                    </template>
-                </UModal>
-            </div>
+                        <template #footer="{ close }">
+                            <NeutralButton label="Zrušit" @click="close" />
+                            <PrimaryButton
+                                label="Přesunout"
+                                :loading="
+                                    postponingDate === (dateKey as string)
+                                "
+                                @click="
+                                    handlePostponeByDate(
+                                        dateKey as string,
+                                        close,
+                                    )
+                                "
+                            />
+                        </template>
+                    </UModal>
+                </div>
 
-            <div class="grid grid-cols-1 gap-4">
-                <template
-                    v-for="item in items"
-                    :key="`${item.type}-${item.data.id}`"
-                >
-                    <Link
-                        v-if="item.type === 'event'"
-                        :href="EventController.show(item.data as Event)"
-                        class="block"
-                        :ref="(el) => setItemRef(el, 'event-' + item.data.id)"
+                <div class="grid grid-cols-1 gap-4">
+                    <template
+                        v-for="item in items"
+                        :key="`${item.type}-${item.data.id}`"
                     >
                         <EventCard
+                            v-if="item.type === 'event'"
                             :event="item.data as Event"
                             view="list"
+                            :href="showEvent.url(item.data as Event)"
+                            :interactive="props.interactive"
+                            :ref="
+                                (el) => setItemRef(el, 'event-' + item.data.id)
+                            "
                             :class="{ 'card-highlight': isHighlighted(item) }"
                         />
-                    </Link>
-                    <Link
-                        v-else
-                        :href="TodoController.show(item.data as Todo)"
-                        class="block"
-                        :ref="(el) => setItemRef(el, 'todo-' + item.data.id)"
-                    >
                         <TodoCard
+                            v-else
                             :todo="item.data as Todo"
+                            :href="showTodo.url(item.data as Todo)"
                             :show-finish-button="true"
+                            :interactive="props.interactive"
+                            :ref="
+                                (el) => setItemRef(el, 'todo-' + item.data.id)
+                            "
                             :class="{ 'card-highlight': isHighlighted(item) }"
                             @toggled="emit('toggled', $event)"
                         />
-                    </Link>
-                </template>
-            </div>
-        </section>
-    </div>
+                    </template>
+                </div>
+            </section>
+        </div>
 
-    <Nothing v-if="!hasItems" :button="button" />
+        <Nothing v-if="!hasItems" :button="button" />
+    </div>
 </template>

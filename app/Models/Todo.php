@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\HasReactions;
 use App\Enums\Capybara;
 use App\Enums\Priority;
 use Carbon\Carbon;
@@ -37,6 +38,7 @@ class Todo extends Model
     /** @use HasFactory<TodoFactory> */
     use HasFactory;
 
+    use HasReactions;
     use SoftDeletes;
 
     /**

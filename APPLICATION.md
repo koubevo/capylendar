@@ -165,6 +165,45 @@ commits. Pink and Blue target subscribers with the matching capybara, while Yell
 targets all other subscribers; the author is always excluded. Update, finish,
 postpone, delete, and restore mutations do not send push notifications.
 
+## Reactions
+
+Authenticated subscribers can react to events and todos using five fixed keys,
+displayed in this order in the picker and each user's summary:
+`love` (❤️ Líbí se mi), `celebrate` (🤩 Těším se), `seen` (👀 Viděl/a jsem),
+`approve` (🙏 Díky), and `question` (🤔 Otázka / nejistota). Stored keys
+remain stable so existing reactions use the updated emoji and meaning. One user may
+use several different reactions on the same item, with at most one of each key.
+Reactions do not change an item's status, privacy, subscribers, or attendance.
+They do not send push notifications.
+
+Only subscribers who can view an item may read its reactions, add their own,
+or remove their own. Explicit event/todo routes identify the target; client
+input cannot choose another user or an arbitrary model. Adding with PUT and
+removing with DELETE are idempotent, and the database enforces uniqueness.
+Deleted or missing items are not valid reaction targets.
+
+List cards and item detail group reactions by user as a capybara avatar followed
+by that user's selected emoji, without a visible name. A compact emoji-only
+picker adds or removes the authenticated user's reactions.
+Reaction responses expose only the user's ID, name, and capybara, never their
+email or authentication data. Guest examples and trash cards have no reaction
+controls.
+
+The web UI updates optimistically through a silent same-origin `fetch` with
+the Laravel `XSRF-TOKEN`, `X-Requested-With: XMLHttpRequest`, and
+`Accept: application/json`. It never navigates or refreshes the page to react.
+Each key has its own pending lock; failed requests roll back only that key.
+Independent requests and refreshed props preserve other pending reactions.
+Dashboard tabs share local reaction state, including their pending locks, so
+switching between combined and separate lists cannot restore stale props.
+Reaction controls are separate from card navigation and todo completion.
+
+Soft-deleting or permanently deleting an item removes its reactions; restoring
+the item starts with no reactions. Deleting a user removes that user's
+reactions. List and detail queries load reacting users eagerly to avoid N+1
+queries. Documents, chat messages, and monthly memories have no reactions in
+the current implementation.
+
 ## Dashboard
 
 The dashboard starts at today. Its first

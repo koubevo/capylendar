@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\HasReactions;
 use App\Enums\Capybara;
 use App\Enums\EventKind;
 use Carbon\Carbon;
@@ -42,6 +43,7 @@ class Event extends Model
     /** @use HasFactory<EventFactory> */
     use HasFactory;
 
+    use HasReactions;
     use SoftDeletes;
 
     /**

@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use App\Concerns\FormatsHumanDates;
 use App\Models\Event;
 use App\Services\EventSurpriseService;
+use App\Services\ReactionService;
 use App\ValueObjects\EventCountdown;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -50,6 +51,7 @@ class EventResource extends JsonResource
 
         return [
             'id' => $this->resource->id,
+            'reactions' => $this->whenLoaded('reactions', fn (): array => app(ReactionService::class)->summarize($this->resource)),
             'title' => $this->resource->title,
             'description' => $description,
             'description_without_meta' => $descriptionWithoutMeta ?? $description,

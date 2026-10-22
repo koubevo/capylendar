@@ -106,6 +106,12 @@ class User extends Authenticatable
         return $this->hasMany(WatchDevice::class);
     }
 
+    /** @return HasMany<Reaction, $this> */
+    public function reactions(): HasMany
+    {
+        return $this->hasMany(Reaction::class);
+    }
+
     /**
      * @return HasMany<WatchPairing, $this>
      */

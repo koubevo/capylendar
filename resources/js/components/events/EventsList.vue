@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import EventController from '@/actions/App/Http/Controllers/EventController';
+import { create, show } from '@/actions/App/Http/Controllers/EventController';
 import EventCard from '@/components/events/EventCard.vue';
 import Nothing from '@/components/Nothing.vue';
 import type { Event } from '@/types/Event';
-import { Link } from '@inertiajs/vue3';
 import {
     type ComponentPublicInstance,
     computed,
@@ -19,11 +18,13 @@ interface Props {
     scrollToDate?: string;
     highlightEvent?: number;
     isScrolled?: boolean;
+    interactive?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     createEventIfEmpty: false,
     scrollToDate: undefined,
+    interactive: true,
 });
 
 const emit = defineEmits<{
@@ -31,7 +32,7 @@ const emit = defineEmits<{
 }>();
 
 const button = props.createEventIfEmpty
-    ? { to: EventController.create(), label: 'Přidat event' }
+    ? { to: create(), label: 'Přidat event' }
     : undefined;
 
 type GroupedEvents = Record<string, Event[]>;
@@ -88,37 +89,37 @@ onMounted(() => {
 </script>
 
 <template>
-    <h2 class="mt-4">{{ props.heading }}</h2>
+    <div>
+        <h2 class="mt-4">{{ props.heading }}</h2>
 
-    <div v-if="props.events.length" class="space-y-4">
-        <section
-            v-for="(events, dateKey) in groupedEvents"
-            :key="dateKey"
-            :ref="(el) => setDateSectionRef(el, dateKey as string)"
-        >
-            <h3 class="lowercase">
-                {{ events[0].date.label }}
-            </h3>
+        <div v-if="props.events.length" class="space-y-4">
+            <section
+                v-for="(events, dateKey) in groupedEvents"
+                :key="dateKey"
+                :ref="(el) => setDateSectionRef(el, dateKey as string)"
+            >
+                <h3 class="lowercase">
+                    {{ events[0].date.label }}
+                </h3>
 
-            <div class="grid grid-cols-1 gap-4">
-                <Link
-                    :href="EventController.show(event)"
-                    v-for="event in events"
-                    :key="event.id"
-                >
+                <div class="grid grid-cols-1 gap-4">
                     <EventCard
+                        v-for="event in events"
+                        :key="event.id"
                         :event="event"
                         view="list"
+                        :href="show.url(event)"
+                        :interactive="props.interactive"
                         :class="{
                             'card-highlight':
                                 props.isScrolled &&
                                 props.highlightEvent === event.id,
                         }"
                     />
-                </Link>
-            </div>
-        </section>
-    </div>
+                </div>
+            </section>
+        </div>
 
-    <Nothing v-if="!props.events.length" :button="button" />
+        <Nothing v-if="!props.events.length" :button="button" />
+    </div>
 </template>

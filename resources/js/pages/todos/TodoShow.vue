@@ -74,7 +74,7 @@ function handleToggled() {
                 :class="props.todo.capybara.classes"
             >
                 <template #event-modal-body>
-                    <TodoCard :todo="props.todo" />
+                    <TodoCard :todo="props.todo" :interactive="false" />
                 </template>
             </ActionButtons>
         </div>

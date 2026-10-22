@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Concerns\FormatsHumanDates;
 use App\Models\Todo;
+use App\Services\ReactionService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -42,6 +43,7 @@ class TodoResource extends JsonResource
 
         return [
             'id' => $this->resource->id,
+            'reactions' => $this->whenLoaded('reactions', fn (): array => app(ReactionService::class)->summarize($this->resource)),
             'title' => $this->resource->title,
             'description' => $description,
             'description_without_meta' => $descriptionWithoutMeta ?? $description,

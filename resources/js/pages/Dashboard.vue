@@ -5,6 +5,7 @@ import NearestCountdownCard from '@/components/dashboard/NearestCountdownCard.vu
 import EventFilterForm from '@/components/events/EventFilterForm.vue';
 import EventsList from '@/components/events/EventsList.vue';
 import TodosList from '@/components/todos/TodosList.vue';
+import { provideItemReactions } from '@/composables/useItemReactions';
 import { useRefreshAt } from '@/composables/useRefreshAt';
 import AuthenticatedLayout from '@/layouts/app/AuthenticatedLayout.vue';
 import { Capybara } from '@/types/Capybara';
@@ -34,6 +35,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+provideItemReactions();
 
 const upcomingEvents = computed(() =>
     props.dashboardMonths.data.flatMap((month) => month.events),

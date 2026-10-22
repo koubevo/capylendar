@@ -1,4 +1,5 @@
 import type { Capybara } from '@/types/Capybara';
+import type { ReactionOption } from '@/types/Reaction';
 import type { RelationshipMenuSummary } from '@/types/Relationship';
 import { InertiaLinkProps } from '@inertiajs/vue3';
 import type { LucideIcon } from 'lucide-vue-next';
@@ -29,6 +30,7 @@ export type AppPageProps<
     vapidPublicKey?: string;
     version: string;
     relationshipSummary: RelationshipMenuSummary | null;
+    reactionOptions: ReactionOption[];
 };
 
 export interface User {

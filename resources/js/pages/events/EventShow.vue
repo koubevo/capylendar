@@ -82,7 +82,7 @@ useRefreshAt(
                 :class="props.event.capybara.classes"
             >
                 <template #event-modal-body>
-                    <EventCard :event="props.event" />
+                    <EventCard :event="props.event" :interactive="false" />
                 </template>
             </ActionButtons>
         </div>

@@ -4,9 +4,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventImageController;
+use App\Http\Controllers\EventReactionController;
 use App\Http\Controllers\EventSurpriseController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TodoController;
+use App\Http\Controllers\TodoReactionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -19,6 +21,11 @@ Route::get('/', function () {
 })->name('landingPage');
 
 Route::middleware(['auth'])->group(function () {
+    Route::put('/event/{event}/reactions/{reaction}', [EventReactionController::class, 'store'])->name('event.reactions.store');
+    Route::delete('/event/{event}/reactions/{reaction}', [EventReactionController::class, 'destroy'])->name('event.reactions.destroy');
+    Route::put('/todo/{todo}/reactions/{reaction}', [TodoReactionController::class, 'store'])->name('todo.reactions.store');
+    Route::delete('/todo/{todo}/reactions/{reaction}', [TodoReactionController::class, 'destroy'])->name('todo.reactions.destroy');
+
     Route::get('/dashboard', DashboardController::class)
         ->name('dashboard');
 

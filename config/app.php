@@ -138,4 +138,6 @@ return [
     ],
 
     'heart_keywords' => explode(',', env('APP_EVENT_HEART_KEYWORDS', '')),
+
+    'preview_password' => env('PREVIEW_PASSWORD'),
 ];

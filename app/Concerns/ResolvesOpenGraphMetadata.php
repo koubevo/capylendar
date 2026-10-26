@@ -10,6 +10,7 @@ use GuzzleHttp\Psr7\UriResolver;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Throwable;
 
 use function Illuminate\Support\defer;
@@ -110,7 +111,76 @@ trait ResolvesOpenGraphMetadata
      */
     private function fetchMapPreview(string $mapUrl): ?array
     {
-        $currentUrl = $mapUrl;
+        $page = $this->fetchMapPage($mapUrl);
+
+        if ($page === null) {
+            return null;
+        }
+
+        $placeQuery = $this->findPlaceQuery($page['url']);
+
+        // Without coordinates in the URL, Google centers the preview on the server's location.
+        if (! preg_match('#/@-?\d#', $page['url'])) {
+            $coordinates = $placeQuery === null ? null : $this->lookupCoordinates($placeQuery);
+            $page = $coordinates === null ? null : $this->fetchMapPage("https://www.google.com/maps/@{$coordinates},16z");
+        }
+
+        $metadata = $page === null ? null : $this->parseOpenGraphMetadata($page['html'], $page['url']);
+
+        if ($metadata === null) {
+            return null;
+        }
+
+        $placeName = $placeQuery === null ? '' : trim(Str::before($placeQuery, ','));
+
+        return [
+            'title' => $placeName === '' || is_numeric($placeName) ? $metadata['title'] : Str::limit($placeName, 120),
+            'image' => $metadata['image'],
+            'url' => $mapUrl,
+        ];
+    }
+
+    private function findPlaceQuery(string $url): ?string
+    {
+        parse_str((string) parse_url($url, PHP_URL_QUERY), $query);
+
+        $placeQuery = $query['q'] ?? $query['query'] ?? null;
+
+        if (is_string($placeQuery) && trim($placeQuery) !== '') {
+            return trim($placeQuery);
+        }
+
+        if (preg_match('#/maps/place/([^/?]+)#', $url, $matches)) {
+            return trim(urldecode($matches[1]));
+        }
+
+        return null;
+    }
+
+    private function lookupCoordinates(string $placeQuery): ?string
+    {
+        if (preg_match('/^(-?\d{1,3}\.\d+),\s*(-?\d{1,3}\.\d+)$/', $placeQuery, $matches)) {
+            return "{$matches[1]},{$matches[2]}";
+        }
+
+        $page = $this->fetchMapPage('https://www.google.com/maps?'.http_build_query([
+            'q' => $placeQuery,
+            'output' => 'embed',
+        ]));
+
+        if ($page === null || ! preg_match('/"0x[\da-f]+:0x[\da-f]+","(?:[^"\\\\]|\\\\.)*",\[(-?\d{1,3}\.\d+),(-?\d{1,3}\.\d+)\]/', $page['html'], $matches)) {
+            return null;
+        }
+
+        return "{$matches[1]},{$matches[2]}";
+    }
+
+    /**
+     * @return array{url: string, html: string}|null
+     */
+    private function fetchMapPage(string $url): ?array
+    {
+        $currentUrl = $url;
 
         for ($redirectCount = 0; $redirectCount <= self::MAP_PREVIEW_MAX_REDIRECTS; $redirectCount++) {
             if (! $this->isAllowedMapUrl($currentUrl)) {
@@ -157,15 +227,7 @@ trait ResolvesOpenGraphMetadata
                 return null;
             }
 
-            $metadata = $this->parseOpenGraphMetadata($html, $currentUrl);
-            if ($metadata === null) {
-                return null;
-            }
-
-            return [
-                ...$metadata,
-                'url' => $mapUrl,
-            ];
+            return ['url' => $currentUrl, 'html' => $html];
         }
 
         return null;

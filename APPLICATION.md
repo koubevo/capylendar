@@ -68,7 +68,11 @@ event must fall back to an empty configuration state.
 
 Events may have shared color tags. A Google Maps URL in the description can be
 resolved into a map OpenGraph preview when a title and image are available. The
-same applies to todos. Saving never waits for the lookup: it runs as
+same applies to todos. The preview is centered on the shared place: a link
+without coordinates (typically a mobile share link) is resolved through
+Google's place lookup, and when the place cannot be located no preview is
+stored rather than a map centered on the server's location. The preview title is
+the place name from the link when available, otherwise Google's page title. Saving never waits for the lookup: it runs as
 post-response deferred work without a queue worker, so a new preview appears on
 the next page load. The deferred result is discarded when the description
 changed in the meantime, and storing it does not mark the item as edited.
@@ -191,7 +195,9 @@ Deleted or missing items are not valid reaction targets.
 
 List cards and item detail group reactions by user as a capybara avatar followed
 by that user's selected emoji, without a visible name. A compact emoji-only
-picker adds or removes the authenticated user's reactions.
+picker adds or removes the authenticated user's reactions. An item without
+reactions shows no reaction row; only a small add-reaction button sits in the
+card corner so the card keeps its height.
 Reaction responses expose only the user's ID, name, and capybara, never their
 email or authentication data. Guest examples and trash cards have no reaction
 controls.

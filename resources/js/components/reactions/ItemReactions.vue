@@ -92,6 +92,10 @@ const hasContent = computed(
     () => canInteract.value || userEntries.value.length > 0,
 );
 
+const isCompact = computed(
+    () => userEntries.value.length === 0 && errorEntries.value.length === 0,
+);
+
 const isActive = (group: ReactionGroup | undefined): boolean =>
     Boolean(group?.users.some((user) => user.id === currentUser.value?.id));
 
@@ -112,7 +116,12 @@ function reactionUserFromAuth(user: User): ReactionUser {
 <template>
     <div
         v-if="hasContent"
-        class="border-t border-black/5 px-4 py-2 dark:border-white/10"
+        :class="
+            isCompact
+                ? 'absolute right-1.5 bottom-1.5'
+                : 'border-t border-black/5 px-4 py-2 dark:border-white/10'
+        "
+        data-reaction-bar
         @click.stop
     >
         <div class="flex flex-wrap items-center gap-2">
@@ -129,9 +138,14 @@ function reactionUserFromAuth(user: User): ReactionUser {
                     size="xs"
                     variant="ghost"
                     color="neutral"
-                    icon="i-lucide-plus"
+                    :icon="isCompact ? 'i-lucide-smile-plus' : 'i-lucide-plus'"
                     aria-label="Přidat reakci"
                     title="Přidat reakci"
+                    :class="
+                        isCompact
+                            ? 'rounded-full bg-white/80 text-gray-500 shadow-sm ring-1 ring-black/5 dark:bg-gray-900/70 dark:text-gray-300 dark:ring-white/10'
+                            : ''
+                    "
                     @click.stop
                 />
 

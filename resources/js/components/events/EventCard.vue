@@ -29,7 +29,7 @@ const descriptionIsOnlyLinks = computed(() =>
 </script>
 
 <template>
-    <UCard :class="props.event.capybara.classes" class="event-card">
+    <UCard :class="props.event.capybara.classes" class="event-card relative">
         <component :is="contentComponent" :href="props.href" class="block">
             <div
                 class="flex items-center justify-between p-4"

@@ -593,6 +593,11 @@ const detailHtml = await render(itemReactions, {
         { key: 'love', users: [partner] },
     ],
 });
+const emptyHtml = await render(itemReactions, {
+    itemType: 'event',
+    itemId: 7,
+    reactions: [],
+});
 runtime.renderPickerContent = true;
 const pickerHtml = await render(itemReactions, {
     itemType: 'event',
@@ -625,6 +630,11 @@ return {
     detailGroupsByUser:
         (detailHtml.match(/data-reaction-user/g) ?? []).length === 2,
     detailKeepsEmojiOrder: emojiAppearInOrder(detailHtml, ['❤️', '🙏']),
+    emptyHasCompactPicker:
+        emptyHtml.includes('Přidat reakci') &&
+        emptyHtml.includes('absolute') &&
+        !emptyHtml.includes('border-t') &&
+        !listHtml.includes('absolute'),
     pickerShowsAll: options.every(
         option => pickerHtml.includes(option.label) && pickerHtml.includes(option.emoji),
     ),
@@ -648,6 +658,7 @@ JS);
         'listHasPicker' => true,
         'detailGroupsByUser' => true,
         'detailKeepsEmojiOrder' => true,
+        'emptyHasCompactPicker' => true,
         'pickerShowsAll' => true,
         'pickerKeepsEmojiOrder' => true,
         'pickerHidesLabels' => true,

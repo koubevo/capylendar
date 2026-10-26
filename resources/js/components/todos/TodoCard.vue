@@ -70,7 +70,7 @@ function handleFinish(event: MouseEvent) {
 
 <template>
     <UCard
-        class="todo-card overflow-hidden p-0 transition-all duration-300"
+        class="todo-card relative overflow-hidden p-0 transition-all duration-300"
         :class="[
             props.todo.capybara.classes,
             props.todo.is_finished ? 'opacity-75' : '',

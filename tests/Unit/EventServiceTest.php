@@ -67,7 +67,7 @@ describe('EventService update', function () {
 
 describe('EventService resolveMetadata', function () {
     it('resolves map preview from google maps url', function () {
-        $url = 'https://maps.app.goo.gl/test';
+        $url = 'https://www.google.com/maps/@50.08,14.42,17z';
 
         Http::fake([
             $url => Http::response(
@@ -88,7 +88,7 @@ describe('EventService resolveMetadata', function () {
     });
 
     it('resolves map preview without being redirected to the google consent page', function () {
-        $url = 'https://maps.app.goo.gl/consent';
+        $url = 'https://www.google.com/maps/@50.08,14.42,17z';
 
         Http::fake(fn ($request) => str_contains($request->header('Cookie')[0] ?? '', 'SOCS=')
             ? Http::response(
@@ -106,8 +106,59 @@ describe('EventService resolveMetadata', function () {
         expect($result['map_preview']['title'])->toBe('Map Location');
     });
 
+    it('centers the map preview on the shared place when the link has no coordinates', function () {
+        $shortUrl = 'https://maps.app.goo.gl/mobile';
+
+        Http::fake([
+            $shortUrl => Http::response('', 302, [
+                'Location' => 'https://www.google.com/maps?q=Kav%C3%A1rna+Slavia,+Smetanovo+n%C3%A1b%C5%99e%C5%BE%C3%AD&ftid=0x1:0x2',
+            ]),
+            'https://www.google.com/maps?q=Kav*output=embed' => Http::response(
+                '<script>initEmbed([["0x1:0x2","Café \\"Slavia\\", Prague",[50.0815,14.4135]]])</script>',
+            ),
+            'https://www.google.com/maps?q=Kav*' => Http::response('<html>Google Maps</html>'),
+            'https://www.google.com/maps/@50.0815,14.4135,16z' => Http::response(
+                '<meta property="og:title" content="Google Maps"><meta property="og:image" content="https://maps.google.com/staticmap?center=50.0815,14.4135">',
+            ),
+        ]);
+
+        $method = new ReflectionMethod(EventService::class, 'resolveMetadata');
+
+        $result = $method->invoke($this->eventService, "Sraz: $shortUrl");
+
+        expect($result['map_preview'])->toBe([
+            'title' => 'Kavárna Slavia',
+            'image' => 'https://maps.google.com/staticmap?center=50.0815,14.4135',
+            'url' => $shortUrl,
+        ]);
+    });
+
+    it('uses the place name from a google maps place link', function () {
+        $url = 'https://www.google.com/maps/place/Pra%C5%BEsk%C3%BD+hrad/@50.091,14.4005,17z';
+
+        Http::fake([
+            $url => Http::response('<meta property="og:title" content="Google Maps"><meta property="og:image" content="https://example.com/image.jpg">'),
+        ]);
+
+        $method = new ReflectionMethod(EventService::class, 'resolveMetadata');
+
+        expect($method->invoke($this->eventService, $url)['map_preview']['title'])->toBe('Pražský hrad');
+    });
+
+    it('does not show a map preview centered on the server location when the place is unknown', function () {
+        $url = 'https://maps.app.goo.gl/unknown';
+
+        Http::fake([
+            $url => Http::response('<meta property="og:title" content="Google Maps"><meta property="og:image" content="https://example.com/frankfurt.jpg">'),
+        ]);
+
+        $method = new ReflectionMethod(EventService::class, 'resolveMetadata');
+
+        expect($method->invoke($this->eventService, $url))->toBeNull();
+    });
+
     it('preserves utf-8 map preview titles without a charset declaration', function () {
-        $url = 'https://maps.app.goo.gl/utf8';
+        $url = 'https://www.google.com/maps/@49.81,15.47,17z';
         $title = "\u{010C}esk\u{00FD} Krumlov \u{2013} n\u{00E1}m\u{011B}st\u{00ED}";
 
         Http::fake([
@@ -127,7 +178,7 @@ describe('EventService resolveMetadata', function () {
     });
 
     it('rejects insecure preview images', function () {
-        $url = 'https://maps.app.goo.gl/insecure-image';
+        $url = 'https://www.google.com/maps/@50.08,14.42,17z';
 
         Http::fake([
             $url => Http::response(

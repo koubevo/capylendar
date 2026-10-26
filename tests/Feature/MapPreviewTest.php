@@ -7,7 +7,7 @@ use App\Models\Todo;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 
-const MAP_PREVIEW_URL = 'https://maps.app.goo.gl/place';
+const MAP_PREVIEW_URL = 'https://www.google.com/maps/place/Kav%C3%A1rna/@50.08,14.42,17z';
 
 function fakeMapPreview(?Closure $beforeResponse = null): void
 {

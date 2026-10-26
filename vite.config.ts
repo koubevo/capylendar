@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
     return {
         resolve: {
             alias: {
-                '@': path.resolve(__dirname, './resources/js'),
+                '@': path.resolve(import.meta.dirname, './resources/js'),
             },
         },
         plugins: [

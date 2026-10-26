@@ -67,8 +67,15 @@ web, phone, and watch surface. A removed or inaccessible manually selected
 event must fall back to an empty configuration state.
 
 Events may have shared color tags. A Google Maps URL in the description can be
-resolved into a map OpenGraph preview when a title and image are available. If
-the remote lookup fails, the event remains valid without a preview. Preview
+resolved into a map OpenGraph preview when a title and image are available. The
+same applies to todos. Saving never waits for the lookup: it runs as
+post-response deferred work without a queue worker, so a new preview appears on
+the next page load. The deferred result is discarded when the description
+changed in the meantime, and storing it does not mark the item as edited.
+Changing the description clears the old preview immediately. An unchanged
+description keeps its existing preview without a new lookup, while a missing
+preview is retried on the next save. If the remote lookup fails, the item
+remains valid without a preview. Preview
 lookups accept HTTPS Google Maps URLs only, validate every redirect against the
 explicit Google Maps host allowlist, follow at most three redirects, use short
 connection and response timeouts, and read at most 1 MiB of HTML. Preview image

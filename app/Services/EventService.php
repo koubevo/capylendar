@@ -60,7 +60,6 @@ class EventService
 
         /** @var array<int> $tags */
         $tags = $request->input('tags', []);
-        $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
 
         $newImagePath = null;
         $newSurpriseImagePath = null;
@@ -76,7 +75,7 @@ class EventService
                 $eventData = [...$eventData, ...$this->surpriseAttributes($request, $newSurpriseImagePath)];
             }
 
-            return DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $tags) {
+            $event = DB::transaction(function () use ($author, $eventData, $isPrivateEvent, $tags) {
                 $event = $author->authoredEvents()->create($eventData);
 
                 $this->eventUserService->assignSubscribers($event, $isPrivateEvent, $author);
@@ -90,6 +89,10 @@ class EventService
 
             throw $e;
         }
+
+        $this->resolveMetadataAfterResponse($event);
+
+        return $event;
     }
 
     public function update(Event $event, UpdateEventRequest $request): ?Event
@@ -104,7 +107,10 @@ class EventService
 
         /** @var array<int> $tags */
         $tags = $request->input('tags', []);
-        $eventData['meta'] = $this->resolveMetadata($eventData['description'] ?? null);
+
+        if (array_key_exists('description', $eventData) && $eventData['description'] !== $event->description) {
+            $eventData['meta'] = null;
+        }
 
         $oldImagePath = $event->image_path;
         $newImagePath = null;
@@ -152,6 +158,8 @@ class EventService
         if ($oldSurpriseImagePath && $event->surprise_image_path !== $oldSurpriseImagePath) {
             Storage::disk()->delete($oldSurpriseImagePath);
         }
+
+        $this->resolveMetadataAfterResponse($result);
 
         return $result;
     }

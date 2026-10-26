@@ -2,6 +2,8 @@
 
 namespace App\Concerns;
 
+use App\Models\Event;
+use App\Models\Todo;
 use DOMDocument;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\Psr7\UriResolver;
@@ -10,6 +12,8 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
+use function Illuminate\Support\defer;
+
 trait ResolvesOpenGraphMetadata
 {
     private const int MAP_PREVIEW_MAX_RESPONSE_BYTES = 1048576;
@@ -17,6 +21,12 @@ trait ResolvesOpenGraphMetadata
     private const int MAP_PREVIEW_MAX_REDIRECTS = 3;
 
     private const int MAP_PREVIEW_TIMEOUT_SECONDS = 5;
+
+    /**
+     * Rejects optional cookies so Google serves the page instead of
+     * redirecting EU requests to consent.google.com.
+     */
+    private const string MAP_PREVIEW_CONSENT_COOKIE = 'SOCS=CAI';
 
     /** @var list<string> */
     private const array MAP_PREVIEW_ALLOWED_HOSTS = [
@@ -27,6 +37,28 @@ trait ResolvesOpenGraphMetadata
         'maps.google.com',
         'maps.app.goo.gl',
     ];
+
+    private function resolveMetadataAfterResponse(Event|Todo $item): void
+    {
+        $description = $item->description;
+
+        if ($item->meta !== null || $description === null || $this->findMapUrl($description) === null) {
+            return;
+        }
+
+        defer(function () use ($item, $description): void {
+            $meta = $this->resolveMetadata($description);
+
+            if ($meta === null) {
+                return;
+            }
+
+            $item::withoutTimestamps(fn () => $item->newQueryWithoutScopes()
+                ->whereKey($item->id)
+                ->where('description', $description)
+                ->update(['meta' => json_encode($meta)]));
+        }, 'map-preview:'.$item->getTable().':'.$item->id);
+    }
 
     /**
      * @return array<string, mixed>|null
@@ -49,13 +81,11 @@ trait ResolvesOpenGraphMetadata
      */
     private function resolveMapPreview(string $description): ?array
     {
-        $pattern = '/https:\/\/(?:www\.)?(?:google\.(?:com|cz)\/maps\/[^\s<>"\']+|maps\.app\.goo\.gl\/[^\s<>"\']+)/';
+        $mapUrl = $this->findMapUrl($description);
 
-        if (! preg_match($pattern, $description, $matches)) {
+        if ($mapUrl === null) {
             return null;
         }
-
-        $mapUrl = $matches[0];
 
         try {
             return $this->fetchMapPreview($mapUrl);
@@ -66,6 +96,13 @@ trait ResolvesOpenGraphMetadata
 
             return null;
         }
+    }
+
+    private function findMapUrl(string $description): ?string
+    {
+        $pattern = '/https:\/\/(?:www\.)?(?:google\.(?:com|cz)\/maps\/[^\s<>"\']+|maps\.app\.goo\.gl\/[^\s<>"\']+)/';
+
+        return preg_match($pattern, $description, $matches) ? $matches[0] : null;
     }
 
     /**
@@ -84,6 +121,7 @@ trait ResolvesOpenGraphMetadata
 
             $response = Http::accept('text/html')
                 ->withUserAgent('Capylendar map preview')
+                ->withHeaders(['Cookie' => self::MAP_PREVIEW_CONSENT_COOKIE])
                 ->connectTimeout(2)
                 ->timeout(self::MAP_PREVIEW_TIMEOUT_SECONDS)
                 ->withoutRedirecting()

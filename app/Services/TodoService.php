@@ -33,9 +33,8 @@ class TodoService
 
         /** @var array<int> $tags */
         $tags = $request->input('tags', []);
-        $todoData['meta'] = $this->resolveMetadata($todoData['description'] ?? null);
 
-        return DB::transaction(function () use ($author, $todoData, $isPrivateTodo, $tags) {
+        $todo = DB::transaction(function () use ($author, $todoData, $isPrivateTodo, $tags) {
             $todo = $author->authoredTodos()->create($todoData);
 
             $this->todoUserService->assignSubscribers($todo, $isPrivateTodo, $author);
@@ -44,6 +43,10 @@ class TodoService
 
             return $todo;
         });
+
+        $this->resolveMetadataAfterResponse($todo);
+
+        return $todo;
     }
 
     public function update(Todo $todo, UpdateTodoRequest $request): ?Todo
@@ -58,17 +61,22 @@ class TodoService
 
         /** @var array<int> $tags */
         $tags = $request->input('tags', []);
-        $todoData['meta'] = $this->resolveMetadata($todoData['description'] ?? null);
 
-        return DB::transaction(function () use ($author, $todoData, $isPrivateTodo, $todo, $tags) {
+        if (array_key_exists('description', $todoData) && $todoData['description'] !== $todo->description) {
+            $todoData['meta'] = null;
+        }
+
+        DB::transaction(function () use ($author, $todoData, $isPrivateTodo, $todo, $tags) {
             $todo->update($todoData);
 
             $this->todoUserService->assignSubscribers($todo, $isPrivateTodo, $author);
 
             $this->todoTagService->assignTags($todo, $tags);
-
-            return $todo;
         });
+
+        $this->resolveMetadataAfterResponse($todo);
+
+        return $todo;
     }
 
     public function finish(Todo $todo): Todo

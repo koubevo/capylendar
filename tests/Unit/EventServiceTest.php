@@ -87,6 +87,25 @@ describe('EventService resolveMetadata', function () {
         expect($result['map_preview']['url'])->toBe($url);
     });
 
+    it('resolves map preview without being redirected to the google consent page', function () {
+        $url = 'https://maps.app.goo.gl/consent';
+
+        Http::fake(fn ($request) => str_contains($request->header('Cookie')[0] ?? '', 'SOCS=')
+            ? Http::response(
+                '<meta property="og:title" content="Map Location"><meta property="og:image" content="https://example.com/image.jpg">',
+                200,
+                ['Content-Type' => 'text/html; charset=UTF-8'],
+            )
+            : Http::response('', 302, ['Location' => 'https://consent.google.com/ml?continue='.$url]));
+
+        $method = new ReflectionMethod(EventService::class, 'resolveMetadata');
+        $method->setAccessible(true);
+
+        $result = $method->invoke($this->eventService, "Location: $url");
+
+        expect($result['map_preview']['title'])->toBe('Map Location');
+    });
+
     it('preserves utf-8 map preview titles without a charset declaration', function () {
         $url = 'https://maps.app.goo.gl/utf8';
         $title = "\u{010C}esk\u{00FD} Krumlov \u{2013} n\u{00E1}m\u{011B}st\u{00ED}";
